@@ -1,0 +1,33 @@
+color:
+  palette:
+    ink: "#1f2933"
+    slate: "#64748b"
+    grid: "#e7ecf1"
+    paper: "#ffffff"
+    teal: "#0f9b8e"
+    blue: "#2563eb"
+    amber: "#d97706"
+    red: "#dc2626"
+  foreground: ink
+  background: paper
+  primary: blue
+  secondary: slate
+  success: teal
+  info: blue
+  warning: amber
+  danger: red
+
+typography:
+  fonts:
+    - family: Inter
+      source: google
+      weight: [400, 500, 600, 700]
+  base:
+    family: Inter
+    size: 18px
+    line-height: 1.65
+  headings:
+    family: Inter
+    weight: 600
+  link:
+    color: blue

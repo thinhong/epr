@@ -1,0 +1,378 @@
+(function () {
+  "use strict";
+
+  function init() {
+    if (!window.EPR) return;
+    EPR.injectStyles();
+    injectGameStyles();
+    var mount = document.getElementById("cusum-game");
+    if (!mount) return;
+    if (mount.getAttribute("data-built") === "1") return;
+    mount.setAttribute("data-built", "1");
+    build(mount);
+  }
+
+  function injectGameStyles() {
+    if (document.getElementById("epr-cusum-styles")) return;
+    var css =
+      ".epr-fig .epr-hint{font-size:1.05rem;color:var(--ink);margin:8px 0 12px;min-height:2.6em;background:var(--surfaceAlt);border-radius:10px;padding:10px 13px;border-left:4px solid var(--accent)}" +
+      ".epr-fig .epr-hint.good{border-left-color:var(--expected)}.epr-fig .epr-hint.warn{border-left-color:var(--alarm)}.epr-fig .epr-hint.bad{border-left-color:var(--alarmStrong)}" +
+      ".epr-fig .epr-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 2px}" +
+      ".epr-fig .epr-seg{display:inline-flex;border:1px solid var(--grid);border-radius:10px;overflow:hidden}" +
+      ".epr-fig .epr-seg button{appearance:none;border:0;background:var(--surface);color:var(--muted);font:inherit;font-size:.92rem;font-weight:500;padding:8px 13px;min-height:40px;cursor:pointer}" +
+      ".epr-fig .epr-seg button.on{background:var(--accent);color:#fff}" +
+      ".epr-fig .epr-dials{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 22px;margin-top:12px}" +
+      ".epr-fig .epr-group{border:1px solid var(--grid);border-radius:12px;padding:10px 13px}" +
+      ".epr-fig .epr-group h4{margin:0 0 6px;font-size:.92rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}" +
+      ".epr-fig .epr-hints2{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}" +
+      ".epr-fig .epr-spin{font-variant-numeric:tabular-nums}";
+    var s = document.createElement("style");
+    s.id = "epr-cusum-styles"; s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  var NS = "http://www.w3.org/2000/svg";
+  function svg(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function clear(n) { while (n && n.firstChild) n.removeChild(n.firstChild); }
+  function lin(d0, d1, r0, r1) { return function (v) { return r0 + (v - d0) / (d1 - d0) * (r1 - r0); }; }
+
+  var N = 64, MU0 = 500;
+  var SPEІ = { Slow: 720, Normal: 430, Fast: 240 };
+
+  function build(mount) {
+    var C = EPR.colors();
+    var st = {
+      sigma: 3, delta: 4, K: 1.5, H: 15,
+      step: 0, playing: false, timer: null, waterTween: null, bellTimer: null,
+      speed: "Normal",
+      chartMode: "tank", ghost: false, formula: false,
+      round: null, stopIndex: null, revealed: false, ended: false
+    };
+
+    mount.innerHTML =
+      '<div class="epr-fig">' +
+        '<div class="epr-head"><div><div class="epr-kicker">Process control, 1954</div>' +
+        '<div class="epr-title">The suspicion tank</div></div></div>' +
+        '<div class="epr-hint" id="g-hint"></div>' +
+        '<svg class="epr-stage" id="g-stage" viewBox="0 0 760 300" role="img" aria-label="A bottle filling line and a suspicion tank"></svg>' +
+        '<div class="epr-bar">' +
+          '<span class="epr-seg" id="g-mode"><button data-m="tank" class="on">Tank level</button><button data-m="raw">Raw weights + 3&sigma;</button></span>' +
+          '<button class="epr-chiptog" id="g-ghost">No-floor ghost</button>' +
+          '<button class="epr-chiptog" id="g-formula">Formula</button>' +
+        '</div>' +
+        '<svg class="epr-chart" id="g-chart" viewBox="0 0 760 230" role="img" aria-label="CUSUM chart"></svg>' +
+        '<div id="g-formula-box"></div>' +
+        '<div class="epr-readouts" id="g-read"></div>' +
+        '<div class="epr-result" id="g-result"></div>' +
+        '<div class="epr-controls">' +
+          '<button class="epr-btn primary" id="g-play">&#9654; Play</button>' +
+          '<button class="epr-btn danger" id="g-stop">&#9209; STOP the line</button>' +
+          '<button class="epr-btn" id="g-new">&#8635; New round</button>' +
+          '<span class="epr-spacer"></span>' +
+          '<span class="epr-seg" id="g-speed"><button data-s="Slow">Slow</button><button data-s="Normal" class="on">Normal</button><button data-s="Fast">Fast</button></span>' +
+        '</div>' +
+        '<div class="epr-dials">' +
+          '<div class="epr-group"><h4>The line (the world)</h4>' +
+            dial("g-delta", "drift size &delta;", 0, 9, 0.5, st.delta, "g") +
+            dial("g-sigma", "noise &sigma;", 1.5, 5, 0.5, st.sigma, "g") + '</div>' +
+          '<div class="epr-group"><h4>Your rule (the tank)</h4>' +
+            dial("g-k", "allowance K (the leak)", 0.5, 4, 0.5, st.K, "g") +
+            dial("g-h", "threshold H (the rim)", 6, 26, 1, st.H, "g") +
+            '<div class="epr-hints2" id="g-arl"></div></div>' +
+        '</div>' +
+      '</div>';
+
+    var $ = function (id) { return mount.querySelector(id); };
+    var stage = $("#g-stage"), chart = $("#g-chart"), hint = $("#g-hint"),
+        read = $("#g-read"), result = $("#g-result"), formulaBox = $("#g-formula-box"), arl = $("#g-arl");
+
+    // ---- stage scaffold ----
+    var S = {};
+    buildStage();
+    function buildStage() {
+      clear(stage);
+      var g = svg("g", {}, stage);
+      svg("text", { x: 30, y: 24, "font-size": 17, "font-weight": 600, fill: C.ink }, g).textContent = "Filling line";
+      svg("rect", { x: 26, y: 214, width: 470, height: 16, rx: 8, fill: C.grid }, g);
+      [70, 150, 230, 310, 390, 470].forEach(function (cx) { svg("circle", { cx: cx, cy: 222, r: 4, fill: "#cfd8e3" }, g); });
+      svg("rect", { x: 150, y: 70, width: 64, height: 60, rx: 8, fill: "#eef2f6", stroke: C.muted, "stroke-width": 1.5 }, g);
+      svg("rect", { x: 176, y: 130, width: 12, height: 22, fill: C.muted }, g);
+      svg("text", { x: 182, y: 62, "font-size": 13, "font-weight": 600, fill: C.muted, "text-anchor": "middle" }, g).textContent = "pump";
+      svg("rect", { x: 306, y: 230, width: 48, height: 7, rx: 2, fill: C.muted }, g);
+      svg("line", { x1: 330, y1: 150, x2: 330, y2: 214, stroke: C.expected, "stroke-width": 1.5, "stroke-dasharray": "4 5", opacity: 0.7 }, g);
+      svg("text", { x: 330, y: 146, "font-size": 12.5, fill: C.expected, "text-anchor": "middle" }, g).textContent = "target 500 g";
+      svg("rect", { x: 452, y: 192, width: 44, height: 40, rx: 4, fill: C.surfaceAlt, stroke: C.muted, "stroke-width": 1.5 }, g);
+      svg("text", { x: 474, y: 248, "font-size": 12.5, fill: C.muted, "text-anchor": "middle" }, g).textContent = "ship";
+      [70, 110].forEach(function (qx) { drawJar(g, qx, 214, MU0, 0.5); });
+      S.jarG = svg("g", {}, g);
+      S.wBubble = svg("g", { opacity: 0 }, g);
+      svg("rect", { x: 300, y: 96, width: 60, height: 30, rx: 8, fill: C.ink }, S.wBubble);
+      S.wText = svg("text", { x: 330, y: 116, "font-size": 17, "font-weight": 700, fill: "#fff", "text-anchor": "middle" }, S.wBubble);
+      // tank
+      var tg = svg("g", {}, g);
+      svg("rect", { x: 600, y: 44, width: 118, height: 208, rx: 14, fill: C.surface, stroke: C.ink, "stroke-width": 2 }, tg);
+      S.water = svg("rect", { x: 606, y: 244, width: 106, height: 0, rx: 6, fill: C.accent, opacity: 0.55 }, tg);
+      S.rim = svg("line", { x1: 600, y1: 120, x2: 718, y2: 120, stroke: C.alarmStrong, "stroke-width": 2, "stroke-dasharray": "6 4" }, tg);
+      S.rimLabel = svg("text", { x: 724, y: 124, "font-size": 14, "font-weight": 600, fill: C.alarmStrong }, tg);
+      S.rimLabel.textContent = "H";
+      svg("text", { x: 659, y: 270, "font-size": 13.5, "font-weight": 600, fill: C.ink, "text-anchor": "middle" }, tg).textContent = "suspicion tank";
+      S.bellG = svg("g", { transform: "translate(659,30)" }, tg);
+      S.bell = svg("path", { d: "M -8 4 Q -8 -8 0 -8 Q 8 -8 8 4 L 10 8 L -10 8 Z", fill: "#cbd5e1", stroke: C.muted, "stroke-width": 1 }, S.bellG);
+      svg("circle", { cx: 0, cy: 10, r: 2, fill: C.muted }, S.bellG);
+    }
+    function drawJar(parent, x, baseY, weight, opacity) {
+      var g = svg("g", { transform: "translate(" + x + "," + baseY + ")", opacity: opacity == null ? 1 : opacity }, parent);
+      svg("rect", { x: -15, y: -44, width: 30, height: 42, rx: 6, fill: "#eaf2fb", stroke: C.muted, "stroke-width": 1.3 }, g);
+      var lh = EPR.clamp(lin(485, 515, 6, 36)(weight), 5, 38);
+      svg("rect", { x: -12, y: -3 - lh, width: 24, height: lh, rx: 4, fill: C.accent, opacity: 0.5 }, g);
+      svg("rect", { x: -7, y: -50, width: 14, height: 7, fill: "#eaf2fb", stroke: C.muted, "stroke-width": 1.3 }, g);
+      svg("rect", { x: -9, y: -55, width: 18, height: 5, rx: 2, fill: C.muted }, g);
+      return g;
+    }
+    function setJar(weight, animate) {
+      clear(S.jarG);
+      var bad = Math.abs(weight - MU0) > 3 * st.sigma;
+      var g = drawJar(S.jarG, 330, 214, weight, 1);
+      if (bad) g.querySelector("rect").setAttribute("stroke", C.alarm);
+      S.wText.textContent = Math.round(weight) + " g";
+      S.wBubble.setAttribute("opacity", 1);
+      if (animate && !EPR.reducedMotion()) {
+        g.setAttribute("transform", "translate(258,214)");
+        EPR.tween(258, 330, 260, function (v) { g.setAttribute("transform", "translate(" + v + ",214)"); });
+      }
+    }
+    function setTank(val, animate) {
+      var tankMax = Math.max(st.H * 1.7, 22), innerBottom = 244, innerH = 196;
+      var target = EPR.clamp(val / tankMax, 0, 1.06) * innerH;
+      var yH = innerBottom - (st.H / tankMax) * innerH;
+      S.rim.setAttribute("y1", yH); S.rim.setAttribute("y2", yH); S.rimLabel.setAttribute("y", yH + 4);
+      var over = val > st.H;
+      S.water.setAttribute("fill", over ? C.alarmStrong : C.accent);
+      function apply(h) { S.water.setAttribute("height", h); S.water.setAttribute("y", innerBottom - h); }
+      if (st.waterTween) st.waterTween.stop();
+      var cur = parseFloat(S.water.getAttribute("height")) || 0;
+      if (animate) st.waterTween = EPR.tween(cur, target, 300, apply); else apply(target);
+      if (over) ringBell(); else stillBell();
+    }
+    function ringBell() {
+      S.bell.setAttribute("fill", "#fcd34d");
+      if (EPR.reducedMotion() || st.bellTimer) return;
+      var n = 0;
+      st.bellTimer = setInterval(function () {
+        n++; S.bellG.setAttribute("transform", "translate(659,30) rotate(" + (n % 2 ? 11 : -11) + ")");
+        if (n > 5) { clearInterval(st.bellTimer); st.bellTimer = null; S.bellG.setAttribute("transform", "translate(659,30)"); }
+      }, 95);
+    }
+    function stillBell() { if (st.bellTimer) { clearInterval(st.bellTimer); st.bellTimer = null; } S.bell.setAttribute("fill", "#cbd5e1"); S.bellG.setAttribute("transform", "translate(659,30)"); }
+
+    // ---- data ----
+    function newRound() {
+      var seed = Math.floor(Math.random() * 1e9);
+      var rnd = EPR.rng(seed), z = [];
+      for (var i = 0; i < N; i++) z.push(EPR.gauss(rnd));
+      var ds = 16 + Math.floor(rnd() * (N - 30));
+      st.round = { z: z, driftStart: ds, seed: seed };
+      st.step = 0; st.stopIndex = null; st.revealed = false; st.ended = false;
+      buildData(); stillBell();
+      result.classList.remove("show");
+      setHint("Press play. Somewhere the pump will quietly start over-filling. Hit <b>STOP the line</b> the moment you trust it has gone bad.", "");
+      render();
+    }
+    function buildData() {
+      var r = st.round;
+      var x = [];
+      for (var i = 0; i < N; i++) x.push(EPR.round(MU0 + (i >= r.driftStart ? st.delta : 0) + r.z[i] * st.sigma, 1));
+      r.x = x;
+      r.cusum = EPR.cusumUpper(x, MU0, st.K);
+      r.noFloor = EPR.cusumNoFloor(x, MU0, st.K);
+      r.alarmIdx = EPR.firstCross(r.cusum, st.H);
+    }
+
+    // ---- chart ----
+    var ML = 54, MR = 26, MT = 20, MB = 40, CW = 760, CH = 230;
+    function clampY(v) { return Math.max(MT, Math.min(CH - MB, v)); }
+    function drawChart() {
+      clear(chart);
+      var g = svg("g", {}, chart);
+      var x = lin(0, N - 1, ML, CW - MR);
+      var r = st.round, upto = st.step;
+      var rang = r.alarmIdx >= 0 && st.step >= r.alarmIdx;
+      if (st.chartMode === "raw") {
+        var y = lin(MU0 - 4.4 * st.sigma, MU0 + 4.4 * st.sigma, CH - MB, MT);
+        axis(g, x, y, [Math.round(MU0 - 3 * st.sigma), MU0, Math.round(MU0 + 3 * st.sigma)], "jar number");
+        svg("rect", { x: ML, y: y(MU0 + st.sigma), width: CW - MR - ML, height: y(MU0 - st.sigma) - y(MU0 + st.sigma), fill: C.band }, g);
+        svg("line", { x1: ML, y1: y(MU0), x2: CW - MR, y2: y(MU0), stroke: C.expected, "stroke-width": 1.6 }, g);
+        svg("text", { x: ML + 4, y: y(MU0) - 5, "font-size": 12.5, fill: C.expected }, g).textContent = "target 500 g";
+        [MU0 + 3 * st.sigma, MU0 - 3 * st.sigma].forEach(function (L, idx) {
+          svg("line", { x1: ML, y1: y(L), x2: CW - MR, y2: y(L), stroke: C.alarm, "stroke-width": 1.4, "stroke-dasharray": "5 4" }, g);
+          svg("text", { x: CW - MR, y: y(L) + (idx ? 15 : -6), "font-size": 12, fill: C.alarm, "text-anchor": "end" }, g).textContent = idx ? "lower 3σ" : "upper 3σ";
+        });
+        if (st.revealed) driftLine(g, x);
+        for (var i = 0; i <= upto; i++) {
+          var bad = Math.abs(r.x[i] - MU0) > 3 * st.sigma;
+          svg("circle", { cx: x(i), cy: clampY(y(r.x[i])), r: bad ? 4.2 : 3, fill: bad ? C.alarmStrong : C.muted, opacity: bad ? 1 : 0.7 }, g);
+        }
+      } else {
+        var yMax = Math.max(st.H * 2, 30);
+        var yMin = (st.ghost) ? -st.H : 0;
+        var y2 = lin(yMin, yMax, CH - MB, MT);
+        axis(g, x, y2, st.ghost ? [Math.round(yMin), 0, Math.round(st.H)] : [0, Math.round(st.H)], "jar number");
+        if (st.revealed) driftLine(g, x);
+        svg("line", { x1: ML, y1: y2(st.H), x2: CW - MR, y2: y2(st.H), stroke: C.alarmStrong, "stroke-width": 2, "stroke-dasharray": "6 4" }, g);
+        svg("text", { x: CW - MR, y: y2(st.H) - 7, "font-size": 13, "font-weight": 600, fill: C.alarmStrong, "text-anchor": "end" }, g).textContent = "rim H = " + Math.round(st.H);
+        if (st.ghost) path(g, r.noFloor, x, y2, upto, C.muted, 1.6, "4 4");
+        area(g, r.cusum, x, y2, upto);
+        path(g, r.cusum, x, y2, upto, C.accent, 2.4, null);
+        if (rang) { var ax = x(r.alarmIdx), ay = clampY(y2(r.cusum[r.alarmIdx])); svg("circle", { cx: ax, cy: ay, r: 7.5, fill: "none", stroke: C.alarmStrong, "stroke-width": 1.6, opacity: 0.6 }, g); svg("circle", { cx: ax, cy: ay, r: 4.2, fill: C.alarmStrong }, g); }
+      }
+      // your stop marker
+      if (st.stopIndex != null) marker(g, x, st.stopIndex, C.accent, "your STOP", 1);
+      if (rang) marker(g, x, r.alarmIdx, C.alarmStrong, "tank rang", 2);
+    }
+    function axis(g, x, y, ticks, xlabel) {
+      svg("line", { x1: ML, y1: y(ticks[0]), x2: CW - MR, y2: y(ticks[0]), stroke: C.muted, "stroke-width": 1 }, g);
+      ticks.forEach(function (t) {
+        svg("line", { x1: ML, y1: y(t), x2: CW - MR, y2: y(t), stroke: C.grid, "stroke-width": 1 }, g);
+        svg("text", { x: ML - 9, y: y(t) + 4, "font-size": 13, fill: C.muted, "text-anchor": "end" }, g).textContent = t;
+      });
+      svg("text", { x: (ML + CW - MR) / 2, y: CH - 6, "font-size": 13.5, fill: C.muted, "text-anchor": "middle" }, g).textContent = xlabel;
+    }
+    function driftLine(g, x) {
+      var d = st.round.driftStart;
+      svg("line", { x1: x(d), y1: MT, x2: x(d), y2: CH - MB, stroke: C.expected, "stroke-width": 1.6, "stroke-dasharray": "3 4" }, g);
+      svg("text", { x: x(d) + 5, y: MT + 13, "font-size": 12.5, fill: C.expected }, g).textContent = "drift began";
+    }
+    function marker(g, x, i, color, label, row) {
+      svg("line", { x1: x(i), y1: MT, x2: x(i), y2: CH - MB, stroke: color, "stroke-width": 2, opacity: 0.45 }, g);
+      svg("text", { x: x(i), y: MT + (row === 2 ? 28 : 13), "font-size": 12.5, "font-weight": 600, fill: color, "text-anchor": "middle" }, g).textContent = label;
+    }
+    function path(g, arr, x, y, upto, color, w, dash) {
+      var d = "";
+      for (var i = 0; i <= upto; i++) d += (i ? "L" : "M") + x(i).toFixed(1) + " " + clampY(y(arr[i])).toFixed(1) + " ";
+      svg("path", { d: d, fill: "none", stroke: color, "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": dash || "none" }, g);
+    }
+    function area(g, arr, x, y, upto) {
+      var y0 = clampY(y(0)), d = "M" + x(0).toFixed(1) + " " + y0.toFixed(1) + " ";
+      for (var i = 0; i <= upto; i++) d += "L" + x(i).toFixed(1) + " " + clampY(y(arr[i])).toFixed(1) + " ";
+      d += "L" + x(upto).toFixed(1) + " " + y0.toFixed(1) + " Z";
+      svg("path", { d: d, fill: C.accentSoft, stroke: "none" }, g);
+    }
+
+    // ---- render ----
+    function render() {
+      var r = st.round;
+      setJar(r.x[st.step], false);
+      setTank(r.cusum[st.step], true);
+      drawChart();
+      var bad = Math.abs(r.x[st.step] - MU0) > 3 * st.sigma;
+      read.innerHTML =
+        chip("jar", "#" + (st.step + 1)) +
+        chip("this jar", Math.round(r.x[st.step]) + " g", bad ? "warn" : "") +
+        chip("tank level", Math.round(r.cusum[st.step]) + " g", r.cusum[st.step] > st.H ? "bad" : "") +
+        chip("status", r.alarmIdx >= 0 && st.step >= r.alarmIdx ? "ALARM" : "watching", r.alarmIdx >= 0 && st.step >= r.alarmIdx ? "bad" : "good");
+      renderARL();
+    }
+    function chip(l, v, c) { return '<div class="epr-chip ' + (c || "") + '"><span>' + l + '</span><span class="v epr-spin">' + v + '</span></div>'; }
+    function renderARL() {
+      var k = st.K / st.sigma, h = st.H / st.sigma, dl = st.delta / st.sigma;
+      var a0 = EPR.siegmundARL(0, k, h), a1 = EPR.siegmundARL(dl, k, h);
+      function f(v) { return v >= 1000 ? "1000+" : Math.round(v); }
+      arl.innerHTML = chip("false alarm ≈ every", f(a0) + " jars", "good") + chip("should catch drift in ≈", st.delta <= 0 ? "n/a" : f(a1) + " jars", "warn");
+    }
+    function setHint(html, cls) { hint.className = "epr-hint " + (cls || ""); hint.innerHTML = html; }
+
+    function renderFormula() {
+      if (!st.formula) { formulaBox.innerHTML = ""; return; }
+      formulaBox.innerHTML =
+        '<div class="epr-formula"><span class="s">S<sub>t</sub></span> = max( 0 , <span class="s">S<sub>t-1</sub></span> + ( x<sub>t</sub> &minus; <span class="mu">&mu;<sub>0</sub></span> ) &minus; <span class="k">K</span> ) &nbsp; ring when <span class="s">S<sub>t</sub></span> &gt; <span class="h">H</span></div>' +
+        '<div class="epr-legend">' + leg(C.expected, "&mu;₀ target 500 g") + leg(C.alarm, "K leak / allowance") + leg(C.accent, "Sₜ water level") + leg(C.alarmStrong, "H the rim") + '</div>';
+    }
+    function leg(color, text) { return '<span class="epr-leg"><span class="epr-sw" style="background:' + color + '"></span>' + text + '</span>'; }
+
+    // ---- clock ----
+    function play() {
+      if (st.ended) { newRound(); }
+      st.playing = true; updatePlay(); tick();
+    }
+    function pause() { st.playing = false; if (st.timer) { clearTimeout(st.timer); st.timer = null; } updatePlay(); }
+    function updatePlay() { $("#g-play").innerHTML = st.playing ? "&#10073;&#10073; Pause" : "&#9654; Play"; }
+    function tick() {
+      if (!st.playing) return;
+      st.timer = setTimeout(function () {
+        if (st.step >= N - 1) { endRound(); return; }
+        st.step++;
+        setJar(st.round.x[st.step], true);
+        render();
+        tick();
+      }, EPR.reducedMotion() ? 1 : SPEІ[st.speed]);
+    }
+    function doStop() {
+      if (st.ended || st.stopIndex != null) return;
+      st.stopIndex = st.step; st.revealed = true;
+      var late = st.step - st.round.driftStart;
+      if (st.step < st.round.driftStart) setHint("False alarm. The pump was still healthy when you stopped at jar " + st.step + ".", "warn");
+      else if (late <= 2) setHint("Sharp eye! You caught the drift just " + late + " jar" + (late === 1 ? "" : "s") + " after it began.", "good");
+      else setHint("Caught it, but " + late + " overweight jars shipped before your STOP.", "bad");
+      render();
+    }
+    function endRound() {
+      pause(); st.ended = true; st.revealed = true; st.step = N - 1;
+      render();
+      var r = st.round, you = st.stopIndex, rang = r.alarmIdx;
+      var yTxt = you == null ? "You never called it." : (you < r.driftStart ? "You false-alarmed at jar " + you + "." : "You caught it in " + (you - r.driftStart) + " jars.");
+      var tTxt = rang < 0 ? "the tank never rang." : (rang < r.driftStart ? "the tank false-alarmed at jar " + rang + "." : "the tank caught it in " + (rang - r.driftStart) + " jars.");
+      var youGood = you != null && you >= r.driftStart, tankGood = rang >= 0 && rang >= r.driftStart;
+      var verdict, cls;
+      if (youGood && tankGood) {
+        var dy = you - r.driftStart, dt = rang - r.driftStart;
+        if (dy < dt) { verdict = "You beat the tank this round."; cls = "good"; }
+        else if (dt < dy) { verdict = "The tank beat you, and it never tires."; cls = "warn"; }
+        else { verdict = "Dead heat with the tank."; cls = "good"; }
+      } else if (tankGood) { verdict = "The tank caught it cleanly. Tune K and H and run another round to beat it."; cls = "warn"; }
+      else if (youGood) { verdict = "You won, the tank let this one slip. Lower the rim H or the leak K."; cls = "good"; }
+      else { verdict = "Both missed it. Lower the rim H or the leak K so the tank reacts sooner."; cls = "bad"; }
+      result.className = "epr-result show " + cls;
+      result.innerHTML = "<b>Drift began at jar " + r.driftStart + ".</b> " + yTxt + " And " + tTxt + " " + verdict;
+    }
+
+    // ---- dials / controls ----
+    function dial(id, label, min, max, step, val, unit) {
+      return '<div class="epr-slider"><div class="lab"><span>' + label + '</span><span class="val epr-spin" id="' + id + '-v">' + val + " " + unit + '</span></div>' +
+        '<input id="' + id + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '"></div>';
+    }
+    function bindDial(id, key, world) {
+      var inp = $("#" + id);
+      inp.addEventListener("input", function () {
+        st[key] = parseFloat(inp.value);
+        $("#" + id + "-v").textContent = inp.value + " g";
+        if (world && st.step > 0 && !st.ended) { /* world changed mid-run: keep onset, rescale live */ }
+        buildData(); render();
+      });
+    }
+    bindDial("g-delta", "delta", true); bindDial("g-sigma", "sigma", true);
+    bindDial("g-k", "K", false); bindDial("g-h", "H", false);
+
+    $("#g-play").onclick = function () { st.playing ? pause() : play(); };
+    $("#g-stop").onclick = doStop;
+    $("#g-new").onclick = function () { pause(); newRound(); };
+    mount.querySelectorAll("#g-speed button").forEach(function (b) {
+      b.onclick = function () { st.speed = b.getAttribute("data-s"); mount.querySelectorAll("#g-speed button").forEach(function (o) { o.classList.toggle("on", o === b); }); };
+    });
+    mount.querySelectorAll("#g-mode button").forEach(function (b) {
+      b.onclick = function () { st.chartMode = b.getAttribute("data-m"); mount.querySelectorAll("#g-mode button").forEach(function (o) { o.classList.toggle("on", o === b); }); $("#g-ghost").style.display = st.chartMode === "tank" ? "" : "none"; drawChart(); };
+    });
+    $("#g-ghost").onclick = function () { st.ghost = !st.ghost; $("#g-ghost").classList.toggle("on", st.ghost); drawChart(); };
+    $("#g-formula").onclick = function () { st.formula = !st.formula; $("#g-formula").classList.toggle("on", st.formula); renderFormula(); };
+
+    newRound();
+    renderFormula();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();

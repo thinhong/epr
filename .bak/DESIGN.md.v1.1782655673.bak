@@ -1,0 +1,176 @@
+# EPR design guide
+
+The house style for the **Epidemic Preparedness and Response** book and every
+interactive illustration in it. Read this before adding or changing any figure
+so the whole book stays visually consistent.
+
+The single source of truth for values is code, not this file:
+
+- `_brand.yml` -> Quarto theme colours and fonts
+- `epr.scss` -> CSS custom properties (`--epr-*`), including illustration tokens
+- `js/epr-viz.js` -> the same tokens as a JS fallback (`EPR.colors()`), plus shared math, tweening and injected component CSS
+
+This document explains *what the values mean and how to use them*. If a value
+here ever disagrees with the code, the code wins; fix this file.
+
+---
+
+## 1. Principles
+
+1. **Clinical calm.** White canvas, soft slate ink, one cool accent. No gradients, no drop shadows beyond a faint contact shadow, no clutter. Flat, modern, quiet.
+2. **The metaphor is the lesson.** An "illustration" here is a playable cartoon or game that builds intuition (the bottle line "overfill tank" for CUSUM), not an abstract chart in nice colours.
+3. **One honest scale.** When a picture encodes a quantity, every part of it uses the same pixels-per-unit ruler. Never fudge one element to make it readable.
+4. **Mobile first, gesture friendly.** Big type, big tap targets, smooth on a phone. Time always flows left to right.
+5. **Design before code.** Agree a storyboard and, where useful, a static mockup before building. Prefer a single screen where everything is visible and live over a Next/Back wizard.
+6. **Never use the em dash.** Use a comma, a colon, or "->".
+
+---
+
+## 2. Colour
+
+Colour-blind safe: meaning is carried by blue vs amber/teal (not red/green), plus position and shape. Red and amber are always backed by a second cue (a pulse, a dashed line, the word "OVERFLOW").
+
+### Core tokens
+
+| Token | Hex | Role |
+|---|---|---|
+| `ink` | `#1f2933` | Foreground text, vial outlines, tank outline |
+| `muted` | `#64748b` | Secondary labels, axes, ticks |
+| `grid` | `#e7ecf1` | Hairlines, card borders, faint fills |
+| `surface` | `#ffffff` | Page and card background |
+| `surfaceAlt` | `#f4f7fa` | Inset panels (e.g. the "Now measuring" zoom panel), chips |
+| `expected` (teal) | `#0f9b8e` | In-control baseline, the fill line, in-spec liquid, "drift began" marker |
+| `accent` (blue) | `#2563eb` | The active statistic, primary buttons, current selection |
+| `accentSoft` | `rgba(37,99,235,.13)` | Area under the live statistic, focus ring |
+| `alarm` (amber) | `#d97706` | Warning, the overfill above the line (wasted dose) |
+| `alarmStrong` (red) | `#dc2626` | Threshold H, alarm state, overflow |
+
+### Illustration tokens (vial + conveyor)
+
+| Token | Hex | Use |
+|---|---|---|
+| `glass` | `#eef3f8` | Glass body and neck fill |
+| `glassStroke` | `#9aa7b5` | Glass outline |
+| `cap` | `#8b95a1` | Aluminium flip cap base |
+| `capHi` | `#b9c1ca` | Cap highlight block |
+| `capEdge` | `#6f7882` | Cap shadow edge |
+| `crimp` | `#7e8893` | Crimp ring under the cap |
+| `belt` | `#8b98a8` | Conveyor belt |
+| `roller` | `#b6c0cc` | Belt rollers |
+
+Read tokens at run time with `EPR.color("expected")` or `EPR.colors()`; never
+hard-code a hex in a chapter script except for pure white highlights (`#ffffff`)
+and the tiny serration grey.
+
+---
+
+## 3. Typography
+
+- **Family:** Inter (Google), weights 400/500/600/700. Monospace for formulas only: Iosevka, then system mono.
+- **Body:** ~18px, line-height 1.65. Headings 600 weight.
+- **In SVG figures:** no label below 10.5px in the 760-wide viewBox, and never below 12px for anything the learner must read (chips, axis numbers, the weight bubble). Use `font-variant-numeric: tabular-nums` for any changing number so it does not jiggle.
+
+---
+
+## 4. The vaccine vial (signature component)
+
+Every vial in the book, at any size, is the same object: a small glass vaccine
+vial with an aluminium flip cap. Reference photo lives in the team brief; the
+drawn version is in `js/cusum.js` (`heroVial`, `beltVial`).
+
+### Anatomy, top to bottom
+
+1. **Aluminium flip cap** (`cap`) with a lighter highlight block (`capHi`) on the upper left and a thin shadow edge (`capEdge`) on the right.
+2. **Crimp ring** (`crimp`) with faint vertical serrations.
+3. **Neck** (`glass`), narrow.
+4. **Shoulder**, a short curve flaring from neck to body.
+5. **Glass body** (`glass`, outline `glassStroke`), tall, rounded bottom corners.
+6. **Gloss highlights:** one wide soft white streak and one thin bright white streak on the left third of the body. This is what makes flat glass read as glass; do not use gradients.
+7. **Liquid:** teal (`expected`) at ~30% opacity, filled to the fill line.
+8. **Overfill:** amber (`alarm`) band drawn only for the millilitres above the line.
+9. **Label** (hero size only): white rounded rectangle with a barcode (varied-width black bars) on the left and two red bands (`alarmStrong`) to the right.
+
+### Two sizes, one ruler
+
+- **Hero vial:** the vial currently being measured, shown large in a `surfaceAlt`
+  inspection panel labelled "Now measuring", with the filler nozzle above, the
+  fill line, and the full label. This is where the reference detail lives.
+- **Belt vial:** the finished vials lined up on the conveyor, drawn as a compact
+  silhouette (cap, neck, body, gloss, liquid, amber top). Too small for a label;
+  the silhouette still reads as the same vial.
+
+**Honest scale rule.** The amber overfill height and the tank fill use the *same*
+pixels-per-millilitre constant (`PXG`). A 0.2 mL overfill is the same number of
+pixels on the hero vial, on a belt vial, and as a rise in the tank. Keep it that
+way: it is the whole point of the picture.
+
+### States
+
+| State | Look |
+|---|---|
+| In spec | teal fill to the line, no amber |
+| Over the line | teal fill plus a small amber band above the line |
+| More overfill | taller amber band |
+| Empty preview | glass only, label faded to ~40% (before the first measurement) |
+
+### Do / don't
+
+- Do keep the cap grey aluminium. Don't use a black or coloured cap.
+- Do draw the neck and shoulder. Don't fall back to a plain rounded rectangle (that reads as a test tube).
+- Do colour liquid teal and overfill amber. Don't introduce off-palette blues.
+- Do show the label and barcode only on the hero. Don't try to cram a barcode onto a 10px belt vial.
+
+---
+
+## 5. Conveyor and tank
+
+- The **belt** runs left to right with rollers underneath; finished vials sit on it in order so the learner sees the whole run.
+- The **tank** catches overfill, uses the same `PXG` ruler with ticks at 0 / 0.5 / 1.0 mL, a dashed red `H` stop line, and a small bell that turns amber and shakes on overflow (the shake is skipped under reduced motion).
+
+---
+
+## 6. Shared chart grammar
+
+Every quantitative chart in the book uses the same conventions:
+
+- Time / sequence on the x axis, left to right.
+- The expected level is teal; a muted teal band shows the expected range.
+- The live statistic is the blue line with a soft blue area fill under it.
+- The threshold is a dashed line (amber for a soft limit, red for a hard stop H).
+- An alarm is a red dot or a short pulse, never colour alone.
+
+---
+
+## 7. Motion and gestures
+
+- **One pointer model.** Use Pointer Events (`pointerdown` / `pointermove` / `pointerup`) for any drag, with `setPointerCapture` and CSS `touch-action: none` on the draggable element so a phone does not scroll the page while dragging. Do not ship separate mouse and touch code paths.
+- **Tap targets** are at least 44px tall (buttons already are in `epr-viz.js`).
+- **Animate with** `EPR.tween` (requestAnimationFrame, cubic ease). Keep transitions short (about 240ms) so the line never feels laggy.
+- **Respect `prefers-reduced-motion`.** `EPR.tween`, the bell shake and the leak drip already fall back to an instant state; anything new must do the same.
+- **Immediate feedback:** show the weight bubble, move the tank, and update the chart on the same click.
+
+---
+
+## 8. Accessibility
+
+- Each figure `<svg>` has `role="img"` and a plain-language `aria-label` (or `<title>` + `<desc>`) describing what it shows.
+- Text and meaningful marks meet WCAG AA contrast on white. Buttons have a visible `:focus-visible` ring (`accentSoft`).
+- Never rely on colour alone; pair it with shape, position or a word.
+
+---
+
+## 9. Adding a new illustration
+
+1. Storyboard the metaphor and agree it first.
+2. In the chapter `.qmd`, add a mount: `<div id="my-fig" class="epr-mount"></div>`, inside `::: {.column-page}` if it should be wide.
+3. Write `js/my-fig.js` as an IIFE: read colours with `EPR.colors()`, build SVG with the same helpers used in `cusum.js`, call `EPR.injectStyles()` for the shared component CSS.
+4. Load the scripts at the end of the `.qmd`: `epr-viz.js` first, then your file.
+5. `js/` is already a Quarto resource in `_quarto.yml`, so files are copied to the build.
+
+### Editor gotcha (important)
+
+A formatter / watcher on the author's machine reformats `.js` files on save and
+has **truncated** them mid-write when edited through the normal file tools. Write
+JS files in full with a shell heredoc (`cat > js/file.js <<'EOF' ... EOF`), then
+run `node --check js/file.js` in the same step. Verify rendering before moving on
+(headless jsdom + a rasteriser, or the live Quarto preview).

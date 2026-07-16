@@ -1,0 +1,39 @@
+/*-- scss:defaults --*/
+
+$primary: #2563eb !default;
+
+/*-- scss:rules --*/
+
+:root {
+  --epr-ink: #1f2933;
+  --epr-muted: #64748b;
+  --epr-grid: #e7ecf1;
+  --epr-surface: #ffffff;
+  --epr-surfaceAlt: #f4f7fa;
+  --epr-expected: #0f9b8e;
+  --epr-band: rgba(15, 155, 142, 0.14);
+  --epr-accent: #2563eb;
+  --epr-accentSoft: rgba(37, 99, 235, 0.13);
+  --epr-alarm: #d97706;
+  --epr-alarmStrong: #dc2626;
+  --epr-good: #0f9b8e;
+
+  /* Illustration tokens (vial, conveyor) - see DESIGN.md */
+  --epr-glass: #eef3f8;
+  --epr-glassStroke: #9aa7b5;
+  --epr-cap: #8b95a1;
+  --epr-capHi: #b9c1ca;
+  --epr-capEdge: #6f7882;
+  --epr-crimp: #7e8893;
+  --epr-belt: #8b98a8;
+  --epr-roller: #b6c0cc;
+}
+
+body {
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.epr-mount {
+  margin: 1.5rem 0;
+}

@@ -1,0 +1,210 @@
+{
+    "sources": [
+        {
+            "DOI": "10.1093/comjnl/27.2.97",
+            "ISSN": "0010-4620",
+            "URL": "https://doi.org/10.1093/comjnl/27.2.97",
+            "author": [
+                {
+                    "family": "Knuth",
+                    "given": "Donald E."
+                }
+            ],
+            "container-title": "Comput. J.",
+            "id": "knuth84",
+            "issue": "2",
+            "issued": {
+                "date-parts": [
+                    [
+                        1984,
+                        5
+                    ]
+                ]
+            },
+            "page": "97-111",
+            "publisher": "Oxford University Press, Inc.",
+            "publisher-place": "USA",
+            "title": "Literate programming",
+            "type": "article-journal",
+            "volume": "27"
+        },
+        {
+            "DOI": "10.2307/2333009",
+            "URL": "https://www.jstor.org/stable/2333009",
+            "author": [
+                {
+                    "family": "Page",
+                    "given": "E. S."
+                }
+            ],
+            "container-title": "Biometrika",
+            "id": "page1954",
+            "issue": "1/2",
+            "issued": {
+                "date-parts": [
+                    [
+                        1954
+                    ]
+                ]
+            },
+            "page": "100-115",
+            "title": "Continuous inspection schemes",
+            "type": "article-journal",
+            "volume": "41"
+        },
+        {
+            "URL": "https://www.afro.who.int/publications/technical-guidelines-integrated-disease-surveillance-and-response-african-region-third",
+            "author": [
+                {
+                    "family": "WHO"
+                }
+            ],
+            "id": "who2019",
+            "issued": {
+                "date-parts": [
+                    [
+                        2019,
+                        3,
+                        25
+                    ]
+                ]
+            },
+            "language": "en",
+            "title": "Technical guidelines for integrated disease surveillance and response in the african region: Third edition",
+            "title-short": "Technical guidelines for integrated disease surveillance and response in the african region",
+            "type": "report"
+        },
+        {
+            "author": [
+                {
+                    "dropping-particle": "for",
+                    "family": "Disease Control",
+                    "given": "Centers"
+                },
+                {
+                    "family": "Prevention"
+                }
+            ],
+            "id": "centersfordiseasecontrolandprevention2012",
+            "issued": {
+                "date-parts": [
+                    [
+                        2012
+                    ]
+                ]
+            },
+            "title": "Principles of epidemiology in public health practice",
+            "type": "chapter"
+        },
+        {
+            "URL": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1915276/",
+            "author": [
+                {
+                    "family": "Serfling",
+                    "given": "Robert E."
+                }
+            ],
+            "container-title": "Public Health Reports",
+            "id": "serfling1963",
+            "issue": "6",
+            "issued": {
+                "date-parts": [
+                    [
+                        1963,
+                        6
+                    ]
+                ]
+            },
+            "page": "494-506",
+            "title": "Methods for current statistical analysis of excess pneumonia-influenza deaths",
+            "type": "article-journal",
+            "volume": "78"
+        },
+        {
+            "DOI": "10.1017/s0022172400069928",
+            "URL": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2134154/",
+            "author": [
+                {
+                    "family": "Tillett",
+                    "given": "H. E."
+                },
+                {
+                    "family": "Spencer",
+                    "given": "I. L."
+                }
+            ],
+            "container-title": "The Journal of Hygiene",
+            "id": "tillett1982",
+            "issue": "1",
+            "issued": {
+                "date-parts": [
+                    [
+                        1982,
+                        2
+                    ]
+                ]
+            },
+            "page": "83-94",
+            "title": "Influenza surveillance in england and wales using routine statistics. Development of ’cusum’ graphs to compare 12 previous winters and to monitor the 1980/81 winter.",
+            "type": "article-journal",
+            "volume": "88"
+        },
+        {
+            "DOI": "10.1080/00401706.1985.10488030",
+            "author": [
+                {
+                    "family": "Lucas",
+                    "given": "James M."
+                }
+            ],
+            "container-title": "Technometrics",
+            "id": "lucas1985",
+            "issue": "2",
+            "issued": {
+                "date-parts": [
+                    [
+                        1985
+                    ]
+                ]
+            },
+            "page": "129-144",
+            "title": "Counted data CUSUM’s",
+            "type": "article-journal",
+            "volume": "27"
+        },
+        {
+            "DOI": "10.1002/(SICI)1097-0258(19990830)18:16<2111::AID-SIM171>3.0.CO;2-Q",
+            "author": [
+                {
+                    "family": "Rossi",
+                    "given": "G."
+                },
+                {
+                    "family": "Lampugnani",
+                    "given": "L."
+                },
+                {
+                    "family": "Marchi",
+                    "given": "M."
+                }
+            ],
+            "container-title": "Statistics in Medicine",
+            "id": "rossi1999",
+            "issue": "16",
+            "issued": {
+                "date-parts": [
+                    [
+                        1999
+                    ]
+                ]
+            },
+            "page": "2111-2122",
+            "title": "An approximate CUSUM procedure for surveillance of health events",
+            "type": "article-journal",
+            "volume": "18"
+        }
+    ],
+    "project_biblios": [
+        "references.bib"
+    ]
+}

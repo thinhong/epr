@@ -1,0 +1,338 @@
+(function () {
+  "use strict";
+
+  function init() {
+    if (!window.EPR) return;
+    EPR.injectStyles();
+    injectGameStyles();
+    var mount = document.getElementById("cusum-game");
+    if (!mount) return;
+    if (mount.getAttribute("data-built") === "1") return;
+    mount.setAttribute("data-built", "1");
+    build(mount);
+  }
+
+  function injectGameStyles() {
+    if (document.getElementById("epr-cusum-styles")) return;
+    var css =
+      ".epr-fig .epr-hint{font-size:1.02rem;color:var(--ink);margin:6px 0 10px;background:var(--surfaceAlt);border-radius:10px;padding:9px 13px;border-left:4px solid var(--accent)}" +
+      ".epr-fig .epr-hint.good{border-left-color:var(--expected)}.epr-fig .epr-hint.warn{border-left-color:var(--alarm)}.epr-fig .epr-hint.bad{border-left-color:var(--alarmStrong)}" +
+      ".epr-fig .epr-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 2px}" +
+      ".epr-fig .epr-seg{display:inline-flex;border:1px solid var(--grid);border-radius:10px;overflow:hidden}" +
+      ".epr-fig .epr-seg button{appearance:none;border:0;background:var(--surface);color:var(--muted);font:inherit;font-size:.95rem;font-weight:500;padding:9px 15px;min-height:44px;cursor:pointer}" +
+      ".epr-fig .epr-seg button.on{background:var(--accent);color:#fff}" +
+      ".epr-fig .epr-spin{font-variant-numeric:tabular-nums}";
+    var s = document.createElement("style");
+    s.id = "epr-cusum-styles"; s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  var NS = "http://www.w3.org/2000/svg";
+  function svg(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function clear(n) { while (n && n.firstChild) n.removeChild(n.firstChild); }
+  function lin(d0, d1, r0, r1) { return function (v) { return r0 + (v - d0) / (d1 - d0) * (r1 - r0); }; }
+
+  // --- model (unchanged): honest scale PXG px per mL is shared by vial overfill AND tank ---
+  var N = 40, MU0 = 3, SIGMA = 0.1, DELTA = 0.2, K = 0.1, H = 0.7, PXG = 80, TMAX = 1.2;
+  // --- stage geometry (belt only) ---
+  var BASE = 150;
+  var BELT_L = 40, BELT_R = 624, SLOT = (BELT_R - BELT_L) / N;
+  var bBTOP = 130, bFL = 136, bBOT = 148;
+  var TANK_X = 656, TANK_W = 72, TANK_BOT = 148, TANK_TOP = TANK_BOT - TMAX * PXG;
+  var rimY = TANK_BOT - H * PXG;
+  function slotX(i) { return BELT_L + (i + 0.5) * SLOT; }
+
+  function build(mount) {
+    var C = EPR.colors();
+    var LIQ = C.expected, OVER = C.alarm, GLASS = C.glass, GST = C.glassStroke,
+        CAP = C.cap, CAPHI = C.capHi, CRIMP = C.crimp,
+        BELT = C.belt, BELT_HI = "#aab6c4", ROLLER = C.roller,
+        AMBER_L = "#f0a83a", RED_L = "#f0726b";
+    var st = { mode: "cusum", formula: false, step: -1, round: null, stopIndex: null, rang: null, revealed: false, ended: false, waterTween: null, bellTimer: null };
+
+    mount.innerHTML =
+      '<div class="epr-fig">' +
+        '<div class="epr-head"><div><div class="epr-kicker">Precision vaccine line</div>' +
+        '<div class="epr-title">The overfill tank</div></div></div>' +
+        '<div class="epr-hint" id="g-hint"></div>' +
+        '<svg class="epr-stage" id="g-stage" viewBox="0 0 760 182" role="img" aria-label="A conveyor belt of small vaccine vials filled to a line, with a measuring tank on the right catching the overfill"></svg>' +
+        '<div class="epr-readouts" id="g-read"></div>' +
+        '<div class="epr-bar">' +
+          '<button class="epr-btn primary" id="g-next">&#9654; Next vial</button>' +
+          '<button class="epr-btn" id="g-reset">&#8635; New batch</button>' +
+          '<span class="epr-spacer"></span>' +
+          '<span class="epr-seg" id="g-mode"><button data-m="manual">You measure</button><button data-m="cusum" class="on">CUSUM</button></span>' +
+          '<button class="epr-chiptog" id="g-formula">Formula</button>' +
+        '</div>' +
+        '<svg class="epr-chart" id="g-chart" viewBox="0 0 760 130" role="img" aria-label="Wasted vaccine caught in the tank, per vial"></svg>' +
+        '<div id="g-formula-box"></div>' +
+        '<div class="epr-result" id="g-result"></div>' +
+      '</div>';
+
+    var $ = function (id) { return mount.querySelector(id); };
+    var stage = $("#g-stage"), chart = $("#g-chart"), hint = $("#g-hint"),
+        read = $("#g-read"), result = $("#g-result"), formulaBox = $("#g-formula-box");
+
+    var S = {};
+    buildStage();
+    function buildStage() {
+      clear(stage);
+      var g = svg("g", {}, stage), sx, rx;
+      // conveyor belt (no support legs)
+      var belt = svg("g", {}, g);
+      svg("rect", { x: BELT_L - 16, y: BASE, width: (BELT_R + 16) - (BELT_L - 16), height: 9, fill: BELT }, belt);
+      svg("rect", { x: BELT_L - 16, y: BASE, width: (BELT_R + 16) - (BELT_L - 16), height: 3, fill: BELT_HI }, belt);
+      for (sx = BELT_L - 10; sx < BELT_R + 14; sx += 20) svg("line", { x1: sx, y1: BASE + 2, x2: sx - 4, y2: BASE + 8, stroke: "#6e7c8d", "stroke-width": 1, opacity: 0.5 }, belt);
+      for (rx = BELT_L - 6; rx < BELT_R + 16; rx += 30) svg("circle", { cx: rx, cy: BASE + 14, r: 5, fill: ROLLER, stroke: BELT, "stroke-width": 1 }, belt);
+
+      S.lineG = svg("g", {}, g);   // belt vials (redrawn each step)
+      S.leakG = svg("g", {}, g);
+      S.wBubble = svg("g", { opacity: 0 }, g);
+      svg("rect", { x: -30, y: -12, width: 60, height: 21, rx: 7, fill: C.ink }, S.wBubble);
+      svg("path", { d: "M -5 9 L 0 14 L 5 9 Z", fill: C.ink }, S.wBubble);
+      S.wText = svg("text", { x: 0, y: 3.5, "font-size": 12.5, "font-weight": 700, fill: "#fff", "text-anchor": "middle" }, S.wBubble);
+
+      buildTank(g);
+    }
+
+    function buildTank(g) {
+      var L = TANK_X, R = TANK_X + TANK_W, T = TANK_TOP, B = TANK_BOT, r = 14;
+      var dPath = "M " + L + " " + T + " L " + L + " " + (B - r) + " Q " + L + " " + B + " " + (L + r) + " " + B + " L " + (R - r) + " " + B + " Q " + R + " " + B + " " + R + " " + (B - r) + " L " + R + " " + T;
+      var defs = svg("defs", {}, g);
+      var cp = svg("clipPath", { id: "eprTankClip" }, defs);
+      svg("path", { d: dPath + " Z" }, cp);
+      // interior
+      svg("path", { d: dPath + " Z", fill: C.surface }, g);
+      // liquid (clipped) with a meniscus
+      var fg = svg("g", { "clip-path": "url(#eprTankClip)" }, g);
+      S.water = svg("rect", { x: L, y: B - 4, width: TANK_W, height: 0, fill: OVER }, fg);
+      S.meniscus = svg("ellipse", { cx: L + TANK_W / 2, cy: B - 4, rx: TANK_W / 2 - 1, ry: 3.5, fill: AMBER_L, opacity: 0 }, fg);
+      // outline + rim
+      svg("path", { d: dPath, fill: "none", stroke: C.ink, "stroke-width": 2, "stroke-linejoin": "round" }, g);
+      svg("rect", { x: L - 3, y: T - 3, width: TANK_W + 6, height: 5, rx: 2.5, fill: C.muted }, g);
+      // drain spout (where the tolerance leaks out)
+      svg("path", { d: "M " + R + " " + (B - 12) + " Q " + (R + 9) + " " + (B - 11) + " " + (R + 8) + " " + (B - 2), fill: "none", stroke: C.ink, "stroke-width": 1.6, "stroke-linecap": "round" }, g);
+      // side graduations
+      [0, 0.5, 1.0].forEach(function (gv) {
+        var ty = B - gv * PXG;
+        svg("line", { x1: L - 5, y1: ty, x2: L, y2: ty, stroke: C.muted, "stroke-width": 1.1 }, g);
+        svg("text", { x: L - 8, y: ty + 4, "font-size": 10.5, fill: C.muted, "text-anchor": "end" }, g).textContent = gv.toFixed(1);
+      });
+      // H stop line
+      svg("line", { x1: L, y1: rimY, x2: R, y2: rimY, stroke: C.alarmStrong, "stroke-width": 2, "stroke-dasharray": "6 4" }, g);
+      svg("text", { x: R + 6, y: rimY + 4, "font-size": 12.5, "font-weight": 600, fill: C.alarmStrong }, g).textContent = "H";
+      // alarm lamp
+      S.lamp = svg("circle", { cx: L + 10, cy: T - 12, r: 6, fill: "#cbd5e1", stroke: C.muted, "stroke-width": 1 }, g);
+      svg("text", { x: L + 20, y: T - 8, "font-size": 10, fill: C.muted }, g).textContent = "alarm";
+      svg("text", { x: L + TANK_W / 2, y: B + 18, "font-size": 12, "font-weight": 600, fill: C.ink, "text-anchor": "middle" }, g).textContent = "overfill tank (mL)";
+    }
+
+    // one compact, squat vaccine vial on the belt
+    function beltVial(cx, dev, ov, isCur) {
+      var g = S.lineG;
+      var bw = Math.min(13, SLOT - 1.6), hw = bw / 2, capW = bw * 0.95, chw = capW / 2;
+      // cap + highlight
+      svg("rect", { x: cx - chw, y: bBTOP - 9, width: capW, height: 5, rx: 1.5, fill: CAP }, g);
+      svg("rect", { x: cx - chw + 0.8, y: bBTOP - 8, width: capW * 0.4, height: 1.8, rx: 0.8, fill: CAPHI }, g);
+      // neck
+      svg("rect", { x: cx - bw * 0.26, y: bBTOP - 4, width: bw * 0.52, height: 4.4, fill: GLASS, stroke: GST, "stroke-width": 0.4 }, g);
+      // squat body
+      svg("rect", { x: cx - hw, y: bBTOP, width: bw, height: bBOT - bBTOP, rx: 4, fill: GLASS, stroke: GST, "stroke-width": 0.7 }, g);
+      // teal fill
+      svg("rect", { x: cx - hw + 0.7, y: bFL, width: bw - 1.4, height: bBOT - 0.7 - bFL, fill: LIQ, opacity: 0.34 }, g);
+      // small amber top only if over the line (clamped cue; the tank carries the exact amount)
+      if (ov > 0) { var ah = Math.min(ov * PXG, bFL - bBTOP - 1), at = bFL - ah; svg("rect", { x: cx - hw + 0.7, y: at, width: bw - 1.4, height: ah, fill: OVER, opacity: 0.9 }, g); }
+      // single gloss highlight
+      svg("rect", { x: cx - hw + 1.4, y: bBTOP + 3, width: 1.5, height: bBOT - bBTOP - 9, rx: 0.7, fill: "#ffffff", opacity: 0.7 }, g);
+      // current vial accent
+      if (isCur) svg("rect", { x: cx - hw - 2.5, y: bBTOP - 11, width: bw + 5, height: (bBOT - bBTOP) + 13, rx: 5, fill: "none", stroke: C.accent, "stroke-width": 1.8 }, g);
+    }
+
+    function drawLineup(newOver) {
+      clear(S.lineG);
+      for (var i = 0; i <= st.step; i++) {
+        var dev = st.round.x[i] - MU0, isCur = i === st.step;
+        var ov = (isCur && newOver != null) ? newOver : Math.max(0, dev);
+        beltVial(slotX(i), dev, ov, isCur);
+      }
+    }
+    function showWeight(w) {
+      var cx = EPR.clamp(slotX(st.step), 50, 612);
+      S.wBubble.setAttribute("transform", "translate(" + cx + "," + (bBTOP - 30) + ")");
+      S.wText.textContent = w.toFixed(2) + " mL";
+      S.wBubble.setAttribute("opacity", 1);
+    }
+    function leakDrip() {
+      if (EPR.reducedMotion()) return;
+      clear(S.leakG);
+      var ox = TANK_X + TANK_W + 7, oy = TANK_BOT - 4;
+      var d = svg("circle", { cx: ox, cy: oy, r: 2.3, fill: OVER, opacity: 0.8 }, S.leakG);
+      EPR.tween(oy, oy + 22, 340, function (y) { d.setAttribute("cy", y); d.setAttribute("opacity", Math.max(0, 0.8 * (1 - (y - oy) / 22))); }, function () { if (d.parentNode) d.parentNode.removeChild(d); });
+    }
+
+    function newRound() {
+      var seed = Math.floor(Math.random() * 1e9), rnd = EPR.rng(seed), z = [];
+      for (var i = 0; i < N; i++) z.push(EPR.gauss(rnd));
+      st.round = { z: z, driftStart: 10 + Math.floor(rnd() * (N - 18)) };
+      buildData();
+      st.step = -1; st.stopIndex = null; st.rang = null; st.revealed = false; st.ended = false;
+      clear(S.lineG); clear(S.leakG); S.wBubble.setAttribute("opacity", 0); stillBell(); setTankStatic(0);
+      result.classList.remove("show");
+      setHint("Every vial of this expensive vaccine must fill to the <b>line</b>. Anything <b>over the line</b> (amber) is a wasted dose, straight off your margin, and the tank catches it. Click <b>Next vial</b>; every vial stays on the belt so you watch the whole run.", "");
+      renderReadouts(); drawChart();
+    }
+    function buildData() {
+      var r = st.round, x = [], manual = [], cusum = [], pm = 0, pc = 0;
+      for (var i = 0; i < N; i++) {
+        x.push(EPR.round(MU0 + (i >= r.driftStart ? DELTA : 0) + r.z[i] * SIGMA, 2));
+        var ov = Math.max(0, x[i] - MU0);
+        pm = pm + ov; manual.push(pm);
+        pc = Math.max(0, pc + ov - K); cusum.push(pc);
+      }
+      r.x = x; r.manual = manual; r.cusum = cusum;
+    }
+    function series() { return st.mode === "cusum" ? st.round.cusum : st.round.manual; }
+
+    function setTankStatic(level) { tankTo(level, false); }
+    function tankTo(level, animate) {
+      var h = EPR.clamp(level, 0, TMAX) * PXG, over = level > H;
+      S.water.setAttribute("fill", over ? C.alarmStrong : OVER);
+      S.meniscus.setAttribute("fill", over ? RED_L : AMBER_L);
+      function ap(v) { S.water.setAttribute("height", v); S.water.setAttribute("y", TANK_BOT - v); S.meniscus.setAttribute("cy", TANK_BOT - v); S.meniscus.setAttribute("opacity", v > 2 ? 0.95 : 0); }
+      if (st.waterTween) st.waterTween.stop();
+      var cur = parseFloat(S.water.getAttribute("height")) || 0;
+      if (animate) st.waterTween = EPR.tween(cur, h, 240, ap); else ap(h);
+      if (over) ringBell(); else stillBell();
+    }
+    function ringBell() {
+      S.lamp.setAttribute("fill", C.alarmStrong);
+      if (EPR.reducedMotion() || st.bellTimer) return;
+      var n = 0;
+      st.bellTimer = setInterval(function () {
+        n++; S.lamp.setAttribute("r", n % 2 ? 8.5 : 6);
+        if (n > 5) { clearInterval(st.bellTimer); st.bellTimer = null; S.lamp.setAttribute("r", 7); }
+      }, 150);
+    }
+    function stillBell() { if (st.bellTimer) { clearInterval(st.bellTimer); st.bellTimer = null; } S.lamp.setAttribute("r", 6); S.lamp.setAttribute("fill", "#cbd5e1"); }
+
+    function nextBottle() {
+      if (st.ended || st.step >= N - 1) return;
+      st.step++;
+      var w = st.round.x[st.step], level = series()[st.step];
+      renderReadouts();
+      drawLineup(null);
+      showWeight(w);
+      if (st.mode === "cusum") leakDrip();
+      tankTo(level, true);
+      drawChart();
+      afterStep();
+    }
+    function afterStep() {
+      if (st.step >= 0 && series()[st.step] > H) { st.rang = st.step; st.ended = true; st.revealed = true; showResult(); return; }
+      if (st.step >= N - 1) { st.ended = true; st.revealed = true; showResult(); }
+    }
+
+    function renderReadouts() {
+      if (st.step < 0) { read.innerHTML = chip("vials", "0 of " + N) + chip("tank", "0.00 mL", "good"); return; }
+      var w = st.round.x[st.step], dev = w - MU0, level = series()[st.step], over = level > H;
+      read.innerHTML =
+        chip("vial", "#" + (st.step + 1)) +
+        chip("fill", w.toFixed(2) + " mL", Math.abs(dev) > 3 * SIGMA ? "warn" : "") +
+        chip("over line", (dev >= 0 ? "+" : "") + dev.toFixed(2) + " mL", dev > 0 ? "warn" : "good") +
+        chip("wasted", level.toFixed(2) + " mL", over ? "bad" : "") +
+        chip("status", over ? "OVERFLOW" : "running", over ? "bad" : "good");
+    }
+    function chip(l, v, c) { return '<div class="epr-chip ' + (c || "") + '"><span>' + l + '</span><span class="v epr-spin">' + v + '</span></div>'; }
+
+    var ML = 50, MR = 22, MT = 14, MB = 28, CW = 760, CH = 130;
+    function clampY(v) { return Math.max(MT, Math.min(CH - MB, v)); }
+    function drawChart() {
+      clear(chart);
+      var g = svg("g", {}, chart), s = series(), upto = st.step;
+      var x = lin(0, N - 1, ML, CW - MR), yMax = Math.max(H * 1.7, 1.0), y = lin(0, yMax, CH - MB, MT);
+      svg("line", { x1: ML, y1: y(0), x2: CW - MR, y2: y(0), stroke: C.muted, "stroke-width": 1 }, g);
+      [0, H].forEach(function (t) { svg("text", { x: ML - 8, y: y(t) + 4, "font-size": 12, fill: C.muted, "text-anchor": "end" }, g).textContent = t.toFixed(1); });
+      svg("text", { x: ML, y: MT - 1, "font-size": 11.5, fill: C.muted }, g).textContent = "wasted vaccine (mL)";
+      svg("text", { x: (ML + CW - MR) / 2, y: CH - 3, "font-size": 12, fill: C.muted, "text-anchor": "middle" }, g).textContent = "vial number";
+      svg("line", { x1: ML, y1: y(H), x2: CW - MR, y2: y(H), stroke: C.alarmStrong, "stroke-width": 2, "stroke-dasharray": "6 4" }, g);
+      svg("text", { x: CW - MR, y: y(H) - 6, "font-size": 12.5, "font-weight": 600, fill: C.alarmStrong, "text-anchor": "end" }, g).textContent = "stop H";
+      if (st.revealed) {
+        var d = st.round.driftStart;
+        svg("line", { x1: x(d), y1: MT, x2: x(d), y2: CH - MB, stroke: C.expected, "stroke-width": 1.6, "stroke-dasharray": "3 4" }, g);
+        svg("text", { x: x(d) + 4, y: MT + 11, "font-size": 11.5, fill: C.expected }, g).textContent = "drift began";
+      }
+      if (upto >= 0) {
+        var dd = "M" + x(0).toFixed(1) + " " + clampY(y(0)).toFixed(1) + " ";
+        for (var i = 0; i <= upto; i++) dd += "L" + x(i).toFixed(1) + " " + clampY(y(s[i])).toFixed(1) + " ";
+        dd += "L" + x(upto).toFixed(1) + " " + clampY(y(0)).toFixed(1) + " Z";
+        svg("path", { d: dd, fill: C.accentSoft }, g);
+        var dl = "";
+        for (var j = 0; j <= upto; j++) dl += (j ? "L" : "M") + x(j).toFixed(1) + " " + clampY(y(s[j])).toFixed(1) + " ";
+        svg("path", { d: dl, fill: "none", stroke: C.accent, "stroke-width": 2.3, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
+        if (st.rang != null) svg("circle", { cx: x(st.rang), cy: clampY(y(s[st.rang])), r: 4.2, fill: C.alarmStrong }, g);
+      }
+      if (st.stopIndex != null) { svg("line", { x1: x(st.stopIndex), y1: MT, x2: x(st.stopIndex), y2: CH - MB, stroke: C.accent, "stroke-width": 2, opacity: 0.5 }, g); svg("text", { x: x(st.stopIndex), y: MT + 11, "font-size": 11.5, "font-weight": 600, fill: C.accent, "text-anchor": "middle" }, g).textContent = "you"; }
+    }
+    function setHint(html, cls) { hint.className = "epr-hint " + (cls || ""); hint.innerHTML = html; }
+
+    function renderFormula() {
+      if (!st.formula) { formulaBox.innerHTML = ""; return; }
+      formulaBox.innerHTML =
+        '<div class="epr-formula"><span class="s">tank</span> = ' + (st.mode === "cusum" ? 'max( 0 , ' : '') + '<span class="s">tank</span> + <span class="k">overfill</span>' + (st.mode === "cusum" ? ' &minus; <span class="k">tolerance</span> )' : '') + ' &nbsp; stop when <span class="s">tank</span> &gt; <span class="h">H</span></div>' +
+        '<div class="epr-legend">' + leg(LIQ, "filled to the line (in spec)") + leg(OVER, "overfill = mL over the line (wasted)") + (st.mode === "cusum" ? leg(C.muted, "tolerance = 0.10 mL/vial leaks away") : "") + leg(C.alarmStrong, "H = stop level = 0.70 mL") + '</div>';
+    }
+    function leg(color, text) { return '<span class="epr-leg"><span class="epr-sw" style="background:' + color + '"></span>' + text + '</span>'; }
+
+    function callDrift() {
+      if (st.step < 0 || st.ended || st.stopIndex != null) return;
+      st.stopIndex = st.step;
+      setHint("You flagged the filler at vial " + (st.step + 1) + ". Keep going to the end of the batch to see how your call compares to the real drift and to the tank.", "");
+      drawChart();
+    }
+    function reevaluate() {
+      if (!st.round || st.step < 0) { st.ended = false; st.rang = null; return; }
+      var s = series(), rang = -1;
+      for (var i = 0; i <= st.step; i++) { if (s[i] > H) { rang = i; break; } }
+      st.rang = rang >= 0 ? rang : null;
+      st.ended = rang >= 0 || st.step >= N - 1;
+      if (st.ended) { st.revealed = true; showResult(); }
+      else { result.classList.remove("show"); setHint("Now running in <b>" + (st.mode === "cusum" ? "CUSUM" : "you-measure") + "</b> mode. Keep clicking <b>Next vial</b> to finish this same batch.", ""); }
+    }
+    function showResult() {
+      var r = st.round, rang = st.rang != null ? st.rang : -1, you = st.stopIndex, ds = r.driftStart, cls;
+      var msg = "<b>Batch over. The filler began overfilling at vial " + (ds + 1) + "</b> (teal line). ";
+      if (rang >= 0 && rang < ds) { msg += (st.mode === "cusum" ? "The tank" : "Your running total") + " brimmed over at vial " + (rang + 1) + ", a false alarm that would stop a line still in spec."; cls = "bad"; }
+      else if (rang >= 0) { msg += "The tank brimmed over at vial " + (rang + 1) + ", " + (rang - ds) + " vial" + (rang - ds === 1 ? "" : "s") + " after the drift. Stop and recalibrate the filler."; cls = "good"; }
+      else { msg += "The batch finished and the tank never brimmed; the line stayed in spec."; cls = "warn"; }
+      if (you != null) msg += " You flagged vial " + (you + 1) + (you >= ds ? "." : ", a false alarm.");
+      if (st.mode === "manual") msg += " With no tolerance the tank fills on ordinary scatter too, so it overflows even on a healthy line; switch to CUSUM to allow a small tolerance.";
+      result.className = "epr-result show " + cls; result.innerHTML = msg;
+      drawChart();
+      setHint("Batch over. Hit <b>New batch</b> for a fresh hidden drift, or flip the mode to replay this same batch under the other rule.", "");
+    }
+
+    $("#g-next").onclick = nextBottle;
+    $("#g-reset").onclick = function () { stillBell(); newRound(); };
+    mount.querySelectorAll("#g-mode button").forEach(function (b) {
+      b.onclick = function () {
+        st.mode = b.getAttribute("data-m");
+        mount.querySelectorAll("#g-mode button").forEach(function (o) { o.classList.toggle("on", o === b); });
+        reevaluate();
+        if (st.step >= 0) setTankStatic(series()[st.step]);
+        renderReadouts(); drawChart(); renderFormula();
+      };
+    });
+    $("#g-formula").onclick = function () { st.formula = !st.formula; $("#g-formula").classList.toggle("on", st.formula); renderFormula(); };
+
+    newRound();
+    renderFormula();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();

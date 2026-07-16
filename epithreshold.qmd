@@ -1,0 +1,19 @@
+---
+title: "Epidemic threshold"
+format: html
+---
+
+In applied surveillance, epidemic threshold is a statistical or operational cut-off separating "expected/endemic" from "excess/epidemic" counts.
+
+there are two types of thresholds used to initiate response: an alert threshold and an epidemic threshold [@who2019]
+
+- Alert threshold: a lower cut-off whose, whose crossing triggers heightened vigilance, investigation and preparedness (but not yet full response). such as when there is one suspected case (as for an epidemic-prone disease or for a disease targeted for elimination or eradication) or when there is an unexplained increase for any disease or unusual pattern seen over a period of time in weekly or monthly summary reporting.
+- epidemic threshold: a higher cut-off whose crossing confirms epidemic activity and triggers control/response measures. For rare diseases or diseases targeted for eradication, detection of a single case suggests an epidemic. In such situations, one case is unusual and is a serious event. In other situations, a number of cases will trigger a response.
+
+FOr example, alert threshold is 2nd quartile/Median of confirmed malaria cases for the past five years, epidemic threshold for malaria in some countries is 3rd Quartile of confirmed malaria cases [@who2019].
+
+These threshold measure how deviation the current situation compared to a Endemic / baseline level: the expected, normal background frequency of a disease in a place/season [@centersfordiseasecontrolandprevention2012].
+
+This was first mentioned by Serfling "at a distance of 1.64 standard deviations above the trend line, a level which experience has shown to be useful for distinguishing epidemic increase from random variation." [@serfling1963]. Observations above it indicate epidemic/excess activity. The Serfling approach remains the basis of CDC's influenza epidemic threshold and excess-mortality estimation.
+
+

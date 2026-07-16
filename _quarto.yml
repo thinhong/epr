@@ -3,6 +3,9 @@ project:
   resources:
     - js/
 
+execute:
+  freeze: auto
+
 book:
   title: "Epidemic Preparedness and Response"
   author:

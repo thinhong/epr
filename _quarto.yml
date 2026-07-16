@@ -10,6 +10,8 @@ book:
       url: https://drthinhong.com/
       orcid: 0000-0001-6772-9291
   date: "26/06/2026"
+  site-url: https://thinhong.github.io/epr/
+  repo-url: https://github.com/thinhong/epr
   chapters:
     - index.qmd
     - part: epithreshold.qmd
@@ -25,6 +27,3 @@ format:
       - cosmo
       - brand
       - epr.scss
-
-
-

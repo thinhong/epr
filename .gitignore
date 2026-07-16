@@ -1,2 +1,24 @@
+# Quarto rendered output (published to the gh-pages branch, not tracked on main)
+/_book/
+
+# Quarto cache and local preview
 /.quarto/
+/_preview.html
 **/*.quarto_ipynb
+
+# R / RStudio session state
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*_cache/
+
+# Local backups and scratch
+/.bak/
+
+# FUSE mount artifacts
+.fuse_hidden*
+
+# OS files
+.DS_Store
+Thumbs.db

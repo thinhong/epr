@@ -1,0 +1,231 @@
+/*-- scss:defaults --*/
+// ============================================================
+//  EPR theme  ·  Harbor colours, Source type, Compact size
+//  Shared design system with the idm4b book. Layers on `cosmo`.
+//  Self-contained: design tokens are declared inline below
+//  (Quarto's SCSS analyzer cannot follow @import, so tokens must
+//  be declared before they are used).
+//  Runtime tokens for the SVG figure scripts live in
+//  assets/tokens.css; keep the colour values in sync.
+//  scss-parser rule: always a space after a declaration colon.
+// ============================================================
+
+// ---- Design tokens ----
+$ox-blue: #002147;
+$ox-blue-2: #0a3161;
+$cobalt: #1B4DC7;
+$cobalt-2: #143aa6;
+$ink: #14263b;
+$ink-2: #42566b;
+$ink-3: #647587;
+$surface: #f1f6fd;
+$surface-2: #e6f0fb;
+$border: #e3edf9;
+$border-strong: #cfe0f2;
+$c-s-line: #2A5CD6;
+$c-s-ink: #1B4DC7;
+$c-i-line: #E0574E;
+$c-i-ink: #C1343F;
+$c-r-line: #16A06B;
+$c-r-ink: #0E7A54;
+$c-e-line: #E0960A;
+$c-e-ink: #9A5B00;
+$c-v-line: #7E5AD6;
+$c-v-ink: #6742BE;
+$c-aux-line: #0E9AAB;
+$c-aux-ink: #0A6E7D;
+$font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+$font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+$fs-root: 15px;
+$radius: 14px;
+$radius-sm: 10px;
+
+// ---- Typography (Bootstrap) ----
+$font-family-sans-serif: $font-sans !default;
+$font-family-monospace: $font-mono !default;
+$headings-font-family: $font-serif !default;
+$font-size-root: $fs-root !default;
+$headings-font-weight: 600 !default;
+$headings-line-height: 1.2 !default;
+$line-height-base: 1.62 !default;
+
+// ---- Color (Bootstrap) ----
+$body-color: $ink !default;
+$primary: $ox-blue !default;
+$secondary: $ink-2 !default;
+$link-color: $cobalt !default;
+$link-hover-color: $cobalt-2 !default;
+$headings-color: $ox-blue !default;
+$border-color: $border !default;
+
+// ---- Shape (Bootstrap) ----
+$border-radius: $radius !default;
+$border-radius-sm: $radius-sm !default;
+$border-radius-lg: $radius !default;
+
+// ---- Code (Bootstrap) ----
+$code-color: $c-v-ink !default;
+$code-bg: $surface-2 !default;
+
+// ---- Bootstrap semantic (alerts, badges, callouts) ----
+$success: $c-r-ink !default;
+$info: $c-s-ink !default;
+$warning: $c-e-ink !default;
+$danger: $c-i-ink !default;
+
+// ---- Quarto callout hues ----
+$callout-color-note: $c-s-ink !default;
+$callout-color-tip: $c-r-ink !default;
+$callout-color-important: $c-i-ink !default;
+$callout-color-warning: $c-e-ink !default;
+$callout-color-caution: $c-v-ink !default;
+
+/*-- scss:rules --*/
+// Every declaration uses "prop: value" (space after colon) so both
+// dart-sass and Quarto's scss-parser accept it.
+
+// ---- Base rhythm ----
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3, h4, h5 { letter-spacing: -0.012em; }
+h1 { letter-spacing: -0.022em; }
+a { text-underline-offset: 2px; text-decoration-thickness: 1.5px; }
+
+// ---- Chapter title block ----
+#title-block-header .quarto-title h1.title { font-weight: 700; letter-spacing: -0.028em; }
+.quarto-title-banner { background: $surface; }
+
+// ---- Left sidebar (book navigation) ----
+// Active item is shown by cobalt text on a soft surface fill only.
+// No colored left rule here (that read too much like a content callout).
+.sidebar-navigation .sidebar-item .sidebar-link {
+  color: $ink-2;
+  border-radius: 8px;
+  padding: 0.28rem 0.55rem;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+.sidebar-navigation .sidebar-item .sidebar-link:hover { color: $ox-blue; background: $surface; }
+.sidebar-navigation .sidebar-item .sidebar-link.active {
+  color: $cobalt;
+  font-weight: 600;
+  background: $surface;
+}
+.sidebar-title, .sidebar-header .sidebar-title { color: $ox-blue; font-family: $font-serif; }
+
+// ---- Right TOC (in-page contents) ----
+nav[role="doc-toc"] a, #TOC a {
+  color: $ink-3;
+  border-left: 2px solid transparent;
+  padding-left: 0.6rem;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+nav[role="doc-toc"] a:hover { color: $ox-blue; }
+nav[role="doc-toc"] a.active, #TOC a.active {
+  color: $cobalt;
+  border-left-color: $cobalt;
+  font-weight: 600;
+}
+nav[role="doc-toc"] > h2, nav[role="doc-toc"] .h2 {
+  color: $ink-3;
+  font-family: $font-sans;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+}
+
+// ---- Inline code ----
+p code, li code, td code, :not(pre) > code {
+  background: $surface-2;
+  color: $c-v-ink;
+  padding: 0.12em 0.4em;
+  border-radius: 6px;
+  border: 1px solid $border;
+  font-size: 0.86em;
+}
+
+// ---- Code blocks ----
+div.sourceCode {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  margin: 1rem 0;
+}
+div.sourceCode pre.sourceCode { background: transparent; padding: 0.85rem 1rem; }
+.code-copy-button { color: $ink-3; border-radius: 8px; }
+.code-copy-button:hover { color: $cobalt; background: $surface-2; }
+// Hidden source blocks (echo: false, e.g. figure widget cells) still emit a
+// copy button; suppress it so it does not float over the widget.
+.sourceCode.hidden + .code-copy-button { display: none; }
+
+// ---- Callouts ----
+.callout { border-radius: $radius; }
+.callout .callout-title { font-family: $font-sans; font-weight: 700; letter-spacing: -0.01em; }
+.callout .callout-title-container { font-weight: 700; }
+
+// ---- Tables ----
+table.table { font-size: 0.95em; }
+table.table > thead { background: $ox-blue; color: #fff; }
+table.table > thead th { border-color: $ox-blue-2; font-weight: 600; letter-spacing: 0.01em; }
+table.table > tbody td { border-color: $border; }
+table.table > tbody tr:nth-child(even) > * { background: $surface; }
+.table > :not(caption) > * > * { padding: 0.6rem 0.8rem; }
+
+// ---- Blockquote ----
+.blockquote, blockquote {
+  border-left: 4px solid $cobalt;
+  color: $ink-2;
+  background: $surface;
+  padding: 0.7rem 1rem;
+  border-radius: 0 $radius-sm $radius-sm 0;
+}
+
+// ---- Figures ----
+figure figcaption, .figure-caption, .quarto-figure figcaption, .subfigure-caption {
+  color: $ink-3;
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
+// ---- Buttons ----
+.btn-primary { background-color: $cobalt; border-color: $cobalt; }
+.btn-primary:hover, .btn-primary:focus { background-color: $cobalt-2; border-color: $cobalt-2; }
+.btn-outline-primary { color: $ox-blue; border-color: $border-strong; }
+.btn-outline-primary:hover { background-color: $surface; color: $ox-blue; border-color: $ox-blue; }
+
+// ---- Figure images ----
+.quarto-figure .figure-img { border-radius: $radius-sm; }
+
+// ---- Focus (keyboard) ----
+a:focus-visible, button:focus-visible, .btn:focus-visible,
+input:focus-visible, select:focus-visible, .sidebar-link:focus-visible {
+  outline: 3px solid rgba(27, 77, 199, 0.55);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+// ---- Responsive / mobile ----
+// Figures and images never overflow their column on a phone.
+.quarto-figure img, figure img, .cell-output-display img, p img {
+  max-width: 100%;
+  height: auto;
+}
+// On-brand tap feedback (instead of the default grey flash) on touch.
+a, button, .btn, summary, .sidebar-link, .code-copy-button {
+  -webkit-tap-highlight-color: rgba(27, 77, 199, 0.14);
+}
+// Keep primary buttons comfortably tappable on small screens.
+@media (max-width: 600px) {
+  .btn { min-height: 44px; }
+}
+
+// ---- EPR interactive figure mounts ----
+// Each SVG game/chart mounts into one of these; the figure's own
+// component CSS is injected by js/epr-viz.js (EPR.injectStyles).
+.epr-mount { margin: 1.5rem 0; }
+
+// ---- Reduced motion ----
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}

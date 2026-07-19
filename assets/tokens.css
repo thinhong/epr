@@ -1,0 +1,55 @@
+/* ============================================================
+   EPR RUNTIME DESIGN TOKENS (plain CSS) - "Harbor", shared with idm4b.
+   Read by the SVG figure scripts at runtime via
+   getComputedStyle(document.documentElement). Mirror of
+   assets/theme.scss; keep the colour values in sync.
+   ============================================================ */
+:root{
+  /* ---- Harbor core (mirrors idm4b) ---- */
+  --ox-blue:#002147; --ox-blue-2:#0a3161; --cobalt:#1B4DC7; --cobalt-2:#143aa6;
+  --ink:#14263b; --ink-2:#42566b; --ink-3:#647587;
+  --surface:#f1f6fd; --surface-2:#e6f0fb; --border:#e3edf9; --border-strong:#cfe0f2;
+
+  /* semantic roles: line (vivid) + ink (AA text on white) */
+  --c-s:#2A5CD6; --c-s-ink:#1B4DC7;   /* blue   */
+  --c-i:#E0574E; --c-i-ink:#C1343F;   /* red    */
+  --c-r:#16A06B; --c-r-ink:#0E7A54;   /* green  */
+  --c-e:#E0960A; --c-e-ink:#9A5B00;   /* amber  */
+  --c-v:#7E5AD6; --c-v-ink:#6742BE;   /* violet */
+  --c-aux:#0E9AAB; --c-aux-ink:#0A6E7D; /* teal */
+
+  --radius:14px; --radius-sm:10px; --radius-pill:999px;
+  --shadow:0 6px 20px rgba(4,33,71,.08); --shadow-lg:0 14px 34px rgba(4,33,71,.13);
+  --dur-fast:180ms; --dur-base:240ms; --dur-slow:340ms;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --font-sans:'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif:'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- EPR surveillance semantics (mapped onto Harbor) ---- */
+  /* Each role has a vivid line (strokes/fills) and an AA ink (text). */
+  --epr-ink:#14263b;
+  --epr-heading:#002147;
+  --epr-muted:#647587;
+  --epr-grid:#e3edf9;
+  --epr-gridStrong:#cfe0f2;
+  --epr-surface:#ffffff;
+  --epr-surfaceAlt:#f1f6fd;
+  --epr-surfaceAlt2:#e6f0fb;
+  --epr-expected:#0E9AAB;        /* in-control baseline (teal line) */
+  --epr-expectedInk:#0A6E7D;     /* teal text */
+  --epr-band:rgba(14,154,171,.14);
+  --epr-accent:#1B4DC7;          /* live statistic / primary (cobalt) */
+  --epr-accentSoft:rgba(27,77,199,.13);
+  --epr-alarm:#E0960A;           /* soft limit / over target (amber line) */
+  --epr-alarmInk:#9A5B00;        /* amber text */
+  --epr-alarmStrong:#E0574E;     /* hard stop H / alarm (red line) */
+  --epr-alarmStrongInk:#C1343F;  /* red text */
+  --epr-good:#0E9AAB;
+  --epr-inactive:#aab8cc;        /* pre-monitoring / reference bars */
+
+  /* illustration tokens (vial + conveyor) - neutral machine greys */
+  --epr-glass:#eef3f8; --epr-glassStroke:#9aa7b5;
+  --epr-cap:#8b95a1; --epr-capHi:#b9c1ca; --epr-capEdge:#6f7882; --epr-crimp:#7e8893;
+  --epr-belt:#8b98a8; --epr-roller:#b6c0cc;
+}

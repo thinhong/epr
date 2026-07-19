@@ -2,6 +2,7 @@ project:
   type: book
   resources:
     - js/
+    - assets/
 
 execute:
   freeze: auto
@@ -28,5 +29,6 @@ format:
   html:
     theme:
       - cosmo
-      - brand
-      - epr.scss
+      - assets/theme.scss
+    include-in-header: assets/head-fonts.html
+    css: assets/tokens.css

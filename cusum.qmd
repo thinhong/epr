@@ -3,47 +3,41 @@ title: "CUSUM"
 format: html
 ---
 
-CUSUM accumulates deviations from an expected mean and is therefore optimal for detecting small, persistent shifts (the gradual onset of an outbreak)
+CUSUM adds up how far each reading strays from its target. Small shifts that no single reading would catch still pile up, so it spots a slow, steady change early, like the start of an outbreak. Click through the vaccine line below: each vial is measured, and the CUSUM climbs until it signals.
 
-::: {.column-page}
 ```{=html}
 <div id="cusum-game" class="epr-mount"></div>
 ```
-:::
 
-CUSUM was invented by ES. Page in 1954 [@page1954] for industrial statistical process control; it entered epidemiology via Tillett & Spencer's 1982 influenza-surveillance "cusum graphs" in England and Wales [@tillett1982]
-
-Page referred to a "quality number" $\theta$, by which he meant a parameter of the probability distribution; for example, the mean. He devised CUSUM as a method to determine changes in it, and proposed a criterion for deciding when to take corrective action.
+E.S. Page invented CUSUM in 1954 for factory quality control [@page1954]. Tillett and Spencer brought it into disease surveillance in 1982, with weekly influenza "cusum graphs" for England and Wales [@tillett1982]. Page tracked one parameter of a distribution, usually the mean, and set a rule for when a change was big enough to act on.
 
 ## Computing an epidemic threshold with CUSUM
 
-For case counts the standard tool is the CUSUM in the R `surveillance` package (`algo.cusum`) [@rossi1999], building on counted-data CUSUMs [@lucas1985]. It works in three steps, shown live below, using the package's default settings.
+For weekly case counts, the standard tool is the CUSUM in R's `surveillance` package (`algo.cusum`) [@rossi1999], building on counted-data CUSUMs [@lucas1985]. It runs in three steps, using the package defaults.
 
-**1. Expected count.** First estimate the in-control mean $m$, the count we expect when nothing unusual is happening. By default (`m = NULL`) the package uses the mean of the weeks before monitoring begins; for seasonal data it can instead fit a Poisson regression $\log m_t = \alpha + \gamma\cos(2\pi t/p) + \delta\sin(2\pi t/p)$ and predict each week (`m = "glm"`).
+**1. Expected level.** Take the in-control mean $m$, the count you expect in a normal week. By default the package uses the mean of the weeks before monitoring starts.
 
-**2. Standardize.** Each new count is turned into a standardized deviation (the default `trans = "standard"`),
+**2. Standardize.** Turn each count into a standardized deviation,
 
 $$ z_t = \frac{x_t - m}{\sqrt{m}}, $$
 
-so a healthy week sits near $z_t \approx 0$ whatever the size of $m$.
+so a normal week sits near $z_t \approx 0$ whatever the size of $m$.
 
-**3. Accumulate.** The chart adds up these deviations minus a reference value $k$, floored at zero, and signals once it reaches the decision boundary $h$:
+**3. Accumulate.** Add up these deviations minus a reference value $k$, floored at zero, and signal once the sum reaches the boundary $h$:
 
 $$ S_t = \max\!\left(0,\; S_{t-1} + (z_t - k)\right), \qquad \text{signal when } S_t \ge h. $$
 
-The package defaults are $k = 1.04$ and $h = 2.26$ (tuned for an in-control run length of roughly 500 weeks), and by default $S_t$ is *not* reset after a signal, so a whole epidemic period stays flagged.
+The defaults are $k = 1.04$ and $h = 2.26$, and $S_t$ is not reset after a signal, so a whole outbreak stays flagged.
 
-The same rule can be read as a threshold on the raw count: a week signals exactly when
+The same rule reads as a threshold on the raw count. A week signals exactly when its cases reach
 
-$$ x_t \;\ge\; U_t = \left\lceil m + \sqrt{m}\,(h + k - S_{t-1}) \right\rceil, $$
+$$ x_t \ge U_t = \left\lceil m + \sqrt{m}\,(h + k - S_{t-1}) \right\rceil, $$
 
-which the package returns as its `upperbound`. This $U_t$ is the **epidemic threshold in cases** for that week. It starts high and falls as evidence accumulates, so a sustained rise is caught even when no single week looks extreme. Drag across the chart below to move through the weeks; the CUSUM follows.
+the package's `upperbound`. This $U_t$ is the **epidemic threshold in cases**. It starts high and falls as evidence builds, so a steady rise is caught even when no single week looks extreme. Hover across the plot below to see each week's numbers.
 
-::: {.column-page}
 ```{=html}
 <div id="cusum-epi" class="epr-mount"></div>
 ```
-:::
 
 ```{=html}
 <script src="js/epr-viz.js"></script>

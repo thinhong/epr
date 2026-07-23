@@ -2,16 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.8.27">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>1&nbsp; CUSUM – Epidemic Preparedness and Response</title>
 <style>
-/* Default styles provided by pandoc.
-** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -27,6 +24,7 @@ ul.task-list li input[type="checkbox"] {
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -56,14 +54,15 @@ div.csl-indent {
 <link href="./epithreshold.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-79932594aa0290807c47a4fa0512a8dc.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-452e82b5fdc6925848d8869b1cdec60b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-51f50a928ebeba495cf6b26d8df7c1ad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d7ba9af0fa552691178a684151a10853.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -96,7 +95,7 @@ div.csl-indent {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -235,7 +234,7 @@ window.Quarto = {
 <p>E.S. Page invented CUSUM in 1954 for factory quality control <span class="citation" data-cites="page1954">(<a href="references.html#ref-page1954" role="doc-biblioref">Page 1954</a>)</span>. Tillett and Spencer brought it into disease surveillance in 1982, with weekly influenza “cusum graphs” for England and Wales <span class="citation" data-cites="tillett1982">(<a href="references.html#ref-tillett1982" role="doc-biblioref">Tillett and Spencer 1982</a>)</span>. Page tracked one parameter of a distribution, usually the mean, and set a rule for when a change was big enough to act on.</p>
 <section id="computing-an-epidemic-threshold-with-cusum" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="computing-an-epidemic-threshold-with-cusum"><span class="header-section-number">1.1</span> Computing an epidemic threshold with CUSUM</h2>
-<p>For weekly case counts, the standard tool is the CUSUM in R’s <code>surveillance</code> package (<code>algo.cusum</code>) <span class="citation" data-cites="rossi1999">(<a href="references.html#ref-rossi1999" role="doc-biblioref">Rossi et al. 1999</a>)</span>, building on counted-data CUSUMs <span class="citation" data-cites="lucas1985">(<a href="references.html#ref-lucas1985" role="doc-biblioref">Lucas 1985</a>)</span>. It runs in three steps, using the package defaults.</p>
+<p>For weekly case counts, the standard tool is the CUSUM in R’s <code>surveillance</code> package (<a href="https://www.rdocumentation.org/packages/surveillance/versions/1.25.0/topics/algo.cusum"><code>algo.cusum</code></a>) <span class="citation" data-cites="rossi1999">(<a href="references.html#ref-rossi1999" role="doc-biblioref">Rossi, Lampugnani, and Marchi 1999</a>)</span>, building on counted-data CUSUMs <span class="citation" data-cites="lucas1985">(<a href="references.html#ref-lucas1985" role="doc-biblioref">Lucas 1985</a>)</span>. It runs in three steps, using the package defaults.</p>
 <p><strong>1. Expected level.</strong> Take the in-control mean <span class="math inline">\(m\)</span>, the count you expect in a normal week. By default the package uses the mean of the weeks before monitoring starts.</p>
 <p><strong>2. Standardize.</strong> Turn each count into a standardized deviation,</p>
 <p><span class="math display">\[ z_t = \frac{x_t - m}{\sqrt{m}}, \]</span></p>
@@ -243,7 +242,15 @@ window.Quarto = {
 <p><strong>3. Accumulate.</strong> Add up these deviations minus a reference value <span class="math inline">\(k\)</span>, floored at zero, and signal once the sum reaches the boundary <span class="math inline">\(h\)</span>:</p>
 <p><span class="math display">\[ S_t = \max\!\left(0,\; S_{t-1} + (z_t - k)\right), \qquad \text{signal when } S_t \ge h. \]</span></p>
 <p>The defaults are <span class="math inline">\(k = 1.04\)</span> and <span class="math inline">\(h = 2.26\)</span>, and <span class="math inline">\(S_t\)</span> is not reset after a signal, so a whole outbreak stays flagged.</p>
-<p>The same rule reads as a threshold on the raw count. A week signals exactly when its cases reach</p>
+<p>The same rule reads as a threshold on the raw count. To see where that threshold comes from, look at the accumulate step at the exact moment a week trips the alarm. At that point <span class="math inline">\(S_t = h\)</span>, and the running sum is positive, so the floor does nothing:</p>
+<p><span class="math display">\[ h = S_{t-1} + (z_t - k). \]</span></p>
+<p>Rearrange for the standardized deviation that just reaches the boundary:</p>
+<p><span class="math display">\[ z_t = h + k - S_{t-1}. \]</span></p>
+<p>Now put back <span class="math inline">\(z_t = (x_t - m)/\sqrt{m}\)</span> from step 2:</p>
+<p><span class="math display">\[ \frac{x_t - m}{\sqrt{m}} = h + k - S_{t-1}. \]</span></p>
+<p>Multiply through by <span class="math inline">\(\sqrt{m}\)</span> and add <span class="math inline">\(m\)</span> to isolate the count:</p>
+<p><span class="math display">\[ x_t = m + \sqrt{m}\,(h + k - S_{t-1}). \]</span></p>
+<p>Cases are whole numbers, so the smallest count that reaches the boundary is this value rounded up. A week signals exactly when</p>
 <p><span class="math display">\[ x_t \ge U_t = \left\lceil m + \sqrt{m}\,(h + k - S_{t-1}) \right\rceil, \]</span></p>
 <p>the package’s <code>upperbound</code>. This <span class="math inline">\(U_t\)</span> is the <strong>epidemic threshold in cases</strong>. It starts high and falls as evidence builds, so a steady rise is caught even when no single week looks extreme. Hover across the plot below to see each week’s numbers.</p>
 <div id="cusum-epi" class="epr-mount"></div>
@@ -252,7 +259,7 @@ window.Quarto = {
 <script src="js/cusum-epi.js"></script>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
 <div id="ref-lucas1985" class="csl-entry" role="listitem">
 Lucas, James M. 1985. <span>“Counted Data CUSUM’s.”</span> <em>Technometrics</em> 27 (2): 129–44. <a href="https://doi.org/10.1080/00401706.1985.10488030">https://doi.org/10.1080/00401706.1985.10488030</a>.
 </div>

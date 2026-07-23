@@ -100,7 +100,7 @@
     }
 
     function drawCard(g, hi) {
-      var cw = 374, ch = 64, cx0 = CW - MR - cw, cy0 = 186, px = cx0 + 15, yy = cy0 + 21;
+      var cw = 394, ch = 64, cx0 = CW - MR - cw, cy0 = 186, px = cx0 + 15, yy = cy0 + 21;
       svg("rect", { x: cx0, y: cy0, width: cw, height: ch, rx: 11, fill: "#ffffff", stroke: C.grid }, g);
       function T(row, str, size, col, mono, bold) { var a = { x: px, y: yy + row * 19, "font-size": size, fill: col }; if (mono) a["font-family"] = MONO; if (bold) a["font-weight"] = bold; svg("text", a, g).textContent = str; }
       if (hi < 0) {
@@ -115,7 +115,7 @@
         var prevS = hi > B ? S[hi - 1] : 0, sig = COUNTS[hi] >= U[hi], vcol = sig ? C.alarmStrongInk : C.accent;
         T(0, "Week " + (hi + 1) + "  ·  " + COUNTS[hi] + " cases  ·  z = " + z[hi].toFixed(2), 13, C.muted, 0, 0);
         T(1, "S = max(0, " + prevS.toFixed(2) + " + (" + z[hi].toFixed(2) + " − 1.04)) = " + S[hi].toFixed(2), 14, C.ink, 1, 0);
-        T(2, "U = ⌈" + m + " + √" + m + "(3.30 − " + prevS.toFixed(2) + ")⌉ = " + U[hi] + (sig ? "   ▲" : ""), 14, vcol, 1, 700);
+        T(2, "U = ⌈" + m + " + √" + m + "(2.26 + 1.04 − " + prevS.toFixed(2) + ")⌉ = " + U[hi] + (sig ? "   ▲" : ""), 14, vcol, 1, 700);
       }
     }
 

@@ -21,6 +21,7 @@ book:
     - part: epithreshold.qmd
       chapters:
         - cusum.qmd
+        - rki.qmd
     - references.qmd
 
 bibliography: references.bib

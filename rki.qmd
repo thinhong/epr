@@ -1,0 +1,321 @@
+---
+title: "RKI"
+---
+
+The RKI method asks a narrower question than a control chart does. Not "is this
+week high?", but "is this week high *for this week of the year*?" It gathers a
+handful of comparable weeks — the same week in earlier years, and the weeks just
+gone — and treats what happened in them as what should happen now. It is the
+instinct behind judging a June electricity bill against last June rather than
+against the yearly average. Set the three parameters below and watch which weeks
+get pulled into the comparison.
+
+::: {#fig-refset}
+```{=html}
+<div id="viz-refset"></div>
+```
+
+Building the reference set for one week. Selected weeks are shaded; the week
+under assessment is outlined.
+:::
+
+The Robert Koch Institute built this into SurvNet, Germany's national electronic
+notification system, in 2001 [@faensen2006; @rki_practical]. It follows the CDC method of Stroup
+and colleagues [@stroup1989], which introduced the idea of judging a week
+against the equivalent weeks of earlier years rather than against one overall
+average. Höhle's `surveillance` package implements it as `algo.rki`
+[@hoehle2007; @hoehle_riebler_surveillance].
+
+## Computing an epidemic threshold with RKI {#sec-rki-threshold}
+
+For weekly case counts the tool is `algo.rki` in R's `surveillance` package,
+with `algo.rki1`, `algo.rki2` and `algo.rki3` as named presets [@salmon2016]. It
+runs in three steps.
+
+::: {.algo-step}
+**1. Reference set.** Collect the weeks that count as comparable to week $t$.
+They come from two places: a window of width $2w+1$ centred on the equivalent
+week in each of the $b$ previous years, and the $w_0$ weeks immediately before
+$t$ in the current year.
+
+$$
+R_{w,w_0,b} \;=\; \left(\bigcup_{i=1}^{b}\ \bigcup_{j=-w}^{w} y_{\,t-52i+j}\right)
+\;\cup\; \left(\bigcup_{k=1}^{w_0} y_{\,t-k}\right)
+$$
+
+Here $y_t$ is the number of cases notified in week $t$, and 52 is the number of
+weeks the package assumes in a year.
+:::
+
+::: {.algo-step}
+**2. Expected level.** Average them.
+
+$$ \hat\mu = \frac{1}{n}\sum_{y \,\in\, R_{w,w_0,b}} y, \qquad n = \bigl|R_{w,w_0,b}\bigr|. $$
+
+There is no fitted curve and no trend term. The reference weeks *are* the model.
+:::
+
+::: {.algo-step}
+**3. Threshold.** Take the upper limit of a two-sided 95% interval for a count
+of that size. `algo.rki` picks the interval two different ways, depending on how
+large $\hat\mu$ is:
+
+$$
+U_t \;=\;
+\begin{cases}
+\hat\mu + 2\hat\sigma, & \hat\mu > 20,\\[4pt]
+\tfrac{1}{2}\,\chi^2_{0.975}\bigl(2(\lfloor\hat\mu\rfloor+1)\bigr), & \hat\mu \le 20,
+\end{cases}
+$$
+
+with $\hat\sigma$ the sample standard deviation of the reference values. A week
+signals when $N_t > U_t$.
+:::
+
+The defaults are $b=2$, $w=4$ and `actY = FALSE` — the RKI 3 system — the
+comparison is strict, so a week that exactly meets the threshold stays quiet,
+and $U_t$ is never rounded to a whole case, so 24 notifications against a
+threshold of 23.49 is a signal.
+
+### How many weeks the comparison uses {#sec-rki-size}
+
+The two sources of reference weeks never overlap, provided $w_0 < 52 - w$, so
+the size of the set is just the two pieces added together. Count each one.
+
+The current year contributes a single week for each $k$ from 1 to $w_0$:
+
+$$ n_{\text{current}} = w_0. $$
+
+Each past year contributes a single week for each $j$ from $-w$ to $w$, which is
+$2w+1$ weeks, and there are $b$ such years:
+
+$$ n_{\text{past}} = b\,(2w+1). $$
+
+Add them:
+
+$$ n = w_0 + b\,(2w+1). $$
+
+Nothing here depends on the case counts. The **size of the comparison is fixed
+by the calendar alone**, decided before any data is read, which is what makes
+the three published systems directly comparable.
+
+One implementation detail matters when you go to run it. In `algo.rki` the two
+widths are not independent: the current-year window is switched on by `actY` and
+reuses the same $w$, so
+
+$$ w_0 = w \cdot \mathbf{1}\{\texttt{actY}\}, $$
+
+and the package labels its output `rki(w, w0, b)` accordingly. A setting like
+$w=1$ with $w_0=2$ is expressible in the definition above but not through
+`algo.rki`; it needs a hand-rolled reference set.
+
+### Where the two branches come from {#sec-rki-branches}
+
+Both branches answer one question: how large can a count get before it stops
+looking like a draw from the reference level?
+
+When the expected count is large, the reference values are roughly symmetric
+about their mean, and the upper limit of a two-sided 95% interval sits about two
+standard deviations above it. The package rounds 1.96 to 2 and takes
+
+$$ U_t = \hat\mu + 2\hat\sigma. $$
+
+When the expected count is small that approximation fails: counts are discrete,
+the distribution is skewed, and a symmetric interval can reach below zero. So
+the package uses the exact Poisson limit instead. For an observation $x$, the
+upper limit is the rate at which $x$ or fewer cases would be seen only 2.5% of
+the time:
+
+$$ \Pr\bigl(X \le x \mid \lambda = U\bigr) = 0.025, $$
+
+which has a closed form in terms of the chi-square quantile,
+
+$$ U = \tfrac{1}{2}\,\chi^2_{0.975}\bigl(2(x+1)\bigr). $$
+
+`algo.rki` reads this out of a stored table (`CIdata`, tabulated by Sachs
+[@sachs1991]) at $x = \lfloor\hat\mu\rfloor$, the reference mean rounded down to
+a whole case. That floor is why $U_t$ is a **step function**: it holds still
+while the reference mean drifts, then jumps the moment the mean crosses an
+integer.
+
+A quicker approximation is sometimes quoted for this step, $\hat\mu +
+1.96\sqrt{\hat\mu}$, which treats the reference mean as a Poisson rate. It lands
+close, but it is not what the package computes, and it is the more permissive of
+the two — on the example below it gives 23.16 where the table gives 24.74.
+
+### The example in @fig-refset {#sec-rki-example}
+
+The figure opens on a worked case. Week 25 of 2026 is assessed with $b=3$, $w=1$
+and $w_0=2$, so the reference set is the three weeks around week 25 in each of
+2025, 2024 and 2023, plus weeks 23 and 24 of 2026 — eleven weeks in all, from
+the formula $n = 2 + 3(2\cdot 1 + 1) = 11$. They average 15.45 cases. That is
+below 20, so the Poisson branch applies: $\lfloor 15.45 \rfloor = 15$, and the
+table gives $U = 24.74$. Twenty-one notifications would pass; twenty-six would
+signal.
+
+Raising $w_0$ pulls more of the current year into the comparison, and lowering
+it pushes the method back onto earlier years. That single trade is what
+separates the three published systems.
+
+## RKI 1, RKI 2 and RKI 3 {#sec-rki-variants}
+
+::: {.algo-step}
+**RKI 1** — $b=0$, $w=6$, `actY = TRUE`, six reference weeks. The six weeks just
+gone, and nothing else. It has no memory of previous years, so it cannot know
+what time of year it is; what it can do is react within six weeks of a change.
+:::
+
+::: {.algo-step}
+**RKI 2** — $b=1$, $w=6$, `actY = TRUE`, nineteen reference weeks. The same six
+recent weeks, plus the thirteen weeks centred on the equivalent week one year
+ago. Roughly half recent, half seasonal.
+:::
+
+::: {.algo-step}
+**RKI 3** — $b=2$, $w=4$, `actY = FALSE`, eighteen reference weeks. The current
+year is dropped entirely; nine weeks are taken around the equivalent week in
+each of the two previous years. Every reference week is seasonal.
+:::
+
+::: {#fig-series}
+```{=html}
+<div id="viz-series"></div>
+```
+
+The same simulated series under all three systems. Hover a week to see the
+reference weeks behind it.
+:::
+
+The consequence is visible in @fig-series. Because RKI 1 and RKI 2 include the
+weeks immediately before $t$, a rise that lasts more than a few weeks **enters
+its own reference set** and lifts its own threshold behind it. The simulated
+rise in the fourth year of the figure spans weeks 14 to 25 of 2025: RKI 1 flags
+two of those weeks, RKI 2 flags four, and RKI 3 — which never looks at the
+current year — flags six.
+
+That is not a ranking. It is a trade, and it runs in both directions. RKI 3
+keeps a baseline no ongoing outbreak can inflate, but it cannot report at all
+until two full years of history exist behind it; in the figure it stays silent
+until week 5 of 2024, while RKI 1 is running by week 7 of 2022. A short memory
+buys speed and a short warm-up and pays for it in seasonal blindness. A long one
+buys a seasonal baseline and pays for it in start-up time and in slower
+recognition that the baseline itself has shifted.
+
+The series in @fig-series is simulated, not observed. It is there to show how
+the threshold behaves, not how dengue behaves.
+
+## Poisson or negative binomial {#sec-rki-dispersion}
+
+Every threshold so far has assumed that a week's count varies about as
+much as its own average. That is what lets $\sqrt{\hat\mu}$ carry the
+whole of step 3: Poisson counts have variance equal to their mean, so
+the mean alone fixes the spread, and no separate variance has to be
+estimated.
+
+The choice between the two distributions is not a choice about which
+disease you are watching. It comes down to one question about the
+reference weeks: do they vary more than their own mean?
+
+Poisson says no. It holds when cases arrive independently, at a rate
+that does not move across the reference weeks. Three things break that,
+and any one is enough:
+
+-   **Cases are not independent.** One case produces others, so they
+    arrive in lumps rather than one at a time.
+-   **The rate itself moves.** Whatever drives transmission changes
+    across the reference weeks, so they are not draws from a single
+    distribution.
+-   **Reporting is uneven.** A delayed week followed by a double week
+    adds variance that has nothing to do with transmission.
+
+All three inflate the variance and leave the mean alone — the one
+failure Poisson cannot express, because it has no parameter for it.
+
+### What it costs to get this wrong {#sec-rki-inflation}
+
+Write the excess as a dispersion factor
+$\varphi = \operatorname{Var}(y) /
+\operatorname{E}(y)$, so $\varphi = 1$ under Poisson. A negative
+binomial with mean $\mu$ and dispersion $\varphi$ has variance
+$\varphi\mu$, so its standard deviation is
+
+$$ \sqrt{\varphi\mu} \;=\; \sqrt{\varphi}\,\sqrt{\mu}. $$
+
+The distance from the mean up to any quantile is a multiple of the
+standard deviation, so it widens by $\sqrt{\varphi}$, not by $\varphi$.
+Doubling the variance moves the threshold out by about 41%.
+
+Small in the threshold, large in the alarm rate. The `algo.rki` Poisson
+branch starts out conservative — a confidence limit read from a table,
+not a predictive quantile — so on true Poisson counts it fires on about
+one normal week in a hundred, not the one in twenty its 95% label
+suggests. Hold that threshold fixed and let the counts be overdispersed:
+
+| Reference mean $\hat\mu$ | Threshold $U_t$ | Poisson | $\varphi = 2$ | $\varphi = 3$ | $\varphi = 5$ |
+|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|
+|                        5 |           11.67 |    0.6% |          3.8% |          6.7% |         10.2% |
+|                       10 |           18.39 |    0.7% |          4.4% |          7.6% |         11.7% |
+|                       15 |           24.74 |    1.1% |          5.4% |          9.0% |         13.4% |
+|                       20 |           30.89 |    1.4% |          6.0% |          9.7% |         14.4% |
+
+: Chance that one ordinary week trips the alarm, holding the RKI
+threshold fixed and varying only the dispersion of the counts underneath
+it. {#tbl-rki-dispersion}
+
+At $\varphi = 3$, a threshold meant to fire on about 1% of normal weeks
+fires on 9%: a false alarm every eleven weeks in place of one every two
+years. In cases, the worked example's threshold of 24.74 would have to
+sit at 33.
+
+The error runs one way only. Assuming Poisson when $\varphi > 1$ costs
+specificity, never sensitivity.
+
+### Choosing {#sec-rki-phi}
+
+$\varphi$ is estimated, not assumed. Estimate it from a long stretch of
+non-epidemic weeks — **not** from the reference set, whose 18 or 19
+values are far too few. The usual estimator is the Pearson dispersion of
+a quasi-Poisson fit with the seasonality left in:
+
+``` r
+fit <- glm(cases ~ t + sin(2*pi*week/52) + cos(2*pi*week/52),
+           family = quasipoisson, data = baseline)
+summary(fit)$dispersion
+```
+
+**Near 1, stay with Poisson.** `algo.rki` works as it stands, needs no
+second estimate, and a badly fitted dispersion is its own source of
+error.
+
+**Above about 2, move to the negative binomial.** @tbl-rki-dispersion
+applies, and the Poisson threshold is delivering several times the alarm
+rate it claims.
+
+**In between, prefer Poisson when the baseline is short.** A
+$\hat\varphi$ drawn from two years of weekly data is itself uncertain,
+and over-estimating it raises the threshold and hides outbreaks Poisson
+would have caught.
+
+`algo.rki` has no negative binomial option. The smallest change keeps
+its reference set and replaces only the last step: a negative binomial
+with mean $\hat\mu$ and variance $\hat\varphi\hat\mu$ has size parameter
+$k = \hat\mu / (\hat\varphi - 1)$, so
+
+``` r
+U <- qnbinom(1 - alpha, mu = mu_hat, size = mu_hat / (phi_hat - 1))
+```
+
+The reference weeks, the calendar and the decision rule are unchanged;
+only the tail is. Beyond that, `farringtonFlexible` estimates dispersion
+as part of fitting and downweights past outbreaks so they cannot inflate
+the baseline [@farrington1996; @noufaily2013], and `boda` fits a
+negative binomial outright [@salmon2016] — both at far more computation
+than RKI.
+
+```{=html}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/rki-core.js"></script>
+<script src="js/rki-reference-set.js"></script>
+<script src="js/rki-series.js"></script>
+```

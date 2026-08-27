@@ -229,3 +229,220 @@ a, button, .btn, summary, .sidebar-link, .code-copy-button {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
 }
+
+
+
+// ============================================================
+//  RKI chapter figures
+//  Append to the END of assets/theme.scss, inside the existing
+//  /*-- scss:rules --*/ section. Nothing here is global: every
+//  selector is .viz-* or .algo-step, so the CUSUM chapter and
+//  the rest of the book are untouched.
+//
+//  Colours come from the $tokens declared at the top of this
+//  file, so the figures cannot drift out of sync with the book,
+//  and each one still honours an --epr-* override at runtime.
+// ============================================================
+
+:root {
+  --viz-ink:          var(--epr-ink, #{$ink});
+  --viz-ink-deep:     var(--epr-heading, #{$ox-blue});
+  --viz-ink-muted:    var(--epr-muted, #{$ink-3});
+
+  --viz-blue:         var(--epr-accent, #{$cobalt});        // observed data, running statistic
+  --viz-teal:         var(--epr-expected, #{$c-aux-line});  // expected level  (always dashed)
+  --viz-red:          var(--epr-alarmStrong, #{$c-i-line}); // alarm boundary  (always dashed)
+  --viz-amber:        var(--epr-alarm, #{$c-e-line});       // the deviation itself
+  --viz-grey:         #{$border-strong};                    // outside the monitored range
+
+  --viz-blue-fill:    #{rgba($cobalt, 0.12)};
+  --viz-red-fill:     #{rgba($c-i-line, 0.58)};
+
+  --viz-surface:      var(--epr-surface, #ffffff);
+  --viz-surface-alt:  var(--epr-surfaceAlt, #{$surface});
+  --viz-rule:         var(--epr-grid, #{$border});
+  --viz-rule-strong:  #{$border-strong};
+  --viz-radius:       #{$radius};
+}
+
+// ---- Numbered algorithm steps ----
+// Written in markdown as: **1. Reference set.** Collect the ...
+.algo-step {
+  max-width: 46rem;
+  margin-bottom: 1.15rem;
+}
+.algo-step strong:first-child { color: $ox-blue; }
+
+// ---- Figure card ----
+// Every interactive figure lives in one of these.
+.viz-card {
+  // Quarto wraps ::: {#fig-...} in <figure class="quarto-figure-center">,
+  // which pushes text-align: center onto everything inside. Undo it here.
+  text-align: left;
+
+  border: 1px solid var(--viz-rule);
+  border-radius: var(--viz-radius);
+  background: var(--viz-surface);
+  padding: 1.5rem 1.6rem 1.4rem;
+  margin: 2rem 0 2.4rem;
+  box-shadow: 0 1px 2px rgba(0, 33, 71, 0.04);
+}
+
+.viz-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.viz-title {
+  font-family: $font-sans;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--viz-ink-deep);
+  margin: 0;
+}
+
+// Status pill — "Running", "Signal", "RKI 3"
+.viz-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--viz-ink-deep);
+  border: 1px solid var(--viz-rule);
+  border-radius: 999px;
+  padding: 0.38rem 0.95rem;
+  white-space: nowrap;
+}
+.viz-status .dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--viz-teal); }
+.viz-status[data-state="alarm"] .dot { background: var(--viz-red); }
+.viz-status[data-state="idle"] .dot { background: var(--viz-grey); }
+
+.viz-panel + .viz-panel { margin-top: 0.4rem; }
+.viz-panel-label { font-size: 0.95rem; font-weight: 700; color: var(--viz-ink-deep); margin: 0 0 0.2rem; }
+
+// ---- Formula box ----
+// Restates the update rule being drawn, plus one hint line.
+.viz-formula {
+  font-family: $font-mono;
+  font-size: 0.84rem;
+  line-height: 1.65;
+  color: var(--viz-ink-muted);
+  border: 1px solid var(--viz-rule);
+  border-radius: $radius-sm;
+  padding: 0.8rem 1rem;
+  background: var(--viz-surface-alt);
+}
+.viz-formula .viz-formula-title { color: var(--viz-ink-muted); font-weight: 500; }
+.viz-formula .viz-formula-hint { color: var(--viz-ink-muted); opacity: 0.75; }
+
+// ---- Parameter steppers ----
+.viz-params { display: flex; flex-wrap: wrap; gap: 1.4rem 2.2rem; margin-bottom: 1.2rem; }
+
+.viz-param { display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; }
+.viz-param .k { font-family: $font-mono; font-weight: 500; color: var(--viz-ink-deep); min-width: 1.4rem; }
+.viz-param .v { font-family: $font-mono; font-weight: 600; color: var(--viz-blue); min-width: 1.3rem; text-align: center; }
+.viz-param .d { color: var(--viz-ink-muted); }
+
+.viz-step {
+  width: 1.85rem;
+  height: 1.85rem;
+  line-height: 1;
+  border: 1px solid var(--viz-rule);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--viz-ink-deep);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.viz-step:hover:not(:disabled) { border-color: var(--viz-rule-strong); }
+.viz-step:disabled { opacity: 0.35; cursor: not-allowed; }
+
+// ---- Preset tabs ----
+.viz-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.1rem; }
+
+.viz-tab {
+  font-size: 0.94rem;
+  font-weight: 600;
+  padding: 0.5rem 1.05rem;
+  border-radius: 8px;
+  border: 1px solid var(--viz-rule);
+  background: #fff;
+  color: var(--viz-ink-deep);
+  cursor: pointer;
+}
+.viz-tab[aria-pressed="true"] { background: var(--viz-blue); border-color: var(--viz-blue); color: #fff; }
+
+// ---- Live readout ----
+// The numbers behind whatever the reader is pointing at.
+.viz-readout {
+  font-family: $font-mono;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: var(--viz-ink-muted);
+  border: 1px solid var(--viz-rule);
+  border-radius: $radius-sm;
+  padding: 0.75rem 1rem;
+  margin-top: 0.9rem;
+  background: var(--viz-surface-alt);
+}
+.viz-readout b { color: var(--viz-ink-deep); font-weight: 600; }
+.viz-readout .ok { color: var(--viz-teal); font-weight: 600; }
+.viz-readout .alarm { color: var(--viz-red); font-weight: 600; }
+
+// Shown in place of a figure when its scripts did not arrive.
+.viz-missing {
+  font-family: $font-mono;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: $c-i-ink;
+  background: $surface;
+  border: 1px solid $border-strong;
+  border-radius: $radius-sm;
+  padding: 0.8rem 1rem;
+}
+
+// ---- Controls: one primary, the rest ghost ----
+.viz-controls { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.3rem; }
+
+.viz-btn {
+  font-family: $font-sans;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.72rem 1.5rem;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.viz-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.viz-btn--primary { background: var(--viz-blue); color: #fff; }
+.viz-btn--primary:hover:not(:disabled) { background: $cobalt-2; }
+.viz-btn--ghost { background: #fff; color: var(--viz-ink-deep); border-color: var(--viz-rule); }
+.viz-btn--ghost:hover:not(:disabled) { border-color: var(--viz-rule-strong); }
+
+// ---- SVG conventions ----
+// No legend, no gridlines, no frame. Series are labelled directly
+// at the end of the line they describe.
+.viz-card svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.viz-axis .domain { stroke: var(--viz-rule); }
+.viz-axis line { stroke: var(--viz-rule); }
+.viz-axis text { fill: var(--viz-ink-muted); font-size: 0.82rem; font-family: $font-sans; }
+.viz-axis--bare .domain { display: none; }
+.viz-axis--bare line { display: none; }
+
+.viz-refline { stroke-dasharray: 5 5; stroke-width: 1.5; fill: none; }
+.viz-reflabel { font-family: $font-sans; font-size: 0.88rem; font-weight: 600; dominant-baseline: middle; }
+.viz-annot { font-family: $font-sans; font-size: 0.88rem; font-weight: 700; text-anchor: middle; }
+
+// ---- Small screens ----
+@media (max-width: 600px) {
+  .viz-card { padding: 1.1rem 1rem; }
+  .viz-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .viz-controls .viz-btn { flex: 1 1 auto; }
+}
+

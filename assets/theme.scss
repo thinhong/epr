@@ -335,6 +335,7 @@ a, button, .btn, summary, .sidebar-link, .code-copy-button {
   border-radius: $radius-sm;
   padding: 0.8rem 1rem;
   background: var(--viz-surface-alt);
+  white-space: pre-wrap;
 }
 .viz-formula .viz-formula-title { color: var(--viz-ink-muted); font-weight: 500; }
 .viz-formula .viz-formula-hint { color: var(--viz-ink-muted); opacity: 0.75; }

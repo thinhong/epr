@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Bayesian – Epidemic Preparedness and Response</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./farrington.html" rel="next">
+<link href="./rki.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e59b32b52c4a9ca5d924671db93c520.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-bb9e99e26899b142fb721f4d14f6f13c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/tokens.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./bayes.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Epidemic Preparedness and Response</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/thinhong/epr" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./epithreshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Epidemic threshold</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cusum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">CUSUM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rki.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">RKI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bayes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./farrington.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-bayes-limits" id="toc-sec-bayes-limits" class="nav-link active" data-scroll-target="#sec-bayes-limits"><span class="header-section-number">3.1</span> What a reference set leaves behind</a></li>
+  <li><a href="#sec-bayes-threshold" id="toc-sec-bayes-threshold" class="nav-link" data-scroll-target="#sec-bayes-threshold"><span class="header-section-number">3.2</span> Computing an epidemic threshold with BODA</a>
+  <ul class="collapse">
+  <li><a href="#sec-bayes-variance" id="toc-sec-bayes-variance" class="nav-link" data-scroll-target="#sec-bayes-variance"><span class="header-section-number">3.2.1</span> Why the Bayesian threshold sits higher</a></li>
+  </ul></li>
+  <li><a href="#sec-bayes-delay" id="toc-sec-bayes-delay" class="nav-link" data-scroll-target="#sec-bayes-delay"><span class="header-section-number">3.3</span> When this week’s count is not yet this week’s count</a></li>
+  <li><a href="#sec-bayes-practice" id="toc-sec-bayes-practice" class="nav-link" data-scroll-target="#sec-bayes-practice"><span class="header-section-number">3.4</span> Practical notes</a></li>
+  <li><a href="#sec-bayes-evaluation" id="toc-sec-bayes-evaluation" class="nav-link" data-scroll-target="#sec-bayes-evaluation"><span class="header-section-number">3.5</span> Measuring whether it works</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./bayes.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Every method so far has answered “how high is too high” by looking up comparable weeks and asking how far above them this week sits. This one answers it differently. It writes down a full probability distribution for what next week’s count could be, then cuts that distribution at a high quantile and calls everything above the cut a signal.</p>
+<p>The difference lives entirely in the tail. A distribution built from parameters you pretend to know is narrower than one built from parameters you admit you had to estimate, and a narrower distribution puts the threshold lower than it should be. Raise the uncertainty slider below and watch the two thresholds come apart.</p>
+<div id="fig-predictive" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-predictive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-predictive"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-predictive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Two predictive distributions for the same week. The grey outline fixes the parameters at their estimates; the blue one averages over what they might be. The shaded band is the gap between the thresholds they produce.
+</figcaption>
+</figure>
+</div>
+<p>The algorithm is BODA, the Bayesian Outbreak Detection Algorithm of Manitz and Höhle <span class="citation" data-cites="manitz2013">(<a href="references.html#ref-manitz2013" role="doc-biblioref">Manitz and Höhle 2013</a>)</span>, implemented in R’s <code>surveillance</code> package as <code>boda()</code> <span class="citation" data-cites="salmon2016">(<a href="references.html#ref-salmon2016" role="doc-biblioref">Salmon et al. 2016</a>)</span>. Salmon and colleagues later extended it to handle reporting delay <span class="citation" data-cites="salmon2015">(<a href="references.html#ref-salmon2015" role="doc-biblioref">Salmon et al. 2015</a>)</span>, which is <code>bodaDelay()</code>.</p>
+<section id="sec-bayes-limits" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="sec-bayes-limits"><span class="header-section-number">3.1</span> What a reference set leaves behind</h2>
+<p>Before the method, the complaint it answers. Reference-value methods — the CUSUM and RKI chapters both belong here — pay for their simplicity in four ways.</p>
+<div class="algo-step">
+<p><strong>They use a sliver of the data.</strong> A handful of weeks from a handful of years decides the threshold. The rest of the series still carries information about trend and seasonality, and none of it is read.</p>
+</div>
+<div class="algo-step">
+<p><strong>The answer depends on a window you chose.</strong> How many years back, how many weeks either side. <a href="rki.html#sec-rki-size" class="quarto-xref"><span>Section 2.1.1</span></a> showed those choices fixing the size of the comparison before any data is read, and nothing in the method tells you which choice is right.</p>
+</div>
+<div class="algo-step">
+<p><strong>They act as though the estimate were the truth.</strong> The reference mean is substituted straight into the predictive distribution, as if it were known rather than estimated. This is the plug-in step, and it is what narrows the distribution and drops the threshold.</p>
+</div>
+<div class="algo-step">
+<p><strong>There is nowhere to put a cause.</strong> Cases rise for reasons — weather, population movement, a change in who gets tested. A reference set has no slot for any of them.</p>
+</div>
+<p>One clarification is worth making before going further, because the chapter title invites the wrong reading. The line that separates these two families is not frequentist against Bayesian. It is <strong>reference values against a regression model</strong>. The Bayesian framework by itself fixes only the third complaint, the plug-in step. The other three fall only because the method moves to a full regression on the whole series.</p>
+<p>The package makes the point for you. <code>surveillance</code> also ships <code>algo.bayes</code>, which is Bayesian and still reference-value based — and still has all three of the other problems.</p>
+</section>
+<section id="sec-bayes-threshold" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="sec-bayes-threshold"><span class="header-section-number">3.2</span> Computing an epidemic threshold with BODA</h2>
+<p><code>boda()</code> runs in six steps. The first three build a model, the fourth fits it, and the last two turn the fit into a number you can compare a count against.</p>
+<div class="algo-step">
+<p><strong>1. Choose the distribution.</strong> Case counts almost always vary more than their own mean, because transmission clusters and so the observations are not independent. <a href="rki.html#sec-rki-dispersion" class="quarto-xref"><span>Section 2.3</span></a> made that case in full; BODA takes it as the starting point and uses a negative binomial throughout:</p>
+<p><span class="math display">\[ y_t \mid \mu_t, \nu \;\sim\; \mathrm{NB}(\mu_t, \nu), \qquad \operatorname{Var}(y_t) = \mu_t + \frac{\mu_t^2}{\nu}. \]</span></p>
+<p>Watch the direction of <span class="math inline">\(\nu\)</span>, which is easy to read backwards. A <strong>larger</strong> <span class="math inline">\(\nu\)</span> means <strong>less</strong> spread; as <span class="math inline">\(\nu \to \infty\)</span> the distribution collapses to Poisson. It measures the inverse of overdispersion.</p>
+</div>
+<div class="algo-step">
+<p><strong>2. Model the expected count.</strong> Everything that should move the expectation goes into a linear predictor on the log scale:</p>
+<p><span class="math display">\[ \log \mu_t \;=\; \log P_t + \alpha_{0t} + \beta t + \gamma_t + X_t^{\!\top}\delta + \zeta z_t. \]</span></p>
+<p>Each term has one job. <span class="math inline">\(\log P_t\)</span> is a population offset, so the model works on rates rather than raw counts and districts of different sizes can be compared. <span class="math inline">\(\alpha_{0t}\)</span> is an intercept free to drift, smoothing the baseline level. <span class="math inline">\(\beta t\)</span> is long-run trend. <span class="math inline">\(\gamma_t\)</span> is the seasonal cycle, period 52 for weekly data. <span class="math inline">\(X_t^{\!\top}\delta\)</span> is where covariates enter — temperature, absolute humidity, rainfall, usually lagged. And <span class="math inline">\(\zeta z_t\)</span> marks weeks already flagged as aberrant, so that old epidemic peaks are not learned as ordinary baseline.</p>
+</div>
+<p>That last term deserves a second look, because it sounds like the objection raised against reference methods: doesn’t somebody have to decide in advance which weeks were epidemic? No.&nbsp;In the implementation <code>z_t</code> is not supplied by the user. With <code>pastAberrations = TRUE</code>, it is read from the alarms the algorithm itself raised at earlier time points. The loop closes on its own.</p>
+<div class="algo-step">
+<p><strong>3. Put a prior on everything.</strong> In a Bayesian model every parameter is a random variable and needs a distribution before the data arrives. This model is a <strong>latent Gaussian model</strong>, which splits the parameters into two tiers: a latent field <span class="math inline">\(x = (\alpha_{0t}, \beta, \gamma_t, \delta, \zeta)\)</span> of regression coefficients and random effects, assumed jointly Gaussian; and a small set of hyperparameters <span class="math inline">\(\theta = (\nu, \tau)\)</span> controlling dispersion and how smooth each effect is.</p>
+<p>The split is not bookkeeping. Keeping the hyperparameters few — under about fifteen — is the condition that makes step 4 possible <span class="citation" data-cites="rue2009">(<a href="references.html#ref-rue2009" role="doc-biblioref">Rue et al. 2009</a>)</span>.</p>
+</div>
+<p>In practice: the drifting intercept is declared through <code>f(time, model = ...)</code>, where <code>rw1</code> (a first-order random walk, a slowly wandering baseline) is a sensible default for weekly data, with <code>iid</code> and <code>rw2</code> as the looser and smoother alternatives. Setting <code>season = TRUE</code> gives the seasonal term a cyclic spline, so the end of one year joins the start of the next. Fixed coefficients get vague Gaussian priors and let the data speak. For the hyperparameters INLA defaults to log-Gamma; on short series or thin ward-level counts, a PC prior is less sensitive to how you set it. Run the whole thing under at least two prior choices and check the answer does not move.</p>
+<div class="algo-step">
+<p><strong>4. Fit it.</strong> With weeks <span class="math inline">\(1\)</span> to <span class="math inline">\(T-1\)</span> in hand, Bayes’ theorem gives</p>
+<p><span class="math display">\[ p(x, \theta \mid y_{1:T-1}) \;\propto\; p(y_{1:T-1} \mid x, \theta)\, p(x \mid \theta)\, p(\theta). \]</span></p>
+<p>The normalising constant is an integral with no closed form. MCMC would sample it accurately and take hours for one series — impossible for a system that runs weekly across hundreds of units. BODA uses INLA instead <span class="citation" data-cites="rue2009">(<a href="references.html#ref-rue2009" role="doc-biblioref">Rue et al. 2009</a>)</span>, a deterministic approximation built for exactly this class of model, which matches MCMC closely and runs orders of magnitude faster.</p>
+</div>
+<div class="algo-step">
+<p><strong>5. Average over what you do not know.</strong> The parameters were never the point. What is wanted is <span class="math inline">\(y_T\)</span>, and the distribution for it integrates the model away:</p>
+<p><span class="math display">\[ p(y_T \mid y_{1:T-1}) \;=\; \int p(y_T \mid x, \theta)\, p(x, \theta \mid y_{1:T-1})\, \mathrm{d}x\, \mathrm{d}\theta. \]</span></p>
+<p>This single line is the whole argument of the chapter. It folds together two different uncertainties: counts bounce around even when the parameters are known exactly, <strong>and</strong> the parameters are not known exactly. Plug-in methods carry only the first.</p>
+</div>
+<p>One implementation detail follows directly from step 4 and is easy to get wrong. INLA returns the <strong>marginal</strong> posterior of each parameter, not their joint distribution. <code>boda()</code> therefore takes a <code>samplingMethod</code> argument, and it should be set to <code>'joint'</code>. Sampling each marginal independently discards the correlations between parameters and narrows the predictive distribution — reintroducing, by the back door, the exact defect the method exists to remove.</p>
+<div class="algo-step">
+<p><strong>6. Cut the tail.</strong> The threshold is the <span class="math inline">\((1-\alpha)\)</span> quantile of that predictive distribution. Counts are whole numbers, so the honest definition is the smallest integer whose cumulative probability reaches <span class="math inline">\(1-\alpha\)</span>:</p>
+<p><span class="math display">\[ \xi_{1-\alpha} \;=\; \min\Bigl\{ k \in \{0,1,2,\dots\} \;:\; \textstyle\sum_{j=0}^{k} p(y_T = j \mid y_{1:T-1}) \;\ge\; 1-\alpha \Bigr\}. \]</span></p>
+<p>A week signals when <span class="math inline">\(y_T^{\text{obs}} &gt; \xi_{1-\alpha}\)</span>.</p>
+</div>
+<section id="sec-bayes-variance" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="sec-bayes-variance"><span class="header-section-number">3.2.1</span> Why the Bayesian threshold sits higher</h3>
+<p>The claim that the predictive distribution is wider can be made exact. Split its variance by conditioning on the parameters first:</p>
+<p><span class="math display">\[ \operatorname{Var}(y_T \mid \text{data}) \;=\; \operatorname{E}\!\bigl[\operatorname{Var}(y_T \mid \mu)\bigr] \;+\; \operatorname{Var}\!\bigl(\operatorname{E}[y_T \mid \mu]\bigr). \]</span></p>
+<p>The first term is how much the counts would scatter if you knew where they were centred. The second is how much the centre itself could move.</p>
+<p>Substitute the negative binomial, for which <span class="math inline">\(\operatorname{Var}(y \mid \mu) = \mu +
+\mu^2/\nu\)</span> and <span class="math inline">\(\operatorname{E}[y \mid \mu] = \mu\)</span>:</p>
+<p><span class="math display">\[ \operatorname{Var}(y_T \mid \text{data}) \;=\; \operatorname{E}[\mu] + \frac{\operatorname{E}[\mu^2]}{\nu} + \operatorname{Var}(\mu). \]</span></p>
+<p>Write <span class="math inline">\(\hat\mu = \operatorname{E}[\mu]\)</span> and <span class="math inline">\(s^2 = \operatorname{Var}(\mu)\)</span>, and use <span class="math inline">\(\operatorname{E}[\mu^2] = \hat\mu^2 + s^2\)</span>:</p>
+<p><span class="math display">\[ \operatorname{Var}(y_T \mid \text{data}) \;=\; \underbrace{\hat\mu + \frac{\hat\mu^2}{\nu}}_{\text{plug-in}} \;+\; s^2\Bigl(1 + \frac{1}{\nu}\Bigr). \]</span></p>
+<p>The brace is exactly what a plug-in method computes. Everything after it is what a plug-in method discards, and it has a shape worth reading. The penalty grows with the <strong>square</strong> of how uncertain the expected count is, so it stays negligible until the estimate is genuinely shaky and then grows fast. And it is <strong>larger when <span class="math inline">\(\nu\)</span> is small</strong>: the more overdispersed the counts already are, the more parameter uncertainty piles on top.</p>
+<p><a href="#fig-predictive" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> opens at <span class="math inline">\(\hat\mu = 15\)</span>, <span class="math inline">\(\nu = 6\)</span> and 30% uncertainty. The plug-in variance is 52.50, the formula adds about 24.7, and the total is 77.17. In cases, the plug-in threshold is 28 and the Bayesian one is 32 — and a threshold of 28 that advertises a 5% false alarm rate delivers 7.6%.</p>
+</section>
+</section>
+<section id="sec-bayes-delay" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sec-bayes-delay"><span class="header-section-number">3.3</span> When this week’s count is not yet this week’s count</h2>
+<p>For ward-level surveillance this is not a refinement. It is the main problem.</p>
+<p>A week’s count is never finished when the week is. Cases have to present, be tested, be confirmed and be entered, and all of that takes time. So at the moment the algorithm runs, the current week is <strong>under-reported</strong> — while the threshold it is compared against was calibrated on historical weeks that have long since filled in. The comparison is between an incomplete number and a complete-number threshold, and it fails in the worst possible direction: outbreaks are missed precisely when detecting them matters most.</p>
+<div id="fig-delay" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-delay-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-delay"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-delay-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: The same forty weeks under two rules. Hollow outlines are the counts once every case has arrived; solid bars are what is visible when the week is judged. Rings mark exceedances the rule fails to see.
+</figcaption>
+</figure>
+</div>
+<p>Set the wait to zero and read the figure as reported: only about a third of each week’s cases exist yet, and all three genuine exceedances slip under the threshold. Wait two weeks and all three are caught — but every alarm now arrives two weeks after the week it describes, which for a vector-borne outbreak is most of the window in which a response would have helped.</p>
+<p>The second tab is the way out. If you know what share of a week’s cases has usually arrived by a given delay, you can scale the partial count back up and judge the week immediately. That is what delay correction does, and at a wait of zero it recovers all three.</p>
+<p>Salmon and colleagues built this into the model rather than bolting it on <span class="citation" data-cites="salmon2015">(<a href="references.html#ref-salmon2015" role="doc-biblioref">Salmon et al. 2015</a>)</span>. The data are treated as a two-way table — week of onset against reporting delay — with the lower right corner missing, and that table is modelled with negative binomial regression. The implementation is <code>bodaDelay()</code>, and using it means preparing a <strong>reporting triangle</strong> rather than a plain weekly series.</p>
+<p>Worth knowing before you plan around it: <code>bodaDelay()</code> combines the Manitz–Höhle algorithm with Noufaily’s <span class="citation" data-cites="noufaily2013">(<a href="references.html#ref-noufaily2013" role="doc-biblioref">Noufaily et al. 2013</a>)</span>, and so it still takes reference-window arguments <code>b</code> and <code>w</code>. The dependence on a chosen window, the second complaint in <a href="#sec-bayes-limits" class="quarto-xref"><span>Section 3.1</span></a>, is therefore <strong>not</strong> fully removed. That is a deliberate trade of theoretical tidiness for something that runs.</p>
+</section>
+<section id="sec-bayes-practice" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="sec-bayes-practice"><span class="header-section-number">3.4</span> Practical notes</h2>
+<p><strong>The software is experimental.</strong> <code>boda()</code> says so in its own documentation. It depends on INLA, which is not on CRAN and installs from its own repository:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"INLA"</span>, <span class="at">repos =</span> <span class="st">"https://inla.r-inla-download.org/R/stable"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>It is slow, because a Bayesian model is fitted at every time point. And results are not reproducible under INLA’s default parallelism; for a reproducible run, set <code>INLA::inla.setOption(num.threads = "1:1")</code> before <code>set.seed()</code>.</p>
+<p><strong>Many units at once is a different problem.</strong> This is the easiest thing to overlook when moving from one series to a whole city. Run the algorithm across <span class="math inline">\(N\)</span> units at level <span class="math inline">\(\alpha\)</span> and, with no outbreak anywhere, the expected number of false alarms per week is <span class="math inline">\(N\alpha\)</span>. For 168 units at <span class="math inline">\(\alpha = 0.05\)</span> that is about <strong>eight false alarms every week</strong> — enough to exhaust a response team’s trust within a few months. The options are to lower <span class="math inline">\(\alpha\)</span> and accept the loss of sensitivity, to control a false discovery rate rather than each alarm separately, or to require a signal to repeat across weeks or cluster in space before it triggers fieldwork. Whichever you pick, write down why.</p>
+<p><strong>Use the population offset.</strong> When units differ greatly in size, <span class="math inline">\(\log P_t\)</span> has to enter the model as an offset. Without it, dense wards carry permanently high thresholds and sparse ones alarm constantly, and neither reflects real risk. Check whether the version of <code>boda()</code> you are running accepts an offset, since its <code>X</code> argument takes covariates as fixed effects only.</p>
+</section>
+<section id="sec-bayes-evaluation" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="sec-bayes-evaluation"><span class="header-section-number">3.5</span> Measuring whether it works</h2>
+<p>A detection algorithm is worth only what it can be shown to do. The minimum set: <strong>sensitivity</strong> (the share of real outbreaks detected), <strong>specificity</strong> and the false alarm rate, and <strong>timeliness</strong> — an algorithm that detects everything four weeks late detects nothing useful. Because the output here is a whole distribution rather than a yes-or-no verdict, add a <strong>proper scoring rule</strong>, which grades the probability forecast itself.</p>
+<p>Evaluate on both simulated data, where the true outbreaks are known by construction, and on real historical series, which is how Manitz and Höhle assessed BODA <span class="citation" data-cites="manitz2013">(<a href="references.html#ref-manitz2013" role="doc-biblioref">Manitz and Höhle 2013</a>)</span>. Unkel and colleagues give a fuller comparison framework <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>.</p>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/bayes-core.js"></script>
+<script src="js/bayes-predictive.js"></script>
+<script src="js/bayes-delay.js"></script>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-manitz2013" class="csl-entry" role="listitem">
+Manitz, Juliane, and Michael Höhle. 2013. <span>“Bayesian Outbreak Detection Algorithm for Monitoring Reported Cases of Campylobacteriosis in <span>Germany</span>.”</span> <em>Biometrical Journal</em> 55 (4): 509–26. <a href="https://doi.org/10.1002/bimj.201200141">https://doi.org/10.1002/bimj.201200141</a>.
+</div>
+<div id="ref-noufaily2013" class="csl-entry" role="listitem">
+Noufaily, Angela, Doyo G. Enki, Paddy Farrington, Paul Garthwaite, Nick Andrews, and Andre Charlett. 2013. <span>“An Improved Algorithm for Outbreak Detection in Multiple Surveillance Systems.”</span> <em>Statistics in Medicine</em> 32 (7): 1206–22.
+</div>
+<div id="ref-rue2009" class="csl-entry" role="listitem">
+Rue, Håvard, Sara Martino, and Nicolas Chopin. 2009. <span>“Approximate <span>Bayesian</span> Inference for Latent <span>Gaussian</span> Models by Using Integrated Nested <span>Laplace</span> Approximations.”</span> <em>Journal of the Royal Statistical Society: Series B</em> 71 (2): 319–92. <a href="https://doi.org/10.1111/j.1467-9868.2008.00700.x">https://doi.org/10.1111/j.1467-9868.2008.00700.x</a>.
+</div>
+<div id="ref-salmon2016" class="csl-entry" role="listitem">
+Salmon, Maëlle, Dirk Schumacher, and Michael Höhle. 2016. <span>“Monitoring Count Time Series in <span>R</span>: Aberration Detection in Public Health Surveillance.”</span> <em>Journal of Statistical Software</em> 70 (10): 1–35.
+</div>
+<div id="ref-salmon2015" class="csl-entry" role="listitem">
+Salmon, Maëlle, Dirk Schumacher, Klaus Stark, and Michael Höhle. 2015. <span>“Bayesian Outbreak Detection in the Presence of Reporting Delays.”</span> <em>Biometrical Journal</em> 57 (6): 1051–67.
+</div>
+<div id="ref-unkel2012" class="csl-entry" role="listitem">
+Unkel, Steffen, C. Paddy Farrington, Paul H. Garthwaite, Chris Robertson, and Nick Andrews. 2012. <span>“Statistical Methods for the Prospective Detection of Infectious Disease Outbreaks: A Review.”</span> <em>Journal of the Royal Statistical Society: Series A</em> 175 (1): 49–82. <a href="https://doi.org/10.1111/j.1467-985X.2011.00714.x">https://doi.org/10.1111/j.1467-985X.2011.00714.x</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/thinhong\.github\.io\/epr\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./rki.html" class="pagination-link" aria-label="RKI">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">RKI</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./farrington.html" class="pagination-link" aria-label="Farrington">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

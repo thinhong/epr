@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Farrington – Epidemic Preparedness and Response</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./bayes.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e59b32b52c4a9ca5d924671db93c520.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-bb9e99e26899b142fb721f4d14f6f13c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/tokens.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./farrington.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Epidemic Preparedness and Response</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/thinhong/epr" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./epithreshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Epidemic threshold</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cusum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">CUSUM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rki.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">RKI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./farrington.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-farr-reference" id="toc-sec-farr-reference" class="nav-link active" data-scroll-target="#sec-farr-reference"><span class="header-section-number">4.1</span> Which weeks count as comparable</a></li>
+  <li><a href="#sec-farr-threshold" id="toc-sec-farr-threshold" class="nav-link" data-scroll-target="#sec-farr-threshold"><span class="header-section-number">4.2</span> Computing an epidemic threshold with Farrington</a>
+  <ul class="collapse">
+  <li><a href="#sec-farr-reading" id="toc-sec-farr-reading" class="nav-link" data-scroll-target="#sec-farr-reading"><span class="header-section-number">4.2.1</span> Reading the threshold formula</a></li>
+  </ul></li>
+  <li><a href="#sec-farr-reweight" id="toc-sec-farr-reweight" class="nav-link" data-scroll-target="#sec-farr-reweight"><span class="header-section-number">4.3</span> The cut-off that decides how much history to believe</a></li>
+  <li><a href="#sec-farr-evidence" id="toc-sec-farr-evidence" class="nav-link" data-scroll-target="#sec-farr-evidence"><span class="header-section-number">4.4</span> What the revision bought</a></li>
+  <li><a href="#sec-farr-package" id="toc-sec-farr-package" class="nav-link" data-scroll-target="#sec-farr-package"><span class="header-section-number">4.5</span> Running it</a></li>
+  <li><a href="#sec-farr-interpretation" id="toc-sec-farr-interpretation" class="nav-link" data-scroll-target="#sec-farr-interpretation"><span class="header-section-number">4.6</span> What an alarm is, and is not</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./farrington.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The RKI chapter judged a week by averaging a handful of comparable weeks. Farrington asks the same question — is this week high <em>for this week of the year</em> — but answers it by fitting a model to those weeks instead of averaging them. A regression line gives a baseline that can rise or fall over the years, one shared dispersion parameter says how much ordinary weeks scatter around it, and a right-skewed prediction interval supplies the threshold.</p>
+<p>That buys one thing a reference set cannot: the method can notice that some of its own reference weeks were themselves epidemic, and discount them. How harshly it should discount them is the question the whole method turns on, and the two published versions answer it differently.</p>
+<p>The method comes from the Communicable Disease Surveillance Centre in England and Wales, where it was built to screen weekly laboratory reports across more than three thousand organisms at once <span class="citation" data-cites="farrington1996">(<a href="references.html#ref-farrington1996" role="doc-biblioref">Farrington et al. 1996</a>)</span>. That setting shaped it: one formula, no per-disease tuning, working equally on an organism seen a few times a year and one seen hundreds of times a week. Noufaily and colleagues revised it seventeen years later after simulation showed the false alarm rate was too high <span class="citation" data-cites="noufaily2013">(<a href="references.html#ref-noufaily2013" role="doc-biblioref">Noufaily et al. 2013</a>)</span>.</p>
+<section id="sec-farr-reference" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="sec-farr-reference"><span class="header-section-number">4.1</span> Which weeks count as comparable</h2>
+<p>Both versions start from the same window. For the week under assessment, take the same calendar week in each of the <span class="math inline">\(b\)</span> previous years, plus <span class="math inline">\(w\)</span> weeks either side:</p>
+<p><span class="math display">\[
+R \;=\; \bigl\{\, t_0 - 52i + j \;:\; i = 1,\dots,b;\ j = -w,\dots,+w \,\bigr\}, \qquad n = b(2w+1).
+\]</span></p>
+<p>With the package defaults <span class="math inline">\(b = 5\)</span> and <span class="math inline">\(w = 3\)</span>, that is 35 weeks. Seasonality is handled by the choice of window rather than by a term in the model: only weeks sitting at the same point in the year are ever compared, so no sine and cosine are needed. The current year is excluded, so an outbreak in progress cannot inflate its own baseline.</p>
+<p>The cost is visible as soon as you draw it.</p>
+<div id="fig-farr-reference" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-farr-reference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-farr-reference"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-farr-reference-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Which weeks each version lets the regression see. Switch between the two versions and change <span class="math inline">\(b\)</span> and <span class="math inline">\(w\)</span>.
+</figcaption>
+</figure>
+</div>
+<p>Thirty-five weeks out of the 260 in five years is 13% of the data. The other 87% is not merely unused for the baseline — it is unavailable for estimating the trend and the dispersion too, which is where a thin reference set hurts most.</p>
+<p>The 2013 revision keeps the window but stops discarding everything else. It adds a <strong>ten-level seasonal factor</strong>: the window itself is the reference level, and the remaining weeks of the year are divided into nine blocks, which fit exactly since <span class="math inline">\(7 + 9 \times 5 = 52\)</span>. Each block gets its own multiplier <span class="math inline">\(e^{\delta_j}\)</span>. Weeks outside the window are now <em>explained</em> by their block rather than thrown away, so they contribute to <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\varphi\)</span> without dragging the current window’s level around.</p>
+<p>Two further changes come with it. The 26 weeks immediately before <span class="math inline">\(t_0\)</span> are held out, so a new outbreak a few weeks old cannot teach the model to expect itself — the 1996 version needed no such rule, because its windows already sat the better part of a year away. The arithmetic gives</p>
+<p><span class="math display">\[ n = 52b + w - 26 = 237 \]</span></p>
+<p>reference weeks at the defaults, against 35. The third change comes free with it: with 200-odd points behind the slope, the trend no longer has to pass a significance test to be kept <span class="citation" data-cites="noufaily2013">(<a href="references.html#ref-noufaily2013" role="doc-biblioref">Noufaily et al. 2013</a>)</span>.</p>
+</section>
+<section id="sec-farr-threshold" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="sec-farr-threshold"><span class="header-section-number">4.2</span> Computing an epidemic threshold with Farrington</h2>
+<div class="algo-step">
+<p><strong>1. Fit a quasi-Poisson regression.</strong> On the reference counts,</p>
+<p><span class="math display">\[ \log \mu_i = \alpha + \beta t_i, \qquad \operatorname{Var}(y_i) = \varphi\,\mu_i. \]</span></p>
+<p>Here <span class="math inline">\(\alpha\)</span> is the baseline level on the log scale and <span class="math inline">\(\beta\)</span> the weekly change, so <span class="math inline">\(e^{\beta}\)</span> is a weekly multiplier. The quasi-Poisson family is there because surveillance counts are almost always overdispersed; <a href="rki.html#sec-rki-dispersion" class="quarto-xref"><span>Section 2.3</span></a> sets out what happens when that is ignored. In the 2013 version the seasonal factor joins the linear predictor as <span class="math inline">\(\log \mu_i = \theta + \beta t_i + \delta_{j(i)}\)</span>.</p>
+</div>
+<div class="algo-step">
+<p><strong>2. Estimate the dispersion, with a floor at 1.</strong> From the weighted Pearson statistic,</p>
+<p><span class="math display">\[ \varphi = \max\left\{1,\; \frac{1}{n-p}\sum_{i=1}^{n} \omega_i \frac{(y_i - \mu_i)^2}{\mu_i}\right\}, \]</span></p>
+<p>where <span class="math inline">\(p\)</span> is the number of regression parameters and <span class="math inline">\(\omega_i = 1\)</span> on the first pass. The floor matters: <span class="math inline">\(\varphi &lt; 1\)</span> would mean “less variable than Poisson”, which on 35 points is nearly always estimation noise, so Poisson variance is taken as the minimum.</p>
+</div>
+<div class="algo-step">
+<p><strong>3. Downweight the weeks that look like past outbreaks.</strong> For each reference week compute a standardised Anscombe residual,</p>
+<p><span class="math display">\[ s_i \;=\; \frac{y_i^{2/3} - \mu_i^{2/3}}{\tfrac{2}{3}\sqrt{\varphi}\;\mu_i^{1/6}\sqrt{1 - h_{ii}}}, \]</span></p>
+<p>then assign weights and fit once more:</p>
+<p><span class="math display">\[
+\omega_i =
+\begin{cases}
+\gamma / s_i^2, &amp; s_i &gt; c,\\
+\gamma, &amp; s_i \le c,
+\end{cases}
+\qquad \gamma \text{ chosen so that } \textstyle\sum_i \omega_i = n.
+\]</span></p>
+<p>The cut-off is <span class="math inline">\(c = 1\)</span> in 1996 and <span class="math inline">\(c = 2.58\)</span> in 2013 <span class="citation" data-cites="noufaily2013">(<a href="references.html#ref-noufaily2013" role="doc-biblioref">Noufaily et al. 2013</a>)</span>.</p>
+</div>
+<div class="algo-step">
+<p><strong>4. Keep the trend only if it is worth keeping.</strong> The <span class="math inline">\(\beta t\)</span> term survives when <span class="math inline">\(\beta\)</span> is significant at 5%, when the predicted <span class="math inline">\(\mu_0\)</span> does not exceed the largest count in the reference set, and (in the R implementation) when <span class="math inline">\(b \ge 3\)</span>. Otherwise the whole procedure is repeated with an intercept-only model. A trend estimated from <span class="math inline">\(b\)</span> clusters a year apart and then extrapolated a further year can blow <span class="math inline">\(\mu_0\)</span> up exponentially, which is what the second condition guards against. In 2013 the significance test is dropped — with 200-odd points the slope is stable enough — but both safety catches remain.</p>
+</div>
+<div class="algo-step">
+<p><strong>5. Take the upper end of the prediction interval.</strong> Two things are uncertain: the count itself, with variance <span class="math inline">\(\varphi\mu_0\)</span>, and the estimated mean, with variance <span class="math inline">\(\operatorname{Var}(\mu_0)\)</span>. The 1996 threshold adds them on the <span class="math inline">\(2/3\)</span> power scale, where a Poisson count is close to symmetric:</p>
+<p><span class="math display">\[ U = \mu_0\left(1 + \frac{2}{3}\,z\,\sqrt{\frac{\varphi\mu_0 + \operatorname{Var}(\mu_0)}{\mu_0^{2}}}\,\right)^{3/2}. \]</span></p>
+<p>The 2013 threshold instead reads a quantile straight off a negative binomial with the same mean and variance:</p>
+<p><span class="math display">\[ U = F^{-1}_{\mathrm{NB}}\!\left(1-\alpha;\ \text{size} = \frac{\mu_0}{\varphi - 1},\ \text{prob} = \frac{1}{\varphi}\right). \]</span></p>
+</div>
+<div class="algo-step">
+<p><strong>6. Score it, and refuse to alarm on almost nothing.</strong> The result is reported as an exceedance score,</p>
+<p><span class="math display">\[ X = \frac{y_0 - \mu_0}{U - \mu_0}, \]</span></p>
+<p>which is dimensionless: <span class="math inline">\(X &lt; 1\)</span> is inside the interval, <span class="math inline">\(X = 1\)</span> sits exactly on the threshold, <span class="math inline">\(X = 2\)</span> is twice as far past expectation as it needed to be. A rare organism at 9 cases against 2 expected and a common one at 520 against 400 can be ranked on the same scale. Finally, a rule of thumb against alarms on near-empty series: <strong>no alarm unless there are at least 5 cases in the last 4 weeks</strong>.</p>
+</div>
+<section id="sec-farr-reading" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="sec-farr-reading"><span class="header-section-number">4.2.1</span> Reading the threshold formula</h3>
+<p>The 1996 expression is easier to trust once unpacked. Work on the scale <span class="math inline">\(y^{2/3}\)</span>, where the right skew of a Poisson count largely disappears. On that scale the standard deviation of the prediction error is <span class="math inline">\(\tfrac{2}{3}\mu_0^{1/6}\sqrt{\tau}\)</span>, with</p>
+<p><span class="math display">\[ \tau = \varphi + \frac{\operatorname{Var}(\mu_0)}{\mu_0}. \]</span></p>
+<p>Add <span class="math inline">\(z\)</span> of them to <span class="math inline">\(\mu_0^{2/3}\)</span> and raise the result back to the power <span class="math inline">\(3/2\)</span>:</p>
+<p><span class="math display">\[ U = \left(\mu_0^{2/3} + z\,\tfrac{2}{3}\,\mu_0^{1/6}\sqrt{\tau}\right)^{3/2}. \]</span></p>
+<p>That is the same formula as above, and it is line for line what the package computes.</p>
+<p>Which parts of it actually matter is worth knowing before tuning anything. Take <span class="math inline">\(\mu_0 = 10\)</span>, <span class="math inline">\(\varphi = 1.5\)</span> and <span class="math inline">\(\operatorname{Var}(\mu_0) = 0.5\)</span>:</p>
+<div id="tbl-farr-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-farr-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.1: What moves the threshold, at a fixed expected count of 10 cases.
+</figcaption>
+<div aria-describedby="tbl-farr-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;"><span class="math inline">\(U\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(z = 1.645\)</span> (one-sided 5%, the <code>farringtonFlexible</code> default)</td>
+<td style="text-align: right;">17.13</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(z = 1.96\)</span> (two-sided 5%, the <code>algo.farrington</code> default)</td>
+<td style="text-align: right;">18.64</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(z = 2.58\)</span> (one-sided 0.5%, used by UKHSA)</td>
+<td style="text-align: right;">21.72</td>
+</tr>
+<tr class="even">
+<td>at <span class="math inline">\(z=1.96\)</span>, dropping <span class="math inline">\(\operatorname{Var}(\mu_0)\)</span> entirely</td>
+<td style="text-align: right;">18.48</td>
+</tr>
+<tr class="odd">
+<td>at <span class="math inline">\(z=1.96\)</span>, with <span class="math inline">\(\varphi = 1\)</span> instead of 1.5</td>
+<td style="text-align: right;">16.98</td>
+</tr>
+<tr class="even">
+<td>at <span class="math inline">\(z=1.96\)</span>, with <span class="math inline">\(\varphi = 3\)</span> instead of 1.5</td>
+<td style="text-align: right;">22.59</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Ignoring the uncertainty in the mean altogether costs about a sixth of a case. Changing <span class="math inline">\(\varphi\)</span> from 1 to 3 moves the threshold by five and a half. <strong><span class="math inline">\(\varphi\)</span> and <span class="math inline">\(z\)</span> are what set the distance between expectation and threshold</strong>; the delta-method refinement is a rounding detail beside them.</p>
+<p>For the same numbers the negative binomial rule gives <span class="math inline">\(U = 17\)</span>, against 17.13 from the <span class="math inline">\(2/3\)</span> formula — the two threshold rules agree closely. They differ in kind rather than in value: the NB quantile is always a whole number and needs no back transformation, which is what matters on sparse series, but it plugs <span class="math inline">\(\mu_0\)</span> and <span class="math inline">\(\varphi\)</span> straight in and ignores their uncertainty.</p>
+</section>
+</section>
+<section id="sec-farr-reweight" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="sec-farr-reweight"><span class="header-section-number">4.3</span> The cut-off that decides how much history to believe</h2>
+<p>Step 3 is where the two versions actually part company, and the reason is a piece of arithmetic the 1996 authors did not have in front of them.</p>
+<p>If nothing is wrong, the standardised residuals are roughly standard normal. So a cut-off of 1 catches about <strong>16% of perfectly ordinary weeks</strong> and shrinks them. The weeks it shrinks hardest are the ones with the largest squared residuals — precisely the ones carrying the information about how much ordinary weeks scatter. The result is that <span class="math inline">\(\varphi\)</span> is pulled down, often onto its own floor of 1, the threshold follows it down, and false alarms go up. Raising the cut-off to 2.58 leaves about 0.5% of ordinary weeks affected, so only something genuinely extreme is discounted.</p>
+<div id="fig-farr-reweight" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-farr-reweight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-farr-reweight"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-farr-reweight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Thirty-five reference weeks, one year of which carried an outbreak through the window. Hollow circles are downweighted, with the factor applied. The grey line is the fit with no downweighting at all.
+</figcaption>
+</figure>
+</div>
+<p>The figure holds the data fixed and moves only the cut-off, and the three regimes come out clearly. Turn reweighting off and the old outbreak counts in full: <span class="math inline">\(\varphi\)</span> stays at 2.05, the threshold rises to 16.3, and a new outbreak would have to be very large to clear it. Set the cut-off to 1 and three of the 35 weeks are shrunk, <span class="math inline">\(\varphi\)</span> collapses onto its floor of 1.00, and the threshold drops to 12.89. Set it to 2.58 and only the single most extreme week is touched, <span class="math inline">\(\varphi\)</span> settles at 1.28, and the threshold lands at 14.12.</p>
+<p>The week being assessed notified 13 cases. Under the 1996 cut-off that is an alarm; under the 2013 cut-off it is not. Same data, same formula, same week — one parameter.</p>
+<p>Two properties of the weighting rule are easy to miss. It is <strong>one-sided</strong>: a week that is unusually <em>low</em> keeps its full weight, which makes this a filter for past outbreaks rather than robust regression in general. And <span class="math inline">\(\gamma\)</span> does not move the fitted line at all; it exists only to keep the weights averaging 1, so that the <span class="math inline">\(n - p\)</span> denominator in step 2 still means something.</p>
+</section>
+<section id="sec-farr-evidence" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="sec-farr-evidence"><span class="header-section-number">4.4</span> What the revision bought</h2>
+<div id="tbl-farr-versions" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-farr-versions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4.2: The five changes. The low-count rule and the exceedance score are unchanged.
+</figcaption>
+<div aria-describedby="tbl-farr-versions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>1996</th>
+<th>2013</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reference weeks (<span class="math inline">\(b=5\)</span>, <span class="math inline">\(w=3\)</span>)</td>
+<td>35</td>
+<td>about 237</td>
+</tr>
+<tr class="even">
+<td>Seasonality</td>
+<td>by choice of window</td>
+<td>window plus a 10-level factor</td>
+</tr>
+<tr class="odd">
+<td>Recent weeks excluded</td>
+<td><span class="math inline">\(w\)</span></td>
+<td>26</td>
+</tr>
+<tr class="even">
+<td>Trend</td>
+<td>kept if <span class="math inline">\(p &lt; 0.05\)</span></td>
+<td>always kept</td>
+</tr>
+<tr class="odd">
+<td>Anscombe cut-off</td>
+<td>1</td>
+<td>2.58</td>
+</tr>
+<tr class="even">
+<td>Threshold</td>
+<td>normal approximation, <span class="math inline">\(2/3\)</span> scale</td>
+<td>negative binomial quantile</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>An evaluation by the same group across 959 disease series puts numbers on the trade: the false alarm rate fell from <strong>1.63%</strong> to <strong>0.76%</strong> for the negative binomial version and 0.87% for the quasi-Poisson one, while the probability of detection fell from <strong>57%</strong> to 51% and 53% respectively <span class="citation" data-cites="enki2016">(<a href="references.html#ref-enki2016" role="doc-biblioref">Enki et al. 2016</a>)</span>. Public Health England moved to the negative binomial version. Read the two rows together: roughly half the false alarms, at the cost of a few points of sensitivity — a less flattering picture than “without reducing sensitivity”, and the honest one to quote.</p>
+</section>
+<section id="sec-farr-package" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="sec-farr-package"><span class="header-section-number">4.5</span> Running it</h2>
+<p><code>farringtonFlexible()</code> in R’s <code>surveillance</code> package runs either version depending on the <code>control</code> list <span class="citation" data-cites="salmon2016">(<a href="references.html#ref-salmon2016" role="doc-biblioref">Salmon et al. 2016</a>)</span>. Three things about it cause trouble.</p>
+<p><strong>The defaults are neither version.</strong> They take the reference set, the trend test and the threshold formula from 1996, but the weight cut-off 2.58 from 2013. For the 2013 method you have to ask for it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>control <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">range =</span> weeks,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">b =</span> <span class="dv">5</span>, <span class="at">w =</span> <span class="dv">3</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">noPeriods =</span> <span class="dv">10</span>,              <span class="co"># the seasonal factor</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">pastWeeksNotIncluded =</span> <span class="dv">26</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">pThresholdTrend =</span> <span class="dv">1</span>,         <span class="co"># always keep the trend</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">weightsThreshold =</span> <span class="fl">2.58</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">thresholdMethod =</span> <span class="st">"nbPlugin"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="fl">0.05</span>)                <span class="co"># one-sided here</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">farringtonFlexible</span>(sts_object, control)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>alpha</code> means different things in different functions.</strong> <code>algo.farrington()</code> uses <code>qnorm(1 - alpha/2)</code>, two-sided; <code>farringtonFlexible()</code> uses the <span class="math inline">\(1-\alpha\)</span> quantile, one-sided. At the same nominal <code>alpha</code> the newer function sets a lower threshold and raises more alarms, and comparing the two means doubling <code>alpha</code> for one of them.</p>
+<p><strong>Misspelled names in <code>control</code> are ignored in silence.</strong> There is no error and no warning; the run simply uses the default. Check the returned object rather than assuming the setting took.</p>
+<p>Two more things worth knowing before building a pipeline on it. The earliest week that can be assessed is <span class="math inline">\(52b + w + 1\)</span>, so five years of history buys you nothing until week 264. And weeks failing the 5-in-4 rule come back with <code>upperbound = NA</code>, which breaks the threshold line into pieces on sparse series — decide in advance whether to relax the rule or aggregate the units.</p>
+</section>
+<section id="sec-farr-interpretation" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="sec-farr-interpretation"><span class="header-section-number">4.6</span> What an alarm is, and is not</h2>
+<p>A Farrington alarm says one thing: this week’s count is higher than a model fitted to comparable weeks in the past predicted, at the chosen error rate. ECDC’s own documentation for the method states plainly that such signals “do not necessarily correspond to outbreaks”, and are there to triage many series efficiently <span class="citation" data-cites="ecdc_signal">(<a href="references.html#ref-ecdc_signal" role="doc-biblioref">European Centre for Disease Prevention and Control, n.d.</a>)</span>.</p>
+<p>Every agency running it pairs it with filters and with people. UKHSA sets <span class="math inline">\(\alpha = 0.005\)</span>. France’s food-chain <em>Salmonella</em> system keeps only signals that three algorithms agree on, or that persist beyond two weeks. The reason is arithmetic rather than caution: at a one-sided <span class="math inline">\(\alpha = 0.05\)</span> with a correct model, each series crosses its threshold by chance about one week in twenty, so <strong>168 wards monitored at that level produce roughly eight chance signals every week</strong>. That is the same multiple-comparisons problem as <a href="bayes.html#sec-bayes-practice" class="quarto-xref"><span>Section 3.4</span></a>, and it does not care which algorithm raised the signal.</p>
+<p>Three structural limits are worth stating alongside the method, because they follow from its shape rather than from any implementation.</p>
+<p>It <strong>judges each week alone</strong>. There is no accumulation of evidence, so a rise that is small but sustained can pass without any single week clearing the threshold. That is exactly the gap CUSUM fills, and the package’s own documentation suggests pairing the two.</p>
+<p>It <strong>assumes the season has the same shape every year</strong>. The seasonal factor is estimated from past years and applied to this one, so a season arriving early or late is compared against the wrong step.</p>
+<p>It has <strong>nowhere to put a covariate</strong>. Temperature, rainfall and population movement cannot enter the model, which is the limitation the Bayesian chapter addresses directly.</p>
+<p>One more thing it does not do, which is easy to expect of it. A normal seasonal rise is not an alarm. The method answers “is this week unusual <em>for this time of year</em>”, not “has the season started”. For the second question you need a different tool.</p>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/farrington-core.js"></script>
+<script src="js/farrington-reference.js"></script>
+<script src="js/farrington-reweight.js"></script>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-enki2016" class="csl-entry" role="listitem">
+Enki, Doyo G., Angela Noufaily, Paul H. Garthwaite, et al. 2016. <span>“Comparison of Statistical Algorithms for the Detection of Infectious Disease Outbreaks in Large Multiple Surveillance Systems.”</span> <em>PLOS ONE</em> 11 (8): e0160759. <a href="https://doi.org/10.1371/journal.pone.0160759">https://doi.org/10.1371/journal.pone.0160759</a>.
+</div>
+<div id="ref-ecdc_signal" class="csl-entry" role="listitem">
+European Centre for Disease Prevention and Control. n.d. <em><span>EpiSignalDetection</span>: Signal Detection for Routine Surveillance Data</em>. <a href="https://www.ecdc.europa.eu/sites/default/files/documents/EpiReport-Vignette.pdf">https://www.ecdc.europa.eu/sites/default/files/documents/EpiReport-Vignette.pdf</a>.
+</div>
+<div id="ref-farrington1996" class="csl-entry" role="listitem">
+Farrington, C. P., N. J. Andrews, A. D. Beale, and M. A. Catchpole. 1996. <span>“A Statistical Algorithm for the Early Detection of Outbreaks of Infectious Disease.”</span> <em>Journal of the Royal Statistical Society: Series A</em> 159 (3): 547–63.
+</div>
+<div id="ref-noufaily2013" class="csl-entry" role="listitem">
+Noufaily, Angela, Doyo G. Enki, Paddy Farrington, Paul Garthwaite, Nick Andrews, and Andre Charlett. 2013. <span>“An Improved Algorithm for Outbreak Detection in Multiple Surveillance Systems.”</span> <em>Statistics in Medicine</em> 32 (7): 1206–22.
+</div>
+<div id="ref-salmon2016" class="csl-entry" role="listitem">
+Salmon, Maëlle, Dirk Schumacher, and Michael Höhle. 2016. <span>“Monitoring Count Time Series in <span>R</span>: Aberration Detection in Public Health Surveillance.”</span> <em>Journal of Statistical Software</em> 70 (10): 1–35.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/thinhong\.github\.io\/epr\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./bayes.html" class="pagination-link" aria-label="Bayesian">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

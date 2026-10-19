@@ -1,0 +1,349 @@
+---
+title: "Farrington"
+---
+
+The RKI chapter judged a week by averaging a handful of comparable weeks.
+Farrington asks the same question — is this week high *for this week of the
+year* — but answers it by fitting a model to those weeks instead of averaging
+them. A regression line gives a baseline that can rise or fall over the years,
+one shared dispersion parameter says how much ordinary weeks scatter around it,
+and a right-skewed prediction interval supplies the threshold.
+
+That buys one thing a reference set cannot: the method can notice that some of
+its own reference weeks were themselves epidemic, and discount them. How harshly
+it should discount them is the question the whole method turns on, and the two
+published versions answer it differently.
+
+The method comes from the Communicable Disease Surveillance Centre in England and
+Wales, where it was built to screen weekly laboratory reports across more than
+three thousand organisms at once [@farrington1996]. That setting shaped it: one
+formula, no per-disease tuning, working equally on an organism seen a few times a
+year and one seen hundreds of times a week. Noufaily and colleagues revised it
+seventeen years later after simulation showed the false alarm rate was too high
+[@noufaily2013].
+
+## Which weeks count as comparable {#sec-farr-reference}
+
+Both versions start from the same window. For the week under assessment, take
+the same calendar week in each of the $b$ previous years, plus $w$ weeks either
+side:
+
+$$
+R \;=\; \bigl\{\, t_0 - 52i + j \;:\; i = 1,\dots,b;\ j = -w,\dots,+w \,\bigr\}, \qquad n = b(2w+1).
+$$
+
+With the package defaults $b = 5$ and $w = 3$, that is 35 weeks. Seasonality is
+handled by the choice of window rather than by a term in the model: only weeks
+sitting at the same point in the year are ever compared, so no sine and cosine
+are needed. The current year is excluded, so an outbreak in progress cannot
+inflate its own baseline.
+
+The cost is visible as soon as you draw it.
+
+::: {#fig-farr-reference}
+```{=html}
+<div id="viz-farr-reference"></div>
+```
+
+Which weeks each version lets the regression see. Switch between the two
+versions and change $b$ and $w$.
+:::
+
+Thirty-five weeks out of the 260 in five years is 13% of the data. The other 87%
+is not merely unused for the baseline — it is unavailable for estimating the
+trend and the dispersion too, which is where a thin reference set hurts most.
+
+The 2013 revision keeps the window but stops discarding everything else. It adds
+a **ten-level seasonal factor**: the window itself is the reference level, and
+the remaining weeks of the year are divided into nine blocks, which fit exactly
+since $7 + 9 \times 5 = 52$. Each block gets its own multiplier $e^{\delta_j}$.
+Weeks outside the window are now *explained* by their block rather than thrown
+away, so they contribute to $\beta$ and $\varphi$ without dragging the current
+window's level around.
+
+Two further changes come with it. The 26 weeks immediately before $t_0$ are held
+out, so a new outbreak a few weeks old cannot teach the model to expect itself —
+the 1996 version needed no such rule, because its windows already sat the better
+part of a year away. The arithmetic gives
+
+$$ n = 52b + w - 26 = 237 $$
+
+reference weeks at the defaults, against 35. The third change comes free with
+it: with 200-odd points behind the slope, the trend no longer has to pass a
+significance test to be kept [@noufaily2013].
+
+## Computing an epidemic threshold with Farrington {#sec-farr-threshold}
+
+::: {.algo-step}
+**1. Fit a quasi-Poisson regression.** On the reference counts,
+
+$$ \log \mu_i = \alpha + \beta t_i, \qquad \operatorname{Var}(y_i) = \varphi\,\mu_i. $$
+
+Here $\alpha$ is the baseline level on the log scale and $\beta$ the weekly
+change, so $e^{\beta}$ is a weekly multiplier. The quasi-Poisson family is there
+because surveillance counts are almost always overdispersed; @sec-rki-dispersion
+sets out what happens when that is ignored. In the 2013 version the seasonal
+factor joins the linear predictor as $\log \mu_i = \theta + \beta t_i + \delta_{j(i)}$.
+:::
+
+::: {.algo-step}
+**2. Estimate the dispersion, with a floor at 1.** From the weighted Pearson
+statistic,
+
+$$ \varphi = \max\left\{1,\; \frac{1}{n-p}\sum_{i=1}^{n} \omega_i \frac{(y_i - \mu_i)^2}{\mu_i}\right\}, $$
+
+where $p$ is the number of regression parameters and $\omega_i = 1$ on the first
+pass. The floor matters: $\varphi < 1$ would mean "less variable than Poisson",
+which on 35 points is nearly always estimation noise, so Poisson variance is
+taken as the minimum.
+:::
+
+::: {.algo-step}
+**3. Downweight the weeks that look like past outbreaks.** For each reference
+week compute a standardised Anscombe residual,
+
+$$ s_i \;=\; \frac{y_i^{2/3} - \mu_i^{2/3}}{\tfrac{2}{3}\sqrt{\varphi}\;\mu_i^{1/6}\sqrt{1 - h_{ii}}}, $$
+
+then assign weights and fit once more:
+
+$$
+\omega_i =
+\begin{cases}
+\gamma / s_i^2, & s_i > c,\\
+\gamma, & s_i \le c,
+\end{cases}
+\qquad \gamma \text{ chosen so that } \textstyle\sum_i \omega_i = n.
+$$
+
+The cut-off is $c = 1$ in 1996 and $c = 2.58$ in 2013 [@noufaily2013].
+:::
+
+::: {.algo-step}
+**4. Keep the trend only if it is worth keeping.** The $\beta t$ term survives
+when $\beta$ is significant at 5%, when the predicted $\mu_0$ does not exceed the
+largest count in the reference set, and (in the R implementation) when
+$b \ge 3$. Otherwise the whole procedure is repeated with an intercept-only
+model. A trend estimated from $b$ clusters a year apart and then extrapolated a
+further year can blow $\mu_0$ up exponentially, which is what the second
+condition guards against. In 2013 the significance test is dropped — with 200-odd
+points the slope is stable enough — but both safety catches remain.
+:::
+
+::: {.algo-step}
+**5. Take the upper end of the prediction interval.** Two things are uncertain:
+the count itself, with variance $\varphi\mu_0$, and the estimated mean, with
+variance $\operatorname{Var}(\mu_0)$. The 1996 threshold adds them on the $2/3$
+power scale, where a Poisson count is close to symmetric:
+
+$$ U = \mu_0\left(1 + \frac{2}{3}\,z\,\sqrt{\frac{\varphi\mu_0 + \operatorname{Var}(\mu_0)}{\mu_0^{2}}}\,\right)^{3/2}. $$
+
+The 2013 threshold instead reads a quantile straight off a negative binomial with
+the same mean and variance:
+
+$$ U = F^{-1}_{\mathrm{NB}}\!\left(1-\alpha;\ \text{size} = \frac{\mu_0}{\varphi - 1},\ \text{prob} = \frac{1}{\varphi}\right). $$
+:::
+
+::: {.algo-step}
+**6. Score it, and refuse to alarm on almost nothing.** The result is reported as
+an exceedance score,
+
+$$ X = \frac{y_0 - \mu_0}{U - \mu_0}, $$
+
+which is dimensionless: $X < 1$ is inside the interval, $X = 1$ sits exactly on
+the threshold, $X = 2$ is twice as far past expectation as it needed to be. A
+rare organism at 9 cases against 2 expected and a common one at 520 against 400
+can be ranked on the same scale. Finally, a rule of thumb against alarms on
+near-empty series: **no alarm unless there are at least 5 cases in the last 4
+weeks**.
+:::
+
+### Reading the threshold formula {#sec-farr-reading}
+
+The 1996 expression is easier to trust once unpacked. Work on the scale
+$y^{2/3}$, where the right skew of a Poisson count largely disappears. On that
+scale the standard deviation of the prediction error is
+$\tfrac{2}{3}\mu_0^{1/6}\sqrt{\tau}$, with
+
+$$ \tau = \varphi + \frac{\operatorname{Var}(\mu_0)}{\mu_0}. $$
+
+Add $z$ of them to $\mu_0^{2/3}$ and raise the result back to the power $3/2$:
+
+$$ U = \left(\mu_0^{2/3} + z\,\tfrac{2}{3}\,\mu_0^{1/6}\sqrt{\tau}\right)^{3/2}. $$
+
+That is the same formula as above, and it is line for line what the package
+computes.
+
+Which parts of it actually matter is worth knowing before tuning anything. Take
+$\mu_0 = 10$, $\varphi = 1.5$ and $\operatorname{Var}(\mu_0) = 0.5$:
+
+| | $U$ |
+|---|---:|
+| $z = 1.645$ (one-sided 5%, the `farringtonFlexible` default) | 17.13 |
+| $z = 1.96$ (two-sided 5%, the `algo.farrington` default) | 18.64 |
+| $z = 2.58$ (one-sided 0.5%, used by UKHSA) | 21.72 |
+| at $z=1.96$, dropping $\operatorname{Var}(\mu_0)$ entirely | 18.48 |
+| at $z=1.96$, with $\varphi = 1$ instead of 1.5 | 16.98 |
+| at $z=1.96$, with $\varphi = 3$ instead of 1.5 | 22.59 |
+
+: What moves the threshold, at a fixed expected count of 10 cases.
+{#tbl-farr-sensitivity}
+
+Ignoring the uncertainty in the mean altogether costs about a sixth of a case.
+Changing $\varphi$ from 1 to 3 moves the threshold by five and a half.
+**$\varphi$ and $z$ are what set the distance between expectation and
+threshold**; the delta-method refinement is a rounding detail beside them.
+
+For the same numbers the negative binomial rule gives $U = 17$, against 17.13
+from the $2/3$ formula — the two threshold rules agree closely. They differ in
+kind rather than in value: the NB quantile is always a whole number and needs no
+back transformation, which is what matters on sparse series, but it plugs
+$\mu_0$ and $\varphi$ straight in and ignores their uncertainty.
+
+## The cut-off that decides how much history to believe {#sec-farr-reweight}
+
+Step 3 is where the two versions actually part company, and the reason is a piece
+of arithmetic the 1996 authors did not have in front of them.
+
+If nothing is wrong, the standardised residuals are roughly standard normal. So a
+cut-off of 1 catches about **16% of perfectly ordinary weeks** and shrinks them.
+The weeks it shrinks hardest are the ones with the largest squared residuals —
+precisely the ones carrying the information about how much ordinary weeks
+scatter. The result is that $\varphi$ is pulled down, often onto its own floor of
+1, the threshold follows it down, and false alarms go up. Raising the cut-off to
+2.58 leaves about 0.5% of ordinary weeks affected, so only something genuinely
+extreme is discounted.
+
+::: {#fig-farr-reweight}
+```{=html}
+<div id="viz-farr-reweight"></div>
+```
+
+Thirty-five reference weeks, one year of which carried an outbreak through the
+window. Hollow circles are downweighted, with the factor applied. The grey line
+is the fit with no downweighting at all.
+:::
+
+The figure holds the data fixed and moves only the cut-off, and the three regimes
+come out clearly. Turn reweighting off and the old outbreak counts in full:
+$\varphi$ stays at 2.05, the threshold rises to 16.3, and a new outbreak would
+have to be very large to clear it. Set the cut-off to 1 and three of the 35 weeks
+are shrunk, $\varphi$ collapses onto its floor of 1.00, and the threshold drops
+to 12.89. Set it to 2.58 and only the single most extreme week is touched,
+$\varphi$ settles at 1.28, and the threshold lands at 14.12.
+
+The week being assessed notified 13 cases. Under the 1996 cut-off that is an
+alarm; under the 2013 cut-off it is not. Same data, same formula, same week —
+one parameter.
+
+Two properties of the weighting rule are easy to miss. It is **one-sided**: a
+week that is unusually *low* keeps its full weight, which makes this a filter for
+past outbreaks rather than robust regression in general. And $\gamma$ does not
+move the fitted line at all; it exists only to keep the weights averaging 1, so
+that the $n - p$ denominator in step 2 still means something.
+
+## What the revision bought {#sec-farr-evidence}
+
+| | 1996 | 2013 |
+|---|---|---|
+| Reference weeks ($b=5$, $w=3$) | 35 | about 237 |
+| Seasonality | by choice of window | window plus a 10-level factor |
+| Recent weeks excluded | $w$ | 26 |
+| Trend | kept if $p < 0.05$ | always kept |
+| Anscombe cut-off | 1 | 2.58 |
+| Threshold | normal approximation, $2/3$ scale | negative binomial quantile |
+
+: The five changes. The low-count rule and the exceedance score are unchanged.
+{#tbl-farr-versions}
+
+An evaluation by the same group across 959 disease series puts numbers on the
+trade: the false alarm rate fell from **1.63%** to **0.76%** for the negative
+binomial version and 0.87% for the quasi-Poisson one, while the probability of
+detection fell from **57%** to 51% and 53% respectively [@enki2016]. Public
+Health England moved to the negative binomial version. Read the two rows
+together: roughly half the false alarms, at the cost of a few points of
+sensitivity — a less flattering picture than "without reducing sensitivity", and
+the honest one to quote.
+
+## Running it {#sec-farr-package}
+
+`farringtonFlexible()` in R's `surveillance` package runs either version
+depending on the `control` list [@salmon2016]. Three things about it cause
+trouble.
+
+**The defaults are neither version.** They take the reference set, the trend test
+and the threshold formula from 1996, but the weight cut-off 2.58 from 2013. For
+the 2013 method you have to ask for it:
+
+```r
+control <- list(range = weeks,
+                b = 5, w = 3,
+                noPeriods = 10,              # the seasonal factor
+                pastWeeksNotIncluded = 26,
+                pThresholdTrend = 1,         # always keep the trend
+                weightsThreshold = 2.58,
+                thresholdMethod = "nbPlugin",
+                alpha = 0.05)                # one-sided here
+res <- farringtonFlexible(sts_object, control)
+```
+
+**`alpha` means different things in different functions.** `algo.farrington()`
+uses `qnorm(1 - alpha/2)`, two-sided; `farringtonFlexible()` uses the
+$1-\alpha$ quantile, one-sided. At the same nominal `alpha` the newer function
+sets a lower threshold and raises more alarms, and comparing the two means
+doubling `alpha` for one of them.
+
+**Misspelled names in `control` are ignored in silence.** There is no error and
+no warning; the run simply uses the default. Check the returned object rather
+than assuming the setting took.
+
+Two more things worth knowing before building a pipeline on it. The earliest week
+that can be assessed is $52b + w + 1$, so five years of history buys you nothing
+until week 264. And weeks failing the 5-in-4 rule come back with
+`upperbound = NA`, which breaks the threshold line into pieces on sparse series —
+decide in advance whether to relax the rule or aggregate the units.
+
+## What an alarm is, and is not {#sec-farr-interpretation}
+
+A Farrington alarm says one thing: this week's count is higher than a model
+fitted to comparable weeks in the past predicted, at the chosen error rate.
+ECDC's own documentation for the method states plainly that such signals "do not
+necessarily correspond to outbreaks", and are there to triage many series
+efficiently [@ecdc_signal].
+
+Every agency running it pairs it with filters and with people. UKHSA sets
+$\alpha = 0.005$. France's food-chain *Salmonella* system keeps only signals that
+three algorithms agree on, or that persist beyond two weeks. The reason is
+arithmetic rather than caution: at a one-sided $\alpha = 0.05$ with a correct
+model, each series crosses its threshold by chance about one week in twenty, so
+**168 wards monitored at that level produce roughly eight chance signals every
+week**. That is the same multiple-comparisons problem as @sec-bayes-practice, and
+it does not care which algorithm raised the signal.
+
+Three structural limits are worth stating alongside the method, because they
+follow from its shape rather than from any implementation.
+
+It **judges each week alone**. There is no accumulation of evidence, so a rise
+that is small but sustained can pass without any single week clearing the
+threshold. That is exactly the gap CUSUM fills, and the package's own
+documentation suggests pairing the two.
+
+It **assumes the season has the same shape every year**. The seasonal factor is
+estimated from past years and applied to this one, so a season arriving early or
+late is compared against the wrong step.
+
+It has **nowhere to put a covariate**. Temperature, rainfall and population
+movement cannot enter the model, which is the limitation the Bayesian chapter
+addresses directly.
+
+One more thing it does not do, which is easy to expect of it. A normal seasonal
+rise is not an alarm. The method answers "is this week unusual *for this time of
+year*", not "has the season started". For the second question you need a
+different tool.
+
+```{=html}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/farrington-core.js"></script>
+<script src="js/farrington-reference.js"></script>
+<script src="js/farrington-reweight.js"></script>
+```

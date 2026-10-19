@@ -22,6 +22,8 @@ book:
       chapters:
         - cusum.qmd
         - rki.qmd
+        - bayes.qmd
+        - farrington.qmd
     - references.qmd
 
 bibliography: references.bib

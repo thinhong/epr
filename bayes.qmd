@@ -1,0 +1,299 @@
+---
+title: "Bayesian"
+---
+
+Every method so far has answered "how high is too high" by looking up comparable
+weeks and asking how far above them this week sits. This one answers it
+differently. It writes down a full probability distribution for what next week's
+count could be, then cuts that distribution at a high quantile and calls
+everything above the cut a signal.
+
+The difference lives entirely in the tail. A distribution built from parameters
+you pretend to know is narrower than one built from parameters you admit you had
+to estimate, and a narrower distribution puts the threshold lower than it should
+be. Raise the uncertainty slider below and watch the two thresholds come apart.
+
+::: {#fig-predictive}
+```{=html}
+<div id="viz-predictive"></div>
+```
+
+Two predictive distributions for the same week. The grey outline fixes the
+parameters at their estimates; the blue one averages over what they might be. The
+shaded band is the gap between the thresholds they produce.
+:::
+
+The algorithm is BODA, the Bayesian Outbreak Detection Algorithm of Manitz and
+Höhle [@manitz2013], implemented in R's `surveillance` package as `boda()`
+[@salmon2016]. Salmon and colleagues later extended it to handle reporting delay
+[@salmon2015], which is `bodaDelay()`.
+
+## What a reference set leaves behind {#sec-bayes-limits}
+
+Before the method, the complaint it answers. Reference-value methods — the CUSUM
+and RKI chapters both belong here — pay for their simplicity in four ways.
+
+::: {.algo-step}
+**They use a sliver of the data.** A handful of weeks from a handful of years
+decides the threshold. The rest of the series still carries information about
+trend and seasonality, and none of it is read.
+:::
+
+::: {.algo-step}
+**The answer depends on a window you chose.** How many years back, how many weeks
+either side. @sec-rki-size showed those choices fixing the size of the comparison
+before any data is read, and nothing in the method tells you which choice is right.
+:::
+
+::: {.algo-step}
+**They act as though the estimate were the truth.** The reference mean is
+substituted straight into the predictive distribution, as if it were known rather
+than estimated. This is the plug-in step, and it is what narrows the distribution
+and drops the threshold.
+:::
+
+::: {.algo-step}
+**There is nowhere to put a cause.** Cases rise for reasons — weather, population
+movement, a change in who gets tested. A reference set has no slot for any of them.
+:::
+
+One clarification is worth making before going further, because the chapter title
+invites the wrong reading. The line that separates these two families is not
+frequentist against Bayesian. It is **reference values against a regression
+model**. The Bayesian framework by itself fixes only the third complaint, the
+plug-in step. The other three fall only because the method moves to a full
+regression on the whole series.
+
+The package makes the point for you. `surveillance` also ships `algo.bayes`, which
+is Bayesian and still reference-value based — and still has all three of the other
+problems.
+
+## Computing an epidemic threshold with BODA {#sec-bayes-threshold}
+
+`boda()` runs in six steps. The first three build a model, the fourth fits it, and
+the last two turn the fit into a number you can compare a count against.
+
+::: {.algo-step}
+**1. Choose the distribution.** Case counts almost always vary more than their own
+mean, because transmission clusters and so the observations are not independent.
+@sec-rki-dispersion made that case in full; BODA takes it as the starting point and
+uses a negative binomial throughout:
+
+$$ y_t \mid \mu_t, \nu \;\sim\; \mathrm{NB}(\mu_t, \nu), \qquad \operatorname{Var}(y_t) = \mu_t + \frac{\mu_t^2}{\nu}. $$
+
+Watch the direction of $\nu$, which is easy to read backwards. A **larger** $\nu$
+means **less** spread; as $\nu \to \infty$ the distribution collapses to Poisson.
+It measures the inverse of overdispersion.
+:::
+
+::: {.algo-step}
+**2. Model the expected count.** Everything that should move the expectation goes
+into a linear predictor on the log scale:
+
+$$ \log \mu_t \;=\; \log P_t + \alpha_{0t} + \beta t + \gamma_t + X_t^{\!\top}\delta + \zeta z_t. $$
+
+Each term has one job. $\log P_t$ is a population offset, so the model works on
+rates rather than raw counts and districts of different sizes can be compared.
+$\alpha_{0t}$ is an intercept free to drift, smoothing the baseline level. $\beta t$
+is long-run trend. $\gamma_t$ is the seasonal cycle, period 52 for weekly data.
+$X_t^{\!\top}\delta$ is where covariates enter — temperature, absolute humidity,
+rainfall, usually lagged. And $\zeta z_t$ marks weeks already flagged as
+aberrant, so that old epidemic peaks are not learned as ordinary baseline.
+:::
+
+That last term deserves a second look, because it sounds like the objection raised
+against reference methods: doesn't somebody have to decide in advance which weeks
+were epidemic? No. In the implementation `z_t` is not supplied by the user. With
+`pastAberrations = TRUE`, it is read from the alarms the algorithm itself raised at
+earlier time points. The loop closes on its own.
+
+::: {.algo-step}
+**3. Put a prior on everything.** In a Bayesian model every parameter is a random
+variable and needs a distribution before the data arrives. This model is a **latent
+Gaussian model**, which splits the parameters into two tiers: a latent field
+$x = (\alpha_{0t}, \beta, \gamma_t, \delta, \zeta)$ of regression coefficients and
+random effects, assumed jointly Gaussian; and a small set of hyperparameters
+$\theta = (\nu, \tau)$ controlling dispersion and how smooth each effect is.
+
+The split is not bookkeeping. Keeping the hyperparameters few — under about
+fifteen — is the condition that makes step 4 possible [@rue2009].
+:::
+
+In practice: the drifting intercept is declared through `f(time, model = ...)`,
+where `rw1` (a first-order random walk, a slowly wandering baseline) is a sensible
+default for weekly data, with `iid` and `rw2` as the looser and smoother
+alternatives. Setting `season = TRUE` gives the seasonal term a cyclic spline, so
+the end of one year joins the start of the next. Fixed coefficients get vague
+Gaussian priors and let the data speak. For the hyperparameters INLA defaults to
+log-Gamma; on short series or thin ward-level counts, a PC prior is less sensitive
+to how you set it. Run the whole thing under at least two prior choices and check
+the answer does not move.
+
+::: {.algo-step}
+**4. Fit it.** With weeks $1$ to $T-1$ in hand, Bayes' theorem gives
+
+$$ p(x, \theta \mid y_{1:T-1}) \;\propto\; p(y_{1:T-1} \mid x, \theta)\, p(x \mid \theta)\, p(\theta). $$
+
+The normalising constant is an integral with no closed form. MCMC would sample it
+accurately and take hours for one series — impossible for a system that runs weekly
+across hundreds of units. BODA uses INLA instead [@rue2009], a deterministic
+approximation built for exactly this class of model, which matches MCMC closely and
+runs orders of magnitude faster.
+:::
+
+::: {.algo-step}
+**5. Average over what you do not know.** The parameters were never the point. What
+is wanted is $y_T$, and the distribution for it integrates the model away:
+
+$$ p(y_T \mid y_{1:T-1}) \;=\; \int p(y_T \mid x, \theta)\, p(x, \theta \mid y_{1:T-1})\, \mathrm{d}x\, \mathrm{d}\theta. $$
+
+This single line is the whole argument of the chapter. It folds together two
+different uncertainties: counts bounce around even when the parameters are known
+exactly, **and** the parameters are not known exactly. Plug-in methods carry only
+the first.
+:::
+
+One implementation detail follows directly from step 4 and is easy to get wrong.
+INLA returns the **marginal** posterior of each parameter, not their joint
+distribution. `boda()` therefore takes a `samplingMethod` argument, and it should be
+set to `'joint'`. Sampling each marginal independently discards the correlations
+between parameters and narrows the predictive distribution — reintroducing, by the
+back door, the exact defect the method exists to remove.
+
+::: {.algo-step}
+**6. Cut the tail.** The threshold is the $(1-\alpha)$ quantile of that predictive
+distribution. Counts are whole numbers, so the honest definition is the smallest
+integer whose cumulative probability reaches $1-\alpha$:
+
+$$ \xi_{1-\alpha} \;=\; \min\Bigl\{ k \in \{0,1,2,\dots\} \;:\; \textstyle\sum_{j=0}^{k} p(y_T = j \mid y_{1:T-1}) \;\ge\; 1-\alpha \Bigr\}. $$
+
+A week signals when $y_T^{\text{obs}} > \xi_{1-\alpha}$.
+:::
+
+### Why the Bayesian threshold sits higher {#sec-bayes-variance}
+
+The claim that the predictive distribution is wider can be made exact. Split its
+variance by conditioning on the parameters first:
+
+$$ \operatorname{Var}(y_T \mid \text{data}) \;=\; \operatorname{E}\!\bigl[\operatorname{Var}(y_T \mid \mu)\bigr] \;+\; \operatorname{Var}\!\bigl(\operatorname{E}[y_T \mid \mu]\bigr). $$
+
+The first term is how much the counts would scatter if you knew where they were
+centred. The second is how much the centre itself could move.
+
+Substitute the negative binomial, for which $\operatorname{Var}(y \mid \mu) = \mu +
+\mu^2/\nu$ and $\operatorname{E}[y \mid \mu] = \mu$:
+
+$$ \operatorname{Var}(y_T \mid \text{data}) \;=\; \operatorname{E}[\mu] + \frac{\operatorname{E}[\mu^2]}{\nu} + \operatorname{Var}(\mu). $$
+
+Write $\hat\mu = \operatorname{E}[\mu]$ and $s^2 = \operatorname{Var}(\mu)$, and use
+$\operatorname{E}[\mu^2] = \hat\mu^2 + s^2$:
+
+$$ \operatorname{Var}(y_T \mid \text{data}) \;=\; \underbrace{\hat\mu + \frac{\hat\mu^2}{\nu}}_{\text{plug-in}} \;+\; s^2\Bigl(1 + \frac{1}{\nu}\Bigr). $$
+
+The brace is exactly what a plug-in method computes. Everything after it is what a
+plug-in method discards, and it has a shape worth reading. The penalty grows with
+the **square** of how uncertain the expected count is, so it stays negligible until
+the estimate is genuinely shaky and then grows fast. And it is **larger when $\nu$
+is small**: the more overdispersed the counts already are, the more parameter
+uncertainty piles on top.
+
+@fig-predictive opens at $\hat\mu = 15$, $\nu = 6$ and 30% uncertainty. The
+plug-in variance is 52.50, the formula adds about 24.7, and the total is 77.17. In
+cases, the plug-in threshold is 28 and the Bayesian one is 32 — and a threshold of
+28 that advertises a 5% false alarm rate delivers 7.6%.
+
+## When this week's count is not yet this week's count {#sec-bayes-delay}
+
+For ward-level surveillance this is not a refinement. It is the main problem.
+
+A week's count is never finished when the week is. Cases have to present, be
+tested, be confirmed and be entered, and all of that takes time. So at the moment
+the algorithm runs, the current week is **under-reported** — while the threshold it
+is compared against was calibrated on historical weeks that have long since filled
+in. The comparison is between an incomplete number and a complete-number threshold,
+and it fails in the worst possible direction: outbreaks are missed precisely when
+detecting them matters most.
+
+::: {#fig-delay}
+```{=html}
+<div id="viz-delay"></div>
+```
+
+The same forty weeks under two rules. Hollow outlines are the counts once every
+case has arrived; solid bars are what is visible when the week is judged. Rings
+mark exceedances the rule fails to see.
+:::
+
+Set the wait to zero and read the figure as reported: only about a third of each
+week's cases exist yet, and all three genuine exceedances slip under the threshold.
+Wait two weeks and all three are caught — but every alarm now arrives two weeks
+after the week it describes, which for a vector-borne outbreak is most of the window
+in which a response would have helped.
+
+The second tab is the way out. If you know what share of a week's cases has usually
+arrived by a given delay, you can scale the partial count back up and judge the week
+immediately. That is what delay correction does, and at a wait of zero it recovers
+all three.
+
+Salmon and colleagues built this into the model rather than bolting it on
+[@salmon2015]. The data are treated as a two-way table — week of onset against
+reporting delay — with the lower right corner missing, and that table is modelled
+with negative binomial regression. The implementation is `bodaDelay()`, and using it
+means preparing a **reporting triangle** rather than a plain weekly series.
+
+Worth knowing before you plan around it: `bodaDelay()` combines the Manitz–Höhle
+algorithm with Noufaily's [@noufaily2013], and so it still takes reference-window
+arguments `b` and `w`. The dependence on a chosen window, the second complaint in
+@sec-bayes-limits, is therefore **not** fully removed. That is a deliberate trade of
+theoretical tidiness for something that runs.
+
+## Practical notes {#sec-bayes-practice}
+
+**The software is experimental.** `boda()` says so in its own documentation. It
+depends on INLA, which is not on CRAN and installs from its own repository:
+
+```r
+install.packages("INLA", repos = "https://inla.r-inla-download.org/R/stable")
+```
+
+It is slow, because a Bayesian model is fitted at every time point. And results are
+not reproducible under INLA's default parallelism; for a reproducible run, set
+`INLA::inla.setOption(num.threads = "1:1")` before `set.seed()`.
+
+**Many units at once is a different problem.** This is the easiest thing to overlook
+when moving from one series to a whole city. Run the algorithm across $N$ units at
+level $\alpha$ and, with no outbreak anywhere, the expected number of false alarms
+per week is $N\alpha$. For 168 units at $\alpha = 0.05$ that is about **eight false
+alarms every week** — enough to exhaust a response team's trust within a few months.
+The options are to lower $\alpha$ and accept the loss of sensitivity, to control a
+false discovery rate rather than each alarm separately, or to require a signal to
+repeat across weeks or cluster in space before it triggers fieldwork. Whichever you
+pick, write down why.
+
+**Use the population offset.** When units differ greatly in size, $\log P_t$ has to
+enter the model as an offset. Without it, dense wards carry permanently high
+thresholds and sparse ones alarm constantly, and neither reflects real risk. Check
+whether the version of `boda()` you are running accepts an offset, since its `X`
+argument takes covariates as fixed effects only.
+
+## Measuring whether it works {#sec-bayes-evaluation}
+
+A detection algorithm is worth only what it can be shown to do. The minimum set:
+**sensitivity** (the share of real outbreaks detected), **specificity** and the
+false alarm rate, and **timeliness** — an algorithm that detects everything four
+weeks late detects nothing useful. Because the output here is a whole distribution
+rather than a yes-or-no verdict, add a **proper scoring rule**, which grades the
+probability forecast itself.
+
+Evaluate on both simulated data, where the true outbreaks are known by
+construction, and on real historical series, which is how Manitz and Höhle assessed
+BODA [@manitz2013]. Unkel and colleagues give a fuller comparison framework
+[@unkel2012].
+
+```{=html}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/bayes-core.js"></script>
+<script src="js/bayes-predictive.js"></script>
+<script src="js/bayes-delay.js"></script>
+```

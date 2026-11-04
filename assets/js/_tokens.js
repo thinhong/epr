@@ -6,10 +6,11 @@
 //  Each surveillance role has [line, ink]: line = vivid
 //  (strokes/fills), ink = AA-safe on white (text/labels).
 //
-//  NOTE: the book's live figures (js/cusum.js, js/cusum-epi.js)
-//  read the tokens through the global `EPR` object in
-//  js/epr-viz.js. This module is the ES-module mirror kept for
-//  parity with idm4b and for any future module-based figure.
+//  NOTE: the book's live figures read the tokens as CSS custom
+//  properties, through js/viz-kit.js and the figure rules in
+//  assets/theme.scss (js/epr-viz.js is legacy and no longer
+//  loaded). This module is the ES-module mirror kept for parity
+//  with idm4b and for any future module-based figure.
 // ============================================================
 
 export function cssVar(name, fallback) {

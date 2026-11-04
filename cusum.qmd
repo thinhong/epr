@@ -3,44 +3,76 @@ title: "CUSUM"
 format: html
 ---
 
-CUSUM adds up how far each reading strays from its target. Small shifts that no single reading would catch still pile up, so it spots a slow, steady change early, like the start of an outbreak. Click through the vaccine line below: each vial is measured, and the CUSUM climbs until it signals.
+CUSUM adds up how far each reading strays from its target. Small shifts that no single reading would catch still pile up, so it spots a slow, steady change early, like the start of an outbreak. Click through the vaccine line in @fig-cusum-line: each vial is measured, and the CUSUM climbs until it signals.
 
+::: {#fig-cusum-line}
 ```{=html}
-<div id="cusum-game" class="epr-mount"></div>
+<div id="viz-cusum-line"></div>
 ```
+
+A vaccine filling line with a target of 3.0 mL. Each vial adds its fill minus 3.05 mL (the target plus a slack $K = 0.05$ mL) to the CUSUM, which never drops below 0, and the line stops once the CUSUM reaches $H = 0.5$. Somewhere after vial 3 the filler starts to overfill by 0.18 mL, too little to stand out in any single vial. The fills are simulated.
+:::
 
 E.S. Page invented CUSUM in 1954 for factory quality control [@page1954]. Tillett and Spencer brought it into disease surveillance in 1982, with weekly influenza "cusum graphs" for England and Wales [@tillett1982]. Page tracked one parameter of a distribution, usually the mean, and set a rule for when a change was big enough to act on.
 
 ## Computing an epidemic threshold with CUSUM
 
-For weekly case counts, the standard tool is the CUSUM in R's `surveillance` package (`algo.cusum`) [@rossi1999], building on counted-data CUSUMs [@lucas1985]. It runs in three steps, using the package defaults.
+For weekly case counts, the standard tool is the CUSUM in R's `surveillance` package ([`algo.cusum`](https://www.rdocumentation.org/packages/surveillance/versions/1.25.0/topics/algo.cusum)) [@rossi1999], building on counted-data CUSUMs [@lucas1985]. It runs in three steps, using the package defaults.
 
+::: {.algo-step}
 **1. Expected level.** Take the in-control mean $m$, the count you expect in a normal week. By default the package uses the mean of the weeks before monitoring starts.
+:::
 
-**2. Standardize.** Turn each count into a standardized deviation,
+::: {.algo-step}
+**2. Standardise.** Turn each count into a standardised deviation,
 
 $$ z_t = \frac{x_t - m}{\sqrt{m}}, $$
 
 so a normal week sits near $z_t \approx 0$ whatever the size of $m$.
+:::
 
+::: {.algo-step}
 **3. Accumulate.** Add up these deviations minus a reference value $k$, floored at zero, and signal once the sum reaches the boundary $h$:
 
 $$ S_t = \max\!\left(0,\; S_{t-1} + (z_t - k)\right), \qquad \text{signal when } S_t \ge h. $$
+:::
 
 The defaults are $k = 1.04$ and $h = 2.26$, and $S_t$ is not reset after a signal, so a whole outbreak stays flagged.
 
-The same rule reads as a threshold on the raw count. A week signals exactly when its cases reach
+The same rule reads as a threshold on the raw count. To see where that threshold comes from, look at the accumulate step at the exact moment a week trips the alarm. At that point $S_t = h$, and the running sum is positive, so the floor does nothing:
+
+$$ h = S_{t-1} + (z_t - k). $$
+
+Rearrange for the standardised deviation that just reaches the boundary:
+
+$$ z_t = h + k - S_{t-1}. $$
+
+Now put back $z_t = (x_t - m)/\sqrt{m}$ from step 2:
+
+$$ \frac{x_t - m}{\sqrt{m}} = h + k - S_{t-1}. $$
+
+Multiply through by $\sqrt{m}$ and add $m$ to isolate the count:
+
+$$ x_t = m + \sqrt{m}\,(h + k - S_{t-1}). $$
+
+Cases are whole numbers, so the smallest count that reaches the boundary is this value rounded up. A week signals exactly when
 
 $$ x_t \ge U_t = \left\lceil m + \sqrt{m}\,(h + k - S_{t-1}) \right\rceil, $$
 
-the package's `upperbound`. This $U_t$ is the **epidemic threshold in cases**. It starts high and falls as evidence builds, so a steady rise is caught even when no single week looks extreme. Hover across the plot below to see each week's numbers.
+the package's `upperbound`. This $U_t$ is the **epidemic threshold in cases**. It starts high and falls as evidence builds, so a steady rise is caught even when no single week looks extreme. Hover across @fig-cusum-threshold to see each week's numbers.
 
+::: {#fig-cusum-threshold}
 ```{=html}
-<div id="cusum-epi" class="epr-mount"></div>
+<div id="viz-cusum-threshold"></div>
 ```
 
+Simulated weekly cases. Weeks 1 to 13 set the expected count $m = 8$. From week 14 the CUSUM $S_t$ (bottom) builds up during the outbreak, and the case threshold $U_t$ (red dashed step, top) falls as it does. Weeks that signal are red. Hover over or tap a week to see its numbers.
+:::
+
 ```{=html}
-<script src="js/epr-viz.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/cusum-core.js"></script>
 <script src="js/cusum.js"></script>
 <script src="js/cusum-epi.js"></script>
 ```

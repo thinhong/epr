@@ -1,232 +1,337 @@
+/* ============================================================
+   CUSUM figure 1: a vaccine filling line (#viz-cusum-line)
+   Three rows on one vial axis: the belt, each vial's fill against
+   the 3.0 mL target, and the CUSUM
+       S_t = max(0, S_(t-1) + (x_t - 3.05)),   signal when S_t >= H,
+   where 3.05 is the target plus a slack K = 0.05 mL, and H = 0.5.
+   Fills are kept in hundredths of a mL, so every sum in the readout
+   adds up exactly. Somewhere after vial 3 the filler starts to
+   overfill by 0.18 mL, and the line stops at the first signal.
+   ============================================================ */
+
 (function () {
-  "use strict";
-
-  function init() {
-    if (!window.EPR) return;
-    EPR.injectStyles();
-    injectGameStyles();
-    var mount = document.getElementById("cusum-game");
-    if (!mount || mount.getAttribute("data-built") === "1") return;
-    mount.setAttribute("data-built", "1");
-    build(mount);
+  const MOUNT = '#viz-cusum-line';
+  const el = document.querySelector(MOUNT);
+  if (!el) return;
+  const missing = [];
+  if (typeof d3 === 'undefined') missing.push('d3');
+  if (typeof VIZ === 'undefined') missing.push('viz-kit.js');
+  if (typeof CUSUM === 'undefined') missing.push('cusum-core.js');
+  if (missing.length) {
+    el.innerHTML = '<div class="viz-missing">Figure did not load. Not available: <b>' +
+      missing.join('</b>, <b>') + '</b>. Check the script list at the end of the chapter.</div>';
+    return;
   }
 
-  function injectGameStyles() {
-    if (document.getElementById("epr-cusum-styles")) return;
-    var css =
-      ".epr-fig{box-shadow:0 1px 2px rgba(4,33,71,.06)}" +
-      ".epr-fig #g-chart{cursor:crosshair;touch-action:none}" +
-      ".epr-fig .epr-bar{gap:14px;margin-top:12px}" +
-      ".epr-fig .epr-btn{min-height:40px;padding:0 16px;font-size:.95rem}" +
-      ".epr-fig .epr-card{}";
-    var s = document.createElement("style"); s.id = "epr-cusum-styles"; s.textContent = css;
-    document.head.appendChild(s);
+  // Everything in hundredths of a mL.
+  const TARGET = 300, K = 5, H = 50, SD = 10, SHIFT = 18, N = 12, START = 3;
+  const LO = 268, HI = 352, SMAX = 100;          // fill axis 2.68 to 3.52 mL, CUSUM axis 0 to 1.0 mL
+  const mL = v => CUSUM.num(v / 100, 2);
+  const nb = t => t.replace(/ /g, '\u00a0');      // keep a piece of a formula on one line
+  const st = { x: [], S: [], drift: 0, alarm: -1, shown: 0, sel: null, p: 1, raf: 0 };
+
+  /* ---- the card ------------------------------------------------ */
+  el.classList.add('cusum-card');
+  const card = VIZ.card(MOUNT, { title: 'Catching a small overfill', status: 'Running' });
+  const box = card.body.append('div').attr('class', 'cusum-model').attr('aria-live', 'polite');
+  const chart = card.body.append('div').attr('class', 'cusum-chart');
+  const foot = card.body.append('div').attr('class', 'cusum-foot');
+  const hint = foot.append('p').attr('class', 'cusum-hint');
+  const acts = foot.append('div').attr('class', 'cusum-actions');
+  const nextBtn = acts.append('button').attr('type', 'button').text('Fill next vial').on('click', fillNext);
+  const newBtn = acts.append('button').attr('type', 'button').text('New batch').on('click', newBatch);
+  const svg = chart.append('svg').attr('role', 'slider').attr('aria-label', 'Vial').attr('aria-valuemin', 1);
+  let L = null, G = null;
+
+  /* ---- the batch ----------------------------------------------- */
+  function makeBatch() {
+    const g = d3.randomNormal(0, 1);
+    const noise = () => { let v; do { v = g(); } while (Math.abs(v) > 3); return v; };   // fills stay within 3 sd
+    st.drift = START + Math.floor(Math.random() * 3);             // first overfilled vial: the 4th, 5th or 6th
+    st.x = d3.range(N).map(i => Math.round(TARGET + (i >= st.drift ? SHIFT : 0) + SD * noise()));
+    let s = 0;
+    st.S = st.x.map(v => (s = Math.max(0, s + (v - TARGET - K))));
+    st.alarm = st.S.findIndex(v => v >= H);
+    st.shown = st.alarm >= 0 && st.alarm < START ? st.alarm + 1 : START;
+    st.sel = null;
+  }
+  const ended = () => st.shown >= N || (st.alarm >= 0 && st.shown > st.alarm);
+  const done = () => ended() && st.p >= 1;
+  const stopped = () => done() && st.alarm >= 0;
+  const current = () => (st.sel != null ? st.sel : st.shown - 1);
+
+  function newBatch() {
+    stopFill();
+    makeBatch();
+    picker.reset();
+    CUSUM.fitBox(box, d3.range(N).map(readout));
+    draw();
   }
 
-  var NS = "http://www.w3.org/2000/svg";
-  function svg(tag, attrs, parent) {
-    var e = document.createElementNS(NS, tag);
-    if (attrs) for (var k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
-    if (parent) parent.appendChild(e);
-    return e;
+  /* One click fills one vial: the liquid rises, its bar grows and
+     the CUSUM steps on, together. A click during a fill completes it
+     at once and starts the next vial. */
+  function fillNext() {
+    if (ended()) return;
+    stopFill();
+    st.shown += 1;
+    st.sel = null;
+    picker.reset();
+    const ms = VIZ.dur(560);
+    if (ms) st.p = 0;
+    draw();
+    if (!ms) return;
+    const t0 = performance.now();
+    const tick = now => {
+      const k = Math.min(1, (now - t0) / ms);
+      st.p = d3.easeCubicOut(k);
+      if (k < 1) { drawData(); drawSel(); st.raf = requestAnimationFrame(tick); }
+      else { st.raf = 0; st.p = 1; draw(); }
+    };
+    st.raf = requestAnimationFrame(tick);
   }
-  function clear(n) { while (n && n.firstChild) n.removeChild(n.firstChild); }
-  function spaces(n) { return new Array(n + 1).join(" "); }
-
-  // exact one-sided CUSUM: S_t = max(0, S_{t-1} + (x_t - MU0 - K)); signal S_t > H
-  var MU0 = 3.0, SIGMA = 0.1, K = 0.05, H = 0.5, DELTA = 0.18, N = 12;
-  var CML = 54, CMR = 22, CW = 760, STEP = (CW - CML - CMR) / N;
-  function xMap(i) { return CML + (i + 0.5) * STEP; }
-  // vial geometry
-  var VBB = 104, VW = Math.min(STEP * 0.5, 34), VHW = VW / 2, VBODY = VW * 1.42, VBT = VBB - VBODY,
-      VCAPW = VW * 0.56, VCAPHW = VCAPW / 2, VCAPH = VW * 0.32, VYFL = VBT + VBODY * 0.42, VSC = 70;
-
-  function build(mount) {
-    var C = EPR.colors();
-    var LIQ = C.expected, OVER = C.alarm, GLASS = C.glass, GST = C.glassStroke,
-        CAP = C.cap, CAPHI = C.capHi, BELT = C.belt, BELT_HI = "#c4cdd8", ROLLER = C.roller, TITLE = C.heading;
-    var st = { step: -1, stop: -1, ended: false, round: null, fillFrac: 1 };
-
-    mount.innerHTML =
-      '<div class="epr-fig" style="position:relative">' +
-        '<svg class="epr-stage" id="g-belt" viewBox="0 0 760 124" role="img" aria-label="A vaccine filling line: click to fill each vial; the line stops if the CUSUM alarms"></svg>' +
-        '<svg class="epr-chart" id="g-bars" viewBox="0 0 760 126" role="img" aria-label="Bar chart of each vial fill volume against the 3.0 mL target"></svg>' +
-        '<svg class="epr-chart" id="g-chart" viewBox="0 0 760 164" role="img" aria-label="CUSUM chart; hover or drag to see the running computation for each vial"></svg>' +
-        '<div class="epr-bar">' +
-          '<button class="epr-btn primary" id="g-next">&#9654; Fill next vial</button>' +
-          '<button class="epr-btn" id="g-reset">&#8635; New batch</button>' +
-        '</div>' +
-      '</div>';
-
-    var $ = function (id) { return mount.querySelector(id); };
-    var fig = $(".epr-fig"), belt = $("#g-belt"), bars = $("#g-bars"), chart = $("#g-chart"), nextBtn = $("#g-next");
-
-    var beltG;
-    (function buildBelt() {
-      var g = svg("g", {}, belt), sx, by = VBB;
-      svg("text", { x: CML, y: 22, "font-size": 16, "font-weight": 600, fill: TITLE }, g).textContent = "Vaccine fill line";
-      svg("ellipse", { cx: CML - 12, cy: by + 4.5, rx: 5.5, ry: 6.5, fill: ROLLER, stroke: BELT, "stroke-width": 1 }, g);
-      svg("ellipse", { cx: CW - CMR + 12, cy: by + 4.5, rx: 5.5, ry: 6.5, fill: ROLLER, stroke: BELT, "stroke-width": 1 }, g);
-      svg("rect", { x: CML - 12, y: by, width: (CW - CMR + 12) - (CML - 12), height: 9, rx: 2, fill: BELT }, g);
-      svg("rect", { x: CML - 12, y: by, width: (CW - CMR + 12) - (CML - 12), height: 2.5, rx: 2, fill: BELT_HI }, g);
-      for (sx = CML + 6; sx < CW - CMR - 8; sx += 34) svg("path", { d: "M" + sx + " " + (by + 2.5) + " l4 2 l-4 2", fill: "none", stroke: "#fff", "stroke-width": 1.4, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.3 }, g);
-      svg("line", { x1: CML, y1: VYFL, x2: CW - CMR, y2: VYFL, stroke: LIQ, "stroke-width": 1.1, "stroke-dasharray": "3 5", opacity: 0.55 }, g);
-      beltG = svg("g", {}, g);
-    })();
-
-    function beltVial(g, cx, vol, isCur, fillFrac, alarmed) {
-      var over = vol >= MU0;
-      var amberH = over ? Math.min((vol - MU0) * VSC, VYFL - VBT - 2) : 0;
-      var finalTop = over ? (VYFL - amberH) : Math.min(VBB - 2, VYFL + (MU0 - vol) * VSC);
-      var yfill = VBB - fillFrac * (VBB - finalTop);
-      svg("ellipse", { cx: cx, cy: VBB + 1.5, rx: VHW + 2, ry: 2.4, fill: "#0f172a", opacity: 0.09 }, g);
-      svg("rect", { x: cx - VCAPHW, y: VBT - VCAPH - 1, width: VCAPW, height: VCAPH, rx: 3, fill: CAP }, g);
-      svg("rect", { x: cx - VCAPHW + 1.5, y: VBT - VCAPH + 0.5, width: VCAPW * 0.4, height: VCAPH * 0.34, rx: 1, fill: CAPHI }, g);
-      svg("ellipse", { cx: cx - VCAPW * 0.12, cy: VBT - VCAPH + 1.6, rx: VCAPW * 0.22, ry: 1.3, fill: "#ffffff", opacity: 0.5 }, g);
-      svg("rect", { x: cx - VW * 0.16, y: VBT - 2, width: VW * 0.32, height: 3.5, fill: GLASS, stroke: GST, "stroke-width": 0.5 }, g);
-      var bid = "vb" + Math.round(cx);
-      svg("rect", { x: cx - VHW, y: VBT, width: VW, height: VBB - VBT, rx: VW * 0.3 }, svg("clipPath", { id: bid }, g));
-      svg("rect", { x: cx - VHW, y: VBT, width: VW, height: VBB - VBT, rx: VW * 0.3, fill: GLASS, stroke: GST, "stroke-width": 0.9 }, g);
-      var cg = svg("g", { "clip-path": "url(#" + bid + ")" }, g), lg = cg;
-      if (fillFrac < 1) { var fid = "vf" + Math.round(cx); svg("rect", { x: cx - VHW, y: yfill, width: VW, height: VBB - yfill }, svg("clipPath", { id: fid }, g)); lg = svg("g", { "clip-path": "url(#" + fid + ")" }, cg); }
-      var tealTop = over ? VYFL : finalTop;
-      svg("rect", { x: cx - VHW, y: tealTop, width: VW, height: VBB - tealTop, fill: LIQ, opacity: 0.34 }, lg);
-      if (amberH > 0.4) svg("rect", { x: cx - VHW, y: VYFL - amberH, width: VW, height: amberH, fill: OVER, opacity: 0.92 }, lg);
-      svg("rect", { x: cx - VHW + VW * 0.17, y: VBT + 5, width: 2.6, height: VBODY - 12, rx: 1.3, fill: "#ffffff", opacity: 0.55 }, cg);
-      if (isCur && fillFrac < 1) {
-        var nt = VBT - VCAPH - 22;
-        svg("rect", { x: cx - 11, y: nt, width: 22, height: 9, rx: 3, fill: "#c2ccd6", stroke: GST, "stroke-width": 1 }, g);
-        svg("rect", { x: cx - 3, y: nt + 8, width: 6, height: 5, rx: 1, fill: "#9aa7b5" }, g);
-        svg("rect", { x: cx - 1.4, y: nt + 13, width: 2.8, height: Math.max(0, yfill - (nt + 13)), fill: LIQ, opacity: 0.6 }, g);
-      }
-      if (isCur) svg("rect", { x: cx - VHW - 3, y: VBT - VCAPH - 4, width: VW + 6, height: (VBB - VBT) + VCAPH + 6, rx: 6, fill: "none", stroke: alarmed ? C.alarmStrong : C.accent, "stroke-width": 1.8 }, g);
-    }
-
-    function drawBelt() {
-      clear(beltG);
-      var settled = st.fillFrac >= 1;
-      var running = !st.ended || !settled;
-      var stopped = st.ended && st.stop >= 0 && settled;
-      var t = running ? "Running" : (stopped ? "Line stopped" : "Batch done");
-      var dotc = running ? C.expected : (stopped ? C.alarmStrong : C.muted);
-      var txtc = running ? C.expectedInk : (stopped ? C.alarmStrongInk : C.muted);
-      var pw = 122, px = CW - CMR - pw, py = 7;
-      svg("rect", { x: px, y: py, width: pw, height: 21, rx: 10.5, fill: C.surface, stroke: C.grid }, beltG);
-      svg("circle", { cx: px + 14, cy: py + 10.5, r: 4.5, fill: dotc }, beltG);
-      svg("text", { x: px + 26, y: py + 14.5, "font-size": 12.5, "font-weight": 600, fill: txtc }, beltG).textContent = t;
-      for (var i = 0; i <= st.step; i++) {
-        var isCur = i === st.step, alarmed = stopped && st.stop === i;
-        beltVial(beltG, xMap(i), st.round.x[i], isCur, isCur ? st.fillFrac : 1, alarmed);
-      }
-      if (stopped) {
-        var gs = svg("g", { transform: "translate(" + xMap(st.stop) + "," + (VBT + VBODY * 0.42) + ") rotate(-13)" }, beltG);
-        svg("rect", { x: -25, y: -12, width: 50, height: 24, rx: 5, fill: "rgba(224,87,78,0.15)", stroke: C.alarmStrong, "stroke-width": 2 }, gs);
-        svg("text", { x: 0, y: 5, "font-size": 13, "font-weight": 800, fill: C.alarmStrongInk, "text-anchor": "middle", "letter-spacing": ".08em" }, gs).textContent = "STOP";
-      }
-    }
-
-    function title(g, s) { svg("text", { x: CML, y: 18, "font-size": 16, "font-weight": 600, fill: TITLE, "letter-spacing": ".01em" }, g).textContent = s; }
-    function drawBars() {
-      clear(bars);
-      var g = svg("g", {}, bars), i;
-      var bt = 28, bb = 112, vmin = 2.72, vmax = 3.5, bw = STEP * 0.54;
-      function yV(v) { return bb - (v - vmin) / (vmax - vmin) * (bb - bt); }
-      title(g, "Vial volume (mL)");
-      [2.8, 3.0, 3.2, 3.4].forEach(function (v) { svg("text", { x: CML - 8, y: yV(v) + 5, "font-size": 13.5, fill: C.muted, "text-anchor": "end" }, g).textContent = v.toFixed(1); });
-      var y0 = yV(MU0);
-      for (i = 0; i <= st.step; i++) { var v = st.round.x[i], yv = yV(v); svg("rect", { x: xMap(i) - bw / 2, y: Math.min(yv, y0), width: bw, height: Math.max(0.8, Math.abs(yv - y0)), rx: 3, fill: v > MU0 ? OVER : LIQ, opacity: 0.92 }, g); }
-      svg("line", { x1: CML, y1: y0, x2: CW - CMR, y2: y0, stroke: LIQ, "stroke-width": 1.3, "stroke-dasharray": "3 4" }, g);
-      svg("text", { x: CW - CMR, y: y0 - 6, "font-size": 14, fill: C.expectedInk, "text-anchor": "end" }, g).textContent = "target 3.0";
-    }
-
-    function drawCusum(hi) {
-      clear(chart);
-      var g = svg("g", {}, chart), i;
-      var ct = 28, cb = 118, cmax = 1.0;
-      function yC(c) { return cb - Math.min(c, cmax) / cmax * (cb - ct); }
-      title(g, "CUSUM");
-      svg("line", { x1: CML, y1: cb, x2: CW - CMR, y2: cb, stroke: C.grid, "stroke-width": 1 }, g);
-      [0, 0.5, 1.0].forEach(function (c) { svg("text", { x: CML - 8, y: yC(c) + 5, "font-size": 13.5, fill: C.muted, "text-anchor": "end" }, g).textContent = c.toFixed(1); });
-      if (hi != null && hi >= 0 && hi <= st.step) svg("line", { x1: xMap(hi), y1: ct - 4, x2: xMap(hi), y2: cb, stroke: C.accent, "stroke-width": 1, "stroke-dasharray": "2 3", opacity: 0.55 }, g);
-      if (st.step >= 0) {
-        var area = "M" + xMap(0).toFixed(1) + " " + cb + " ", line = "";
-        for (i = 0; i <= st.step; i++) { var p = xMap(i).toFixed(1) + " " + yC(st.round.S[i]).toFixed(1); area += "L" + p + " "; line += (i ? "L" : "M") + p + " "; }
-        area += "L" + xMap(st.step).toFixed(1) + " " + cb + " Z";
-        svg("path", { d: area, fill: C.accent, opacity: 0.1 }, g);
-        svg("path", { d: line, fill: "none", stroke: C.accent, "stroke-width": 2.4, "stroke-linejoin": "round", "stroke-linecap": "round" }, g);
-        for (i = 0; i <= st.step; i++) {
-          var on = i === hi;
-          if (on) svg("circle", { cx: xMap(i), cy: yC(st.round.S[i]), r: 7, fill: C.accent, opacity: 0.16 }, g);
-          svg("circle", { cx: xMap(i), cy: yC(st.round.S[i]), r: on ? 4.2 : 2.5, fill: st.round.S[i] > H ? C.alarmStrong : C.accent, stroke: "#fff", "stroke-width": on ? 1.2 : 0 }, g);
-          svg("text", { x: xMap(i), y: cb + 18, "font-size": 14, "font-weight": on ? 700 : 500, fill: on ? C.accent : C.muted, "text-anchor": "middle" }, g).textContent = (i + 1);
-        }
-      }
-      svg("line", { x1: CML, y1: yC(H), x2: CW - CMR, y2: yC(H), stroke: C.alarmStrong, "stroke-width": 2, "stroke-dasharray": "6 4" }, g);
-      svg("text", { x: CML + 3, y: yC(H) - 7, "font-size": 14, "font-weight": 600, fill: C.alarmStrongInk }, g).textContent = "H = 0.5";
-      drawCard(g, hi);
-    }
-    var MONO = "'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace";
-    function drawCard(g, hi) {
-      var cw = 322, ch = 58, cx0 = CW - CMR - cw, cy0 = 4, px = cx0 + 14, on = hi != null && hi >= 0 && hi <= st.step;
-      svg("rect", { x: cx0, y: cy0, width: cw, height: ch, rx: 10, fill: "#ffffff", stroke: C.grid }, g);
-      var l1, l2, l3, c2 = C.muted, c3 = C.muted, w3 = 400;
-      if (on) {
-        var x = st.round.x[hi], prev = hi > 0 ? st.round.S[hi - 1] : 0, Sv = st.round.S[hi], al = Sv > H;
-        l1 = "Vial " + (hi + 1) + "  ·  fill " + x.toFixed(2) + " mL";
-        l2 = "S = max(0, " + prev.toFixed(2) + " + (" + x.toFixed(2) + " − 3.05))";
-        l3 = "   = " + Sv.toFixed(2) + (al ? "   ▲ alarm" : "");
-        c2 = C.ink; c3 = al ? C.alarmStrongInk : C.accent; w3 = 700;
-      } else {
-        l1 = "CUSUM  ·  each vial";
-        l2 = "S = max(0, S(t-1) + (fill − 3.05))";
-        l3 = "hover the curve to see the numbers";
-      }
-      svg("text", { x: px, y: cy0 + 18, "font-size": 13, fill: C.muted }, g).textContent = l1;
-      svg("text", { x: px, y: cy0 + 37, "font-size": 14, "font-family": MONO, fill: c2 }, g).textContent = l2;
-      svg("text", { x: px, y: cy0 + 55, "font-size": 14, "font-family": MONO, "font-weight": w3, fill: c3 }, g).textContent = l3;
-    }
-
-    function makeRound() {
-      var seed = Math.floor(Math.random() * 1e9), rnd = EPR.rng(seed), z = [], i;
-      for (i = 0; i < N; i++) z.push(EPR.gauss(rnd));
-      var ds = 3 + Math.floor(rnd() * 3);
-      var x = [], Sp = [], prev = 0;
-      for (i = 0; i < N; i++) { x.push(EPR.round(MU0 + (i >= ds ? DELTA : 0) + z[i] * SIGMA, 2)); prev = Math.max(0, prev + (x[i] - MU0 - K)); Sp.push(prev); }
-      st.round = { x: x, S: Sp, driftStart: ds };
-    }
-    function resetRun() {
-      st.step = 2; st.stop = -1; st.ended = false; st.fillFrac = 1;
-      for (var i = 0; i <= st.step; i++) if (st.round.S[i] > H) { st.stop = i; st.ended = true; st.step = i; break; }
-      drawBelt(); drawBars(); drawCusum(-1); nextBtn.disabled = st.ended;
-    }
-    function nextVial() {
-      if (st.ended || st.step >= N - 1) return;
-      st.step++;
-      drawBars(); drawCusum(-1);
-      if (st.round.S[st.step] > H) { st.stop = st.step; st.ended = true; }
-      else if (st.step >= N - 1) { st.ended = true; }
-      nextBtn.disabled = st.ended;
-      if (EPR.reducedMotion()) { st.fillFrac = 1; drawBelt(); return; }
-      st.fillFrac = 0; drawBelt();
-      EPR.tween(0, 1, 430, function (p) { st.fillFrac = p; drawBelt(); }, function () { st.fillFrac = 1; drawBelt(); });
-    }
-    function newBatch() { makeRound(); resetRun(); }
-
-    function idxFromEvent(e) { var r = chart.getBoundingClientRect(); if (!r.width) return -1; var vx = (e.clientX - r.left) / r.width * CW; return EPR.clamp(Math.round((vx - CML) / STEP - 0.5), 0, st.step); }
-    function onHover(e) { if (st.step < 0) return; var i = idxFromEvent(e); if (i < 0) return; drawCusum(i); }
-    function offHover() { drawCusum(-1); }
-    chart.addEventListener("pointermove", onHover);
-    chart.addEventListener("pointerdown", onHover);
-    chart.addEventListener("pointerleave", offHover);
-    chart.addEventListener("pointerup", offHover);
-    chart.addEventListener("pointercancel", offHover);
-
-    nextBtn.onclick = nextVial;
-    $("#g-reset").onclick = newBatch;
-
-    newBatch();
+  function stopFill() {
+    if (st.raf) cancelAnimationFrame(st.raf);
+    st.raf = 0;
+    st.p = 1;
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  /* ---- layout, in pixels from the card width -------------------- */
+  function layout(width) {
+    const W = Math.max(300, width || 640), small = W < 520;
+    const M = { l: small ? 34 : 46, r: small ? 52 : 86 };
+    const step = (W - M.l - M.r) / N;
+    const vw = Math.max(9, Math.min(26, step * (small ? 0.62 : 0.54)));   // vial body width
+    const bh = vw * 1.36, capH = Math.max(3, vw * 0.3), neckH = Math.max(2, vw * 0.1);
+    const capTop = Math.max(14, vw * 0.5 + 9);                           // room above for the nozzle
+    const y0 = capTop + capH + neckH, beltY = y0 + bh;                   // y0: top of the glass body
+    const yT = y0 + bh * 0.4;                                            // fill line, 3.0 mL
+    const vsc = (yT - y0 - 1.5) / 0.5;                                   // px per mL in a vial: room for +0.5 mL
+    const bT = beltY + 46, bB = bT + (small ? 84 : 96);
+    const cT = bB + 46, cB = cT + (small ? 84 : 100);
+    const Ht = cB + 28;
+    L = { W, Ht, small, M, step, vw, bh, capH, neckH, capTop, y0, beltY, yT, vsc, bT, bB, cT, cB,
+          x: i => M.l + (i + 0.5) * step,
+          yb: d3.scaleLinear().domain([LO, HI]).range([bB, bT]).clamp(true),
+          yc: d3.scaleLinear().domain([0, SMAX]).range([cB, cT]).clamp(true) };
+
+    svg.selectAll('*').remove();
+    svg.attr('width', W).attr('height', Ht).attr('viewBox', `0 0 ${W} ${Ht}`).classed('is-small', small);
+    const root = svg.append('g');
+    G = {};
+    ['col', 'belt', 'vials', 'bars', 'barsRef', 'cus', 'cusRef', 'marks', 'sel', 'top', 'ticks']
+      .forEach(k => { G[k] = root.append('g'); });
+
+    // the belt: full width, with end drums and motion chevrons
+    const by = beltY;
+    G.belt.append('rect').attr('class', 'cusum-beltbar').attr('x', 6).attr('y', by).attr('width', W - 12).attr('height', 8).attr('rx', 4);
+    G.belt.append('rect').attr('class', 'cusum-belt-hi').attr('x', 10).attr('y', by + 1).attr('width', W - 20).attr('height', 2).attr('rx', 1);
+    for (let cx = 24; cx < W - 18; cx += 30) {
+      G.belt.append('path').attr('class', 'cusum-chev').attr('d', `M${cx},${by + 2.6}l3.4,1.5l-3.4,1.5`);
+    }
+    [6, W - 6].forEach(cx => G.belt.append('circle').attr('class', 'cusum-drum').attr('cx', cx).attr('cy', by + 4).attr('r', 6));
+    G.belt.append('line').attr('class', 'cusum-fillline').attr('x1', 14).attr('x2', W - 14).attr('y1', yT).attr('y2', yT);
+
+    // row labels
+    G.ticks.append('text').attr('class', 'cusum-label').attr('x', 0).attr('y', bT - 16).text('Fill volume (mL)');
+    G.ticks.append('text').attr('class', 'cusum-label').attr('x', 0).attr('y', cT - 16).text('CUSUM (mL)');
+
+    // fill row: axis, the 3.0 target and the 3.05 that the CUSUM uses
+    G.barsRef.append('g').attr('class', 'viz-axis viz-axis--bare').attr('transform', `translate(${M.l},0)`)
+      .call(d3.axisLeft(L.yb).tickValues([280, 300, 320, 340]).tickFormat(v => (v / 100).toFixed(1)).tickSize(0).tickPadding(8));
+    refLine(G.barsRef, 'is-target', L.yb(TARGET));
+    refLine(G.barsRef, 'is-k', L.yb(TARGET + K));
+    labels(G.barsRef, [
+      { y: L.yb(TARGET), cls: 'is-target', txt: small ? 'target' : 'target 3.0' },
+      { y: L.yb(TARGET + K), cls: 'is-k', txt: small ? '+K' : '3.0 + K' }
+    ]);
+
+    // CUSUM row: axis, baseline and the decision interval H
+    G.cusRef.append('line').attr('class', 'cusum-base').attr('x1', M.l).attr('x2', W - M.r).attr('y1', cB + 0.5).attr('y2', cB + 0.5);
+    G.cusRef.append('g').attr('class', 'viz-axis viz-axis--bare').attr('transform', `translate(${M.l},0)`)
+      .call(d3.axisLeft(L.yc).tickValues([0, 50, 100]).tickFormat(v => (v ? (v / 100).toFixed(1) : '0')).tickSize(0).tickPadding(8));
+    refLine(G.cusRef, 'is-h', L.yc(H));
+    labels(G.cusRef, [{ y: L.yc(H), cls: 'is-h', txt: small ? 'H' : 'H = 0.5' }]);
+
+    // vial numbers
+    G.ticks.append('text').attr('class', 'cusum-tick is-unit').attr('x', M.l - 8).attr('y', cB + 19).text('vial');
+    G.ticks.selectAll('text.cusum-vtick').data(d3.range(N)).join('text')
+      .attr('class', 'cusum-tick cusum-vtick').attr('x', L.x).attr('y', cB + 19).text(i => i + 1);
+  }
+  function refLine(g, cls, y) {
+    g.append('line').attr('class', 'cusum-refline ' + cls)
+      .attr('x1', L.M.l).attr('x2', L.W - L.M.r).attr('y1', y).attr('y2', y);
+  }
+  function labels(g, list) {
+    CUSUM.spread(list, L.small ? 14 : 16).forEach(d => g.append('text')
+      .attr('class', 'cusum-ref ' + d.cls).attr('x', L.W - L.M.r + 8).attr('y', d.y).text(d.txt));
+  }
+
+  /* ---- the marks that change with each vial --------------------- */
+  // a glass-shaped cup: a rectangle with rounded bottom corners
+  function cup(cx, top, bot, hw, r) {
+    const h = bot - top;
+    if (h <= 0.3) return null;
+    r = Math.max(0, Math.min(r, h, hw));
+    return `M${cx - hw},${top}H${cx + hw}V${bot - r}A${r},${r} 0 0 1 ${cx + hw - r},${bot}` +
+           `H${cx - hw + r}A${r},${r} 0 0 1 ${cx - hw},${bot - r}Z`;
+  }
+
+  function drawVial(g, i, f) {
+    const { vw, bh, capH, neckH, y0, beltY, yT, vsc } = L;
+    const cx = L.x(i), hw = vw / 2, r = Math.min(vw * 0.28, 7), v = st.x[i];
+    const bot = beltY - 1.2, inner = hw - 1.2;
+    const surf = yT - (v - TARGET) / 100 * vsc;            // the settled liquid surface
+    const now = bot - f * (bot - surf);                    // rises while the vial fills
+    const overH = v > TARGET && now < yT ? yT - now : 0;   // amber: above the 3.0 line
+    const capW = vw * 0.62, capY = y0 - neckH - capH, capped = f >= 1 ? null : 'none';
+    g.select('.cusum-shadow').attr('cx', cx).attr('cy', beltY + 0.5).attr('rx', hw + 2).attr('ry', 2.2);
+    g.select('.cusum-neck').attr('x', cx - vw * 0.18).attr('y', y0 - neckH - 0.5).attr('width', vw * 0.36).attr('height', neckH + 1.5);
+    g.select('.cusum-body').attr('x', cx - hw).attr('y', y0).attr('width', vw).attr('height', bh).attr('rx', r);
+    g.select('.cusum-liquid').attr('d', cup(cx, Math.max(now, v > TARGET ? yT : now), bot, inner, r - 1.2));
+    g.select('.cusum-over').attr('x', cx - inner).attr('y', yT - overH).attr('width', 2 * inner).attr('height', overH);
+    g.select('.cusum-gloss').attr('x', cx - hw + vw * 0.16).attr('y', y0 + 3)
+      .attr('width', Math.max(1.4, vw * 0.09)).attr('height', Math.max(0, bh - 8)).attr('rx', 1);
+    // the cap goes on once the vial is full
+    g.select('.cusum-cap').attr('x', cx - capW / 2).attr('y', capY).attr('width', capW).attr('height', capH)
+      .attr('rx', Math.min(2.5, capH / 2)).style('display', capped);
+    g.select('.cusum-cap-hi').attr('x', cx - capW / 2 + 1.2).attr('y', capY + 0.8).attr('width', capW * 0.38)
+      .attr('height', Math.max(1, capH * 0.32)).attr('rx', 0.8).style('display', capped);
+  }
+
+  function drawData() {
+    const { x, yb, yc, vw, step } = L;
+    const n = st.shown, last = n - 1, p = st.p;
+    const grow = i => (i === last ? p : 1);
+    const fillAt = i => TARGET + grow(i) * (st.x[i] - TARGET);
+
+    G.vials.selectAll('g.cusum-vial').data(d3.range(n), i => i)
+      .join(enter => {
+        const g = enter.append('g').attr('class', 'cusum-vial');
+        ['ellipse.cusum-shadow', 'rect.cusum-neck', 'rect.cusum-body', 'path.cusum-liquid', 'rect.cusum-over',
+         'rect.cusum-gloss', 'rect.cusum-cap', 'rect.cusum-cap-hi'].forEach(s => {
+          const [tag, cls] = s.split('.');
+          g.append(tag).attr('class', cls);
+        });
+        return g;
+      })
+      .each(function (i) { drawVial(d3.select(this), i, grow(i)); });
+
+    const bw = Math.min(step * 0.5, 22), y3 = yb(TARGET);
+    G.bars.selectAll('rect').data(d3.range(n), i => i).join('rect')
+      .attr('class', i => 'cusum-bar ' + (st.x[i] > TARGET ? 'is-over' : 'is-under'))
+      .attr('x', i => x(i) - bw / 2).attr('width', bw).attr('rx', Math.min(3, bw / 4))
+      .attr('y', i => Math.min(yb(fillAt(i)), y3))
+      .attr('height', i => Math.max(1, Math.abs(yb(fillAt(i)) - y3)));
+
+    // the CUSUM path; while a vial fills, its segment is drawn part of the way
+    const pts = d3.range(n).map(i => {
+      if (i === last && p < 1 && i > 0) {
+        const ax = x(i - 1), ay = yc(st.S[i - 1]);
+        return [ax + p * (x(i) - ax), ay + p * (yc(st.S[i]) - ay)];
+      }
+      return [x(i), yc(st.S[i])];
+    });
+    G.cus.selectAll('path.cusum-S-area').data([pts]).join('path').attr('class', 'cusum-S-area')
+      .attr('d', d3.area().y0(L.cB));
+    G.cus.selectAll('path.cusum-S').data([pts]).join('path').attr('class', 'cusum-S').attr('d', d3.line());
+    G.cus.selectAll('circle').data(d3.range(n).filter(i => i !== last || p >= 1), i => i).join('circle')
+      .attr('class', i => 'cusum-pt' + (st.S[i] >= H ? ' is-alarm' : ''))
+      .attr('cx', x).attr('cy', i => yc(st.S[i])).attr('r', L.small ? 2.6 : 3);
+
+    G.marks.selectAll('*').remove();
+    G.top.selectAll('*').remove();
+    if (stopped()) {
+      const a = st.alarm, w = Math.max(30, Math.min(48, vw * 2)), h = w * 0.44;
+      G.marks.append('text').attr('class', 'cusum-annot').attr('x', x(a)).attr('y', yc(st.S[a]) - 11).text('signal');
+      const stamp = G.top.append('g').attr('class', 'cusum-stamp')
+        .attr('transform', `translate(${x(a)},${L.y0 + L.bh * 0.45}) rotate(-12)`);
+      stamp.append('rect').attr('x', -w / 2).attr('y', -h / 2).attr('width', w).attr('height', h).attr('rx', 4);
+      stamp.append('text').attr('y', 0.5).style('font-size', (h * 0.56).toFixed(1) + 'px').text('STOP');
+    }
+    if (done()) {                                          // reveal where the overfill began
+      const xd = x(st.drift) - step / 2;
+      G.marks.append('line').attr('class', 'cusum-drift').attr('x1', xd).attr('x2', xd).attr('y1', L.bT - 4).attr('y2', L.cB);
+      G.marks.append('text').attr('class', 'cusum-drift-label').attr('x', xd + 5).attr('y', L.bT + 8).text('overfill starts');
+    }
+    if (p < 1) {                                           // the filler nozzle and its stream
+      const cx = x(last), headW = Math.max(12, vw * 0.9), tip = L.y0 - L.neckH - 3;
+      const bot = L.beltY - 1.2, surf = L.yT - (st.x[last] - TARGET) / 100 * L.vsc;
+      const level = bot - p * (bot - surf), sw = Math.max(1.4, vw * 0.11);
+      G.marks.append('rect').attr('class', 'cusum-nozzle').attr('x', cx - headW / 2).attr('y', tip - 10)
+        .attr('width', headW).attr('height', 6).attr('rx', 2);
+      G.marks.append('rect').attr('class', 'cusum-nozzle').attr('x', cx - sw).attr('y', tip - 5)
+        .attr('width', 2 * sw).attr('height', 5).attr('rx', 1);
+      G.marks.append('rect').attr('class', 'cusum-stream').attr('x', cx - sw / 2).attr('y', tip)
+        .attr('width', sw).attr('height', Math.max(0, level - tip));
+    }
+  }
+
+  /* ---- the chosen vial: band, ring, point, number ---------------- */
+  function drawSel() {
+    const n = st.shown;
+    if (!n) return;
+    const c = current(), { x, yc, vw } = L;
+    const bandW = Math.min(L.step - 2, vw + 16), sig = st.S[c] >= H;
+    const settledPt = c !== n - 1 || st.p >= 1;
+    G.col.selectAll('rect').data([c]).join('rect').attr('class', 'cusum-col')
+      .attr('x', x(c) - bandW / 2).attr('width', bandW)
+      .attr('y', L.capTop - 6).attr('height', L.cB + 4 - (L.capTop - 6)).attr('rx', 7);
+    G.sel.selectAll('rect.cusum-ring').data([c]).join('rect')
+      .attr('class', 'cusum-ring' + (stopped() && c === st.alarm ? ' is-alarm' : ''))
+      .attr('x', x(c) - vw / 2 - 3).attr('y', L.capTop - 3)
+      .attr('width', vw + 6).attr('height', L.beltY - L.capTop + 1).attr('rx', 5);
+    G.sel.selectAll('circle.cusum-halo').data(settledPt ? [c] : []).join('circle')
+      .attr('class', 'cusum-halo' + (sig ? ' is-alarm' : '')).attr('cx', x(c)).attr('cy', yc(st.S[c])).attr('r', 8);
+    G.sel.selectAll('circle.cusum-pt').data(settledPt ? [c] : []).join('circle')
+      .attr('class', 'cusum-pt' + (sig ? ' is-alarm' : '')).attr('cx', x(c)).attr('cy', yc(st.S[c])).attr('r', 4.4);
+    // on a narrow phone only every other vial number fits; the chosen one always shows
+    const thin = L.step < 19;
+    G.ticks.selectAll('text.cusum-vtick').classed('is-sel', i => i === c).classed('is-hidden', i => thin && i !== c && i % 2 === 1);
+    svg.attr('aria-valuemax', n).attr('aria-valuenow', c + 1)
+      .attr('aria-valuetext', `Vial ${c + 1}: fill ${mL(st.x[c])} mL, CUSUM ${mL(st.S[c])}${sig ? ', signal' : ''}`);
+  }
+
+  /* ---- words ----------------------------------------------------- */
+  function readout(i) {
+    const n = i + 1, v = st.x[i], prev = i ? st.S[i - 1] : 0, s = st.S[i];
+    const sig = s >= H, sub = k => `<sub>${k}</sub>`;
+    return `<div class="r"><span class="cusum-head">Vial ${n}</span><span class="cusum-dim"> \u00b7 </span>fill x${sub(n)} = ${mL(v)} mL</div>` +
+      `<div class="r cusum-dim">S${sub(n)} = max(0, S${sub(n - 1)} + (x${sub(n)} \u2212 3.05))</div>` +
+      `<div class="r">   = max(0, ${nb(`${mL(prev)} + (${mL(v)} \u2212 3.05))`)}</div>` +
+      `<div class="r">   = max(0, ${nb(`${mL(prev + v - TARGET - K)})`)} =\u00a0<b${sig ? ' class="is-alarm"' : ''}>${mL(s)}</b>` +
+      (sig ? ' <span class="is-alarm">\u2265 H, signal</span>' : ' &lt; H') + '</div>';
+  }
+
+  function say() {
+    box.html(st.shown ? readout(current()) : '');
+    if (!done()) card.setStatus('Running', 'ok');
+    else card.setStatus(st.alarm >= 0 ? 'Line stopped' : 'Batch done', st.alarm >= 0 ? 'alarm' : 'idle');
+    hint.html(!done() ? 'Hover over or tap a vial to see its working.'
+      : st.alarm >= 0 ? `<b>Signal at vial ${st.alarm + 1}.</b> The overfill began at vial ${st.drift + 1}.`
+      : `<b>No signal in ${N} vials.</b> The overfill began at vial ${st.drift + 1}.`);
+    nextBtn.property('disabled', ended()).attr('class', 'viz-btn ' + (done() ? 'viz-btn--ghost' : 'viz-btn--primary'));
+    newBtn.attr('class', 'viz-btn ' + (done() ? 'viz-btn--primary' : 'viz-btn--ghost'));
+  }
+
+  function draw() {
+    if (!L) return;
+    drawData();
+    drawSel();
+    say();
+  }
+
+  /* ---- start ------------------------------------------------------ */
+  const picker = CUSUM.pick(svg, {
+    count: () => st.shown,
+    at: px => Math.max(0, Math.min(st.shown - 1, Math.floor((px - L.M.l) / L.step))),
+    current,
+    onPick(i) { st.sel = i; drawSel(); say(); }
+  });
+  makeBatch();
+  CUSUM.onWidth(chart.node(), w => {
+    layout(w);
+    CUSUM.fitBox(box, d3.range(N).map(readout));
+    draw();
+  });
 })();

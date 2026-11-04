@@ -1,0 +1,293 @@
+---
+title: "Moving Epidemic Method"
+# MathJax SVG output, as in the figures' prototype: the formula strips stay
+# narrow enough for a phone (CHTML sets the same formulas about 25% wider)
+format:
+  html:
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js"
+---
+
+The Moving Epidemic Method (MEM) sets thresholds for weekly influenza-like
+illness (ILI) or acute respiratory infection (ARI) rates from past seasons
+[@vega2013]. This chapter follows its steps one by one, with a figure for each
+step. The data are weekly ILI consultation rates per 100,000 in Croatia, week 26
+of 2022 to week 43 of 2026, from ECDC's European Respiratory Virus Surveillance
+Summary (ERVISS) [@ecdc_erviss]. In each figure, point at a blue symbol in a
+formula to see where it is in the chart.
+
+## The method in brief {#sec-mem-brief}
+
+MEM uses past seasons to set thresholds for the next season. It works in three
+steps.
+
+1. **Find the epidemic weeks.** For each past season, the MAP curve gives the
+   length and the timing of the epidemic. This splits the season into three
+   periods: pre-epidemic, epidemic and post-epidemic.
+2. **Set the epidemic threshold.** From each pre-epidemic period, take the $n$
+   highest weekly rates, where $n = 30 / \text{number of seasons}$. Pool these
+   values from all seasons. The epidemic threshold is their mean plus
+   $z_{0.05}$ standard deviations, where $z_{0.05} = 1.645$. A post-epidemic
+   threshold comes from the post-epidemic periods in the same way.
+3. **Set the intensity thresholds.** From each epidemic period, take the $n$
+   highest weekly rates and pool them. Their geometric mean and upper limits
+   give the thresholds for the levels of intensity.
+
+In a new season, the first weekly rate above the epidemic threshold signals the
+start of the epidemic. The intensity thresholds then give the level of each
+week.
+
+> The purpose of the MEM is to model influenza epidemics based upon historical
+> data from a specific country or region. The method has three main steps:
+> First, the length, start and the end of the annual epidemics are determined,
+> splitting the season in three periods: a pre-epidemic, an epidemic and a
+> post-epidemic period. Secondly, the baseline and the epidemic thresholds are
+> calculated using the pre-epidemic and post-epidemic values of historical
+> seasons. Finally, thresholds for different levels of intensity are computed.
+> [@vega2013]
+
+## The data: one row per season {#sec-mem-data}
+
+> Weekly rates were estimated at least for 33 weeks in every season, from week
+> 40 of 1 year to the week 20 of the following year. [@vega2013]
+
+> Missing values in weekly rates at the beginning or at the end of the
+> surveillance period did not affect the method and were excluded from
+> calculations. Missing weekly data during the surveillance period were imputed
+> with a smooth regression over the full season's data using a small window
+> parameter. [@vega2013]
+
+A real series needs this preparation. Some weeks were never reported, some
+weeks fall between seasons, and the current season is not finished. The paper
+used countries with five or more seasons of data [@vega2013]. ERVISS has four
+complete seasons for Croatia, so the numbers in this chapter are a worked
+example, not Croatia's official thresholds.
+
+::: {#fig-mem-series}
+```{=html}
+<div id="viz-mem-series" class="mem-fig"></div>
+```
+
+Weekly ILI rates in Croatia as reported to ERVISS. Hatching marks weeks with no
+data; a week with no data is not a week with zero cases. Brackets mark the four
+complete seasons. Press **Cut into seasons**: the weeks between seasons and the
+unfinished current season are left out. One week inside a season has no data,
+week 19 of 2025. It is filled with a smoothing regression over the season, as
+in the authors' R package [@lozano_mem]; the regression gives a value below 0,
+so the week is set to 0.
+:::
+
+## Step 1: the epidemic period of each season {#sec-mem-step1}
+
+> In the first step, for each season separately, the length of the epidemic
+> period is estimated as the minimum number of consecutive weeks with the
+> maximum accumulated rates percentage (MAP). [@vega2013]
+
+> The MAP curve draws the maximum cumulated rate for a period of a given length
+> $r$, expressed as percentage of the total rate of the $j$th season.
+> [@vega2013]
+
+::: {#fig-mem-map}
+```{=html}
+<div id="viz-mem-map" class="mem-fig"></div>
+```
+
+The best window of $r$ weeks in every season, beside the MAP curves. For each
+number of weeks $r$, the window of $r$ consecutive weeks is placed where its total is largest, so it can be in a
+different place in each season.
+:::
+
+> Then the MAP curve is smoothed, using a smoothing regression (over $r$),
+> selecting automatically the window parameter. The optimum number of weeks for
+> each season is determined calculating the increment in the percentage from
+> one number of weeks to the next one. &hellip; When this increment is lower
+> than the predefined criteria, the optimum is found. [@vega2013]
+
+The criterion is $\delta$. It depends on the country, ranges from 2% to 4% and
+is chosen to maximise sensitivity and specificity [@vega2013]. Once the optimum
+number of weeks $r^*$ is found, the epidemic starts at week $k^*$, the first
+week of the window of $r^*$ weeks with the largest total. The weeks before the
+epidemic are the pre-epidemic period, and the weeks after it are the
+post-epidemic period [@vega2013].
+
+::: {#fig-mem-opt}
+```{=html}
+<div id="viz-mem-opt" class="mem-fig"></div>
+```
+
+Left: the MAP curve of one season and its smoothed version. Right: the
+increment in the percentage from one number of weeks to the next. When the
+increment is lower than $\delta$, the optimum length $r^*$ is found. Bottom:
+the best window of $r^*$ weeks starts at week $k^*$; the epidemic runs from
+week $k^*$ to week $k^* + r^* - 1$, and this splits every season into three
+periods.
+:::
+
+## Step 2: the epidemic threshold {#sec-mem-step2}
+
+> In the second step, the baseline and threshold using pre-epidemic values of
+> historical seasons are calculated. The baseline is the arithmetic mean of all
+> pre-epidemic rates of all historical seasons (pooled together as a single
+> sample). [@vega2013]
+
+> To calculate the threshold, only a set of pre-epidemic values is considered.
+> For each season, the highest $n$ values from the pre-epidemic period are
+> taken, where $n$ = 30/number of seasons. [@vega2013]
+
+> With all these $n \times N$ values, a one-tailed point 95% confidence
+> interval is calculated. &hellip; The upper limit of the confidence interval is
+> the epidemic threshold. Additionally, a post-epidemic threshold is calculated
+> using the same procedure. [@vega2013]
+
+So the epidemic threshold is $t^* = \bar{t} + z_{0.05} \times S_t$, where
+$\bar{t}$ and $S_t$ are the mean and the standard deviation of the
+$n \times N$ values, and $z_{0.05} = 1.645$. With four seasons,
+$n = 30 / 4 = 7.5$, which the authors' R package rounds to 8 [@lozano_mem], so
+32 values are pooled.
+
+::: {.callout-note}
+## What is $z_{0.05}$?
+
+```{=html}
+<svg class="mem-bell" viewBox="0 0 320 112" role="img" aria-label="A normal curve: 95% of its area lies below the mean plus z 0.05 standard deviations, where z 0.05 is 1.645, and 5% lies above it."><path d="M14.0,80L14.0,79.6L16.3,79.6L18.6,79.5L20.8,79.4L23.1,79.3L25.4,79.2L27.7,79.0L30.0,78.9L32.2,78.7L34.5,78.5L36.8,78.3L39.1,78.1L41.4,77.8L43.7,77.5L45.9,77.2L48.2,76.8L50.5,76.4L52.8,76.0L55.1,75.5L57.3,74.9L59.6,74.3L61.9,73.7L64.2,72.9L66.5,72.2L68.7,71.3L71.0,70.4L73.3,69.5L75.6,68.4L77.9,67.3L80.2,66.2L82.4,64.9L84.7,63.6L87.0,62.2L89.3,60.7L91.6,59.2L93.8,57.6L96.1,56.0L98.4,54.3L100.7,52.5L103.0,50.7L105.2,48.8L107.5,47.0L109.8,45.1L112.1,43.1L114.4,41.2L116.7,39.2L118.9,37.3L121.2,35.4L123.5,33.5L125.8,31.7L128.1,29.9L130.3,28.2L132.6,26.5L134.9,25.0L137.2,23.5L139.5,22.2L141.7,20.9L144.0,19.8L146.3,18.8L148.6,18.0L150.9,17.3L153.2,16.7L155.4,16.3L157.7,16.1L160.0,16.0L162.3,16.1L164.6,16.3L166.8,16.7L169.1,17.3L171.4,18.0L173.7,18.8L176.0,19.8L178.2,20.9L180.5,22.2L182.8,23.5L185.1,25.0L187.4,26.5L189.7,28.2L191.9,29.9L194.2,31.7L196.5,33.5L198.8,35.4L201.1,37.3L203.3,39.2L205.6,41.2L207.9,43.1L210.2,45.1L212.5,47.0L214.7,48.8L217.0,50.7L219.3,52.5L221.6,54.3L223.9,56.0L226.2,57.6L228.4,59.2L230.7,60.7L233.0,62.2L235.0,63.5L235.0,80Z" fill="var(--tealSoft)"/><path d="M235.0,80L235.0,63.5L237.3,64.8L239.6,66.0L241.9,67.2L244.2,68.3L246.5,69.4L248.7,70.3L251.0,71.2L253.3,72.1L255.6,72.9L257.9,73.6L260.1,74.2L262.4,74.8L264.7,75.4L267.0,75.9L269.3,76.4L271.5,76.8L273.8,77.2L276.1,77.5L278.4,77.8L280.7,78.1L283.0,78.3L285.2,78.5L287.5,78.7L289.8,78.9L292.1,79.0L294.4,79.2L296.6,79.3L298.9,79.4L301.2,79.5L303.5,79.5L305.8,79.6L306.0,79.6L306.0,80Z" fill="var(--red)" fill-opacity=".35"/><path d="M14.0,79.6L16.3,79.6L18.6,79.5L20.8,79.4L23.1,79.3L25.4,79.2L27.7,79.0L30.0,78.9L32.2,78.7L34.5,78.5L36.8,78.3L39.1,78.1L41.4,77.8L43.7,77.5L45.9,77.2L48.2,76.8L50.5,76.4L52.8,76.0L55.1,75.5L57.3,74.9L59.6,74.3L61.9,73.7L64.2,72.9L66.5,72.2L68.7,71.3L71.0,70.4L73.3,69.5L75.6,68.4L77.9,67.3L80.2,66.2L82.4,64.9L84.7,63.6L87.0,62.2L89.3,60.7L91.6,59.2L93.8,57.6L96.1,56.0L98.4,54.3L100.7,52.5L103.0,50.7L105.2,48.8L107.5,47.0L109.8,45.1L112.1,43.1L114.4,41.2L116.7,39.2L118.9,37.3L121.2,35.4L123.5,33.5L125.8,31.7L128.1,29.9L130.3,28.2L132.6,26.5L134.9,25.0L137.2,23.5L139.5,22.2L141.7,20.9L144.0,19.8L146.3,18.8L148.6,18.0L150.9,17.3L153.2,16.7L155.4,16.3L157.7,16.1L160.0,16.0L162.3,16.1L164.6,16.3L166.8,16.7L169.1,17.3L171.4,18.0L173.7,18.8L176.0,19.8L178.2,20.9L180.5,22.2L182.8,23.5L185.1,25.0L187.4,26.5L189.7,28.2L191.9,29.9L194.2,31.7L196.5,33.5L198.8,35.4L201.1,37.3L203.3,39.2L205.6,41.2L207.9,43.1L210.2,45.1L212.5,47.0L214.7,48.8L217.0,50.7L219.3,52.5L221.6,54.3L223.9,56.0L226.2,57.6L228.4,59.2L230.7,60.7L233.0,62.2L235.3,63.6L237.6,64.9L239.8,66.2L242.1,67.3L244.4,68.4L246.7,69.5L249.0,70.4L251.2,71.3L253.5,72.2L255.8,72.9L258.1,73.7L260.4,74.3L262.7,74.9L264.9,75.5L267.2,76.0L269.5,76.4L271.8,76.8L274.1,77.2L276.3,77.5L278.6,77.8L280.9,78.1L283.2,78.3L285.5,78.5L287.7,78.7L290.0,78.9L292.3,79.0L294.6,79.2L296.9,79.3L299.2,79.4L301.4,79.5L303.7,79.6L306.0,79.6L306.0,79.6" fill="none" stroke="var(--ink2)" stroke-width="1.5"/><line x1="14" x2="306" y1="80.5" y2="80.5" stroke="var(--ink2)" stroke-width="1"/><line x1="160.0" x2="160.0" y1="14.0" y2="84" stroke="var(--tealInk)" stroke-width="1.2"/><line x1="235.0" x2="235.0" y1="14.0" y2="84" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 3"/><text x="118.9" y="67" text-anchor="middle" fill="var(--tealInk)" font-size="13" font-weight="600">95%</text><text x="241.0" y="62.0" fill="var(--redInk)" font-size="12.5" font-weight="600">5%</text><text x="160.0" y="97" text-anchor="middle" fill="var(--ink2)" font-size="12">mean</text><text x="235.0" y="97" text-anchor="middle" fill="var(--redInk)" font-size="12" font-weight="600">mean + z<tspan dy="3" font-size="10.5">0.05</tspan><tspan dy="-3"> SD</tspan></text></svg>
+```
+
+$z_{0.05}$ is the point of the standard normal curve with 5% of the area above
+it. Its value is 1.645.
+
+The calculation assumes that the pooled values come from a normal distribution
+with their mean and standard deviation. In any normal distribution, 95% of the
+values lie below the mean plus $z_{0.05}$ standard deviations, and 5% lie above
+it.
+
+The interval is one-tailed because only high rates matter for an alarm, so all
+of the 5% is in the upper tail. A two-tailed 95% interval would put 2.5% in
+each tail and use $z_{0.025} = 1.96$ instead.
+
+The interval is a *point* interval: it is for one weekly value, not for the
+mean. So it uses the standard deviation, not the standard error. In plain
+words, if the highest pre-epidemic weeks of a new season follow the same
+distribution as in past seasons, about 1 in 20 of them would still be above the
+threshold.
+:::
+
+::: {#fig-mem-threshold}
+```{=html}
+<div id="viz-mem-threshold" class="mem-fig"></div>
+```
+
+Top: every season, zoomed in on its pre-epidemic weeks; its $n$ highest weeks
+are dark teal, with their rates per 100,000. Bottom left: the same $n \times N$
+values side by side. Bottom right: their histogram on its side, so that it
+shares the rate axis with the bars, with the normal curve of the same mean,
+standard deviation and area. The $z$ axis on the right counts standard
+deviations from the mean. The threshold $t^*$ is one horizontal line across
+both panels, at $z_{0.05}$ on the $z$ axis, with 5% of the curve's area above
+it. Press **Show how** to watch the steps in order, and **t\* on the seasons**
+to draw the threshold on every season.
+:::
+
+## Step 3: the intensity thresholds {#sec-mem-step3}
+
+> Thresholds for different levels of intensity are calculated using the $n$
+> highest values of each epidemic period to build a sample of $n \times N$
+> rates. With the sample, the geometric mean and 50%, 90% and 95% one-sided
+> confidence intervals are calculated. These upper limits are the threshold for
+> the different levels of intensity of the epidemic. [@vega2013]
+
+As in step 2, $z_\alpha$ is the point of the standard normal curve with
+$\alpha$ of the area above it. Step 3 uses it on the logarithms of the rates:
+$z_{0.50} = 0$ for the 50% limit, which is the geometric mean itself,
+$z_{0.10} = 1.282$ for the 90% limit and $z_{0.05} = 1.645$ for the 95% limit.
+The three thresholds split the weekly rates into five levels: baseline, low,
+medium, high and very high [@vega2015]. The paper says countries may change
+these percentages [@vega2013]. @vega2015 and the authors' R package
+[@lozano_mem] use 40%, 90% and 97.5%.
+
+::: {#fig-mem-intensity}
+```{=html}
+<div id="viz-mem-intensity" class="mem-fig"></div>
+```
+
+Top: every season, zoomed in on its epidemic weeks; its $n$ highest weeks are
+dark blue, with their rates. Bottom: the same values side by side, and their
+histogram on its side, on a log axis. The normal curve of the logs is centred
+on the geometric mean ($z = 0$); the 90% and 95% limits are at $z_{0.10}$ and
+$z_{0.05}$ on the $z$ axis. So the three thresholds split the curve's area into
+50%, 40%, 5% and 5%. Switch to the rate scale to see the same values and the
+same curve on the rates. Press **I50, I90, I95 on the seasons** to draw the
+thresholds on every season.
+:::
+
+## Step 4: watching a new season {#sec-mem-step4}
+
+> The main purpose of the method is to define the baseline influenza activity
+> in historical data and to establish an epidemic threshold above which the
+> weekly rates are considered to be in the epidemic period. [@vega2013]
+
+> Rates in the pre-epidemic period were expected to be lower than the
+> pre-epidemic threshold rate, while rates within the epidemic period are
+> expected to be higher. Finally, rates in the post-epidemic period were
+> expected to be lower than the post-epidemic threshold rate. [@vega2013]
+
+The paper calls the first week with a rate above the epidemic threshold the
+alert week [@vega2013]. During the epidemic, the intensity thresholds give the
+level of each week. The paper gives no rule for the end of the epidemic in a
+new season; the authors' R package ends it at the first week after the peak
+with a rate below the post-epidemic threshold [@lozano_mem].
+
+> If influenza weekly epidemiological data are accompanied by timely virological
+> data, virus circulation should be taken into account to make appropriate
+> public health decisions. [@vega2013]
+
+@fig-mem-monitor starts with the current season, 2026/27, and the thresholds
+from all four past seasons. The data end in week 43 of 2026. To show how a
+season reaches the threshold, the weeks after that are illustrative, not data:
+each one is the average rate of the four past seasons in the same week.
+
+::: {#fig-mem-monitor}
+```{=html}
+<div id="viz-mem-monitor" class="mem-fig"></div>
+```
+
+Press **Play** to add the weeks one by one. Solid bars are data and outlined
+bars are illustrative; the colour of a bar gives its level. At the right, step
+3's curve of past epidemic weeks stands on its side, cut at the intensity
+thresholds. Choose a past season to replay it, as in the paper's
+cross-validation below.
+:::
+
+> For each country, each single season was extracted from the historical
+> records to be used as the target season. MEM calculated the beginning and the
+> end of the epidemic period of the target season. On the basis of the
+> remaining seasons, excluding the target season, MEM calculated the pre- and
+> post-epidemic thresholds. [@vega2013]
+
+In a replay, the band under the chart is the epidemic period that step 1 finds
+for the target season, and the reading scores the alert with the paper's
+timeliness, detection lag and false alerts.
+
+## Notes {#sec-mem-notes}
+
+- The paper gives step 3 in words. The formulas in @fig-mem-intensity are how
+  the authors' R package computes it [@lozano_mem].
+- The MAP curve is smoothed by a local linear kernel regression with the window
+  chosen by AICc. The results were checked against R's `sm` package.
+- The data are the ERVISS snapshot of 30 October 2026, released under the EUPL
+  1.2 licence [@ecdc_erviss].
+
+```{=html}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/mem-data.js"></script>
+<script src="js/mem-core.js"></script>
+<script src="js/mem-shared.js"></script>
+<script src="js/mem-explore.js"></script>
+<script src="js/mem-stage.js"></script>
+<script src="js/mem-series.js"></script>
+<script src="js/mem-map.js"></script>
+<script src="js/mem-opt.js"></script>
+<script src="js/mem-threshold.js"></script>
+<script src="js/mem-intensity.js"></script>
+<script src="js/mem-monitor.js"></script>
+```

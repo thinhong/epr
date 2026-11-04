@@ -1,196 +1,131 @@
 /* ============================================================
-   Figure 1 — What each version counts as comparable
-   A five-year calendar. The 1996 version lights up seven weeks a
-   year and throws the rest away; the 2013 version keeps almost
-   everything by giving the year ten seasonal steps.
+   Figure 1: which weeks count as comparable
+   One row per year, one bar per week, so the season is visible.
+   The window (weeks 25 - w to 25 + w) cuts down through the b
+   previous years; those weeks, and only those, become the
+   baseline. The current year is never used.
    ============================================================ */
 
 (function () {
   const MOUNT = '#viz-farr-reference';
   const el = document.querySelector(MOUNT);
   if (!el) return;
-
   const missing = [];
-  if (typeof d3  === 'undefined') missing.push('d3');
+  if (typeof d3 === 'undefined') missing.push('d3');
   if (typeof VIZ === 'undefined') missing.push('viz-kit.js');
+  if (typeof FDATA === 'undefined') missing.push('farrington-data.js');
   if (missing.length) {
-    el.innerHTML = '<div class="viz-missing">Figure did not load — not available: <b>' +
-      missing.join('</b>, <b>') + '</b>. Check that every script is listed at the ' +
-      'bottom of the chapter, in order, and that the .js files sit next to the .qmd.</div>';
+    el.innerHTML = '<div class="viz-missing">Figure did not load. Not available: <b>' +
+      missing.join('</b>, <b>') + '</b>. Check the script list at the end of the chapter.</div>';
     return;
   }
 
-  const FREQ = 52, T_WEEK = 25, YEAR0 = 2026;
-  const state = { version: 1996, b: 5, w: 3 };
+  const { SERIES, NOW_YEAR, NOW_WEEK } = FDATA;
+  const state = { b: 5, w: 3 };
+  const LIM = { b: [1, 5], w: [0, 12] };
 
-  const LIMITS = {
-    b: { min: 1, max: 5, label: 'years of history' },
-    w: { min: 1, max: 6, label: 'weeks either side of week 25' }
-  };
+  el.classList.add('farr-card');
+  const card = VIZ.card(MOUNT, { title: 'Comparable weeks for week 25 of 2026', status: ' ' });
+  const params = card.body.append('div').attr('class', 'viz-params');
+  const chart = card.body.append('div').attr('class', 'farr-chart');
+  const readout = card.body.append('div').attr('class', 'viz-readout farr-readout');
 
-  /* Everything is measured as an offset in weeks from the week being
-     assessed, which is offset 0. Working in offsets rather than in
-     (year, week) pairs keeps the 26-week hold-out correct where it
-     crosses the new year. */
-  const offsetOf = (year, week) => -(YEAR0 - year) * FREQ + (week - T_WEEK);
-
-  /* Which weeks the regression gets to see.
-       1996: the +/- w window of each of the b past years, nothing else.
-       2013: every week from the far edge of the oldest window up to 26
-             weeks ago, each carrying the seasonal step it falls in. */
-  function classify(year, week, s) {
-    const off = offsetOf(year, week);
-    if (off > 0) return 'future';
-    if (off === 0) return 'target';
-
-    const inWindow = Math.abs(((off % FREQ) + FREQ + 26) % FREQ - 26) <= s.w;
-    const withinYears = off >= -(s.b * FREQ) - s.w;
-
-    if (s.version === 1996) {
-      return (inWindow && off <= -FREQ + s.w && withinYears) ? 'window' : 'unused';
-    }
-
-    if (off > -27) return 'held';            // the 26 weeks before now
-    if (!withinYears) return 'unused';
-    return inWindow ? 'window' : 'step' + seasonalStep(off, s.w);
-  }
-
-  /* The year cut into ten steps: the window itself is the reference
-     level, and nine equal blocks fill the rest of the year. */
-  function seasonalStep(off, w) {
-    let d = ((off % FREQ) + FREQ + 26) % FREQ - 26;   // -26..+25 within the year
-    const past = Math.abs(d) - w;
-    const blockLen = Math.max(1, Math.round((FREQ - (2 * w + 1)) / 9));
-    const k = Math.min(4, Math.max(0, Math.floor((past - 1) / blockLen)));
-    return (d < 0 ? 1 : 6) + k;
-  }
-
-  const STEP_FILL = ['#cfe0f2', '#bcd4ee', '#a9c9ea', '#96bde6', '#83b2e2'];
-
-  const handle = VIZ.card(MOUNT, { title: 'Reference weeks for week 25 of 2026', status: '' });
-
-  const tabs     = handle.body.append('div').attr('class', 'viz-tabs');
-  const paramBar = handle.body.append('div').attr('class', 'viz-params');
-  const grid     = handle.body.append('div');
-  const readout  = handle.body.append('div').attr('class', 'viz-readout');
-
-  VIZ.formula(handle.body, {
-    title: 'reference set size',
-    lines: [
-      '1996   n = b(2w+1)                 the window only',
-      '2013   n = 52b + w - 26            the window plus nine seasonal steps'
-    ],
-    hint: 'switch versions, then change b and w'
-  });
-
-  [[1996, 'Original 1996'], [2013, 'Improved 2013']].forEach(([v, label]) => {
-    tabs.append('button')
-      .attr('class', 'viz-tab').attr('type', 'button')
-      .attr('aria-pressed', state.version === v)
-      .text(label)
-      .on('click', () => { state.version = v; render(); });
-  });
-
-  const syncers = ['b', 'w'].map(key => {
-    const lim = LIMITS[key];
-    const row = paramBar.append('div').attr('class', 'viz-param');
+  function stepper(key, label) {
+    const row = params.append('div').attr('class', 'viz-param');
     row.append('span').attr('class', 'k').text(key);
     const dec = row.append('button').attr('class', 'viz-step').attr('type', 'button')
-      .attr('aria-label', `decrease ${key}`).text('−');
+      .attr('aria-label', 'decrease ' + key).text('\u2212');
     const val = row.append('span').attr('class', 'v').attr('aria-live', 'polite');
     const inc = row.append('button').attr('class', 'viz-step').attr('type', 'button')
-      .attr('aria-label', `increase ${key}`).text('+');
-    row.append('span').attr('class', 'd').text(lim.label);
-
-    dec.on('click', () => { state[key] = Math.max(lim.min, state[key] - 1); render(); });
-    inc.on('click', () => { state[key] = Math.min(lim.max, state[key] + 1); render(); });
-
+      .attr('aria-label', 'increase ' + key).text('+');
+    row.append('span').attr('class', 'd').text(label);
+    dec.on('click', () => { state[key] = Math.max(LIM[key][0], state[key] - 1); draw(); });
+    inc.on('click', () => { state[key] = Math.min(LIM[key][1], state[key] + 1); draw(); });
     return () => {
       val.text(state[key]);
-      dec.property('disabled', state[key] <= lim.min);
-      inc.property('disabled', state[key] >= lim.max);
+      dec.property('disabled', state[key] <= LIM[key][0]);
+      inc.property('disabled', state[key] >= LIM[key][1]);
     };
-  });
+  }
+  const sync = [stepper('b', 'years back'), stepper('w', 'weeks either side')];
 
-  const W = 720, LABEL_W = 46, HEAD_H = 18, ROW_H = 17, ROW_GAP = 5;
-  const CW = (W - LABEL_W - 4) / FREQ;
+  const years = d3.range(NOW_YEAR, NOW_YEAR - 6, -1);          // 2026 at the top
+  const vmax = d3.max(years, yr => d3.max(SERIES[yr]));
 
-  function render() {
-    syncers.forEach(f => f());
-    tabs.selectAll('button').attr('aria-pressed', function () {
-      return d3.select(this).text().indexOf(String(state.version)) >= 0;
-    });
+  function draw() {
+    sync.forEach(f => f());
+    const W = Math.max(300, chart.node().clientWidth || 720);
+    const small = W < 520;
+    const LW = small ? 40 : 50, RW = 6, TOP = 22, AX = 26;
+    const rowH = small ? 34 : 44, gap = small ? 7 : 9;
+    const cw = (W - LW - RW) / 52;
+    const bw = Math.max(1.4, cw - (cw > 7 ? 2 : 1));
+    const H = TOP + years.length * (rowH + gap) + AX;
+    const lo = NOW_WEEK - state.w, hi = NOW_WEEK + state.w;
+    const used = yr => yr < NOW_YEAR && yr >= NOW_YEAR - state.b;
+    const x = wk => LW + (wk - 1) * cw;
+    const rowTop = i => TOP + i * (rowH + gap);
+    const h = v => (v / vmax) * (rowH - 3);
 
-    const years = d3.range(0, state.b + 1).map(i => YEAR0 - i);
-    const H = HEAD_H + years.length * (ROW_H + ROW_GAP) + 6;
-
-    grid.html('');
-    const svg = grid.append('svg')
-      .attr('viewBox', `0 0 ${W} ${H}`)
-      .attr('preserveAspectRatio', 'xMidYMid meet')
+    chart.html('');
+    const svg = chart.append('svg')
+      .attr('viewBox', `0 0 ${W} ${H}`).attr('width', W).attr('height', H)
       .attr('role', 'img')
-      .attr('aria-label', `Calendar of ${state.b} years showing which weeks the ` +
-                          `${state.version} version uses as reference data.`);
+      .attr('aria-label', `Weekly counts 2021 to 2026, one row per year. The baseline is weeks ${lo} to ${hi} of the ${state.b} previous years.`);
 
-    svg.selectAll('text.wk').data([1, 13, 25, 39, 52]).join('text')
-      .attr('class', 'wk')
-      .attr('x', w => LABEL_W + (w - 0.5) * CW)
-      .attr('y', 11)
-      .attr('text-anchor', 'middle')
-      .attr('font-size', 10.5)
-      .attr('font-weight', w => (w === T_WEEK ? 700 : 400))
-      .attr('fill', w => (w === T_WEEK ? VIZ.C.ink : VIZ.C.muted))
-      .text(w => (w === T_WEEK ? 'w25' : w));
+    // the window, drawn behind the bars of the years it covers
+    const iTop = years.indexOf(NOW_YEAR - 1), iBot = years.indexOf(NOW_YEAR - state.b);
+    svg.append('rect').attr('class', 'farr-band')
+      .attr('x', x(lo) - 3).attr('width', x(hi + 1) - x(lo) + 6)
+      .attr('y', rowTop(iTop) - 4).attr('height', rowTop(iBot) + rowH - rowTop(iTop) + 8)
+      .attr('rx', 7);
 
-    const counts = { window: 0, step: 0, held: 0, unused: 0 };
-
-    years.forEach((year, ri) => {
-      const y0 = HEAD_H + ri * (ROW_H + ROW_GAP);
-      svg.append('text')
-        .attr('x', LABEL_W - 8).attr('y', y0 + ROW_H / 2)
-        .attr('text-anchor', 'end').attr('dominant-baseline', 'middle')
-        .attr('font-size', 11).attr('font-weight', 600).attr('fill', VIZ.C.muted)
-        .text(year);
-
-      for (let week = 1; week <= FREQ; week++) {
-        const cls = classify(year, week, state);
-        let fill = '#ffffff', stroke = VIZ.C.rule;
-
-        if (cls === 'target')      { fill = VIZ.C.red;   stroke = VIZ.C.red; }
-        else if (cls === 'window') { fill = VIZ.C.blue;  stroke = VIZ.C.blue; counts.window++; }
-        else if (cls.slice(0,4) === 'step') { fill = STEP_FILL[(+cls.slice(4) - 1) % 5]; stroke = fill; counts.step++; }
-        else if (cls === 'held')   { fill = '#eef2f7'; stroke = '#e2e8f0'; counts.held++; }
-        else if (cls === 'future') { fill = '#fcfdfe'; stroke = '#f4f7fa'; }
-        else                       { fill = '#fbfcfe'; stroke = '#f0f3f7'; counts.unused++; }
-
-        svg.append('rect')
-          .attr('x', LABEL_W + (week - 1) * CW + 0.6).attr('y', y0)
-          .attr('width', CW - 1.2).attr('height', ROW_H)
-          .attr('rx', 2)
-          .attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 0.8);
+    years.forEach((yr, i) => {
+      const y0 = rowTop(i), base = y0 + rowH;
+      const isNow = yr === NOW_YEAR, inB = used(yr);
+      svg.append('text').attr('class', 'farr-year' + (isNow ? ' is-now' : inB ? ' is-used' : ''))
+        .attr('x', LW - 8).attr('y', base - rowH / 2).text(yr);
+      svg.append('line').attr('class', 'farr-baseline')
+        .attr('x1', LW).attr('x2', W - RW).attr('y1', base + 0.5).attr('y2', base + 0.5);
+      SERIES[yr].forEach((v, k) => {
+        const wk = k + 1;
+        let cls = 'farr-bar';
+        if (isNow) cls += wk === NOW_WEEK ? ' is-now' : ' is-current-year';
+        else if (inB && wk >= lo && wk <= hi) cls += ' is-base';
+        else if (!inB) cls += ' is-out';
+        svg.append('rect').attr('class', cls)
+          .attr('x', x(wk) + (cw - bw) / 2).attr('width', bw)
+          .attr('y', base - h(v)).attr('height', Math.max(0.8, h(v)))
+          .attr('rx', Math.min(1.5, bw / 3));
+      });
+      if (isNow) {
+        const xn = x(NOW_WEEK) + cw / 2, v = SERIES[yr][NOW_WEEK - 1];
+        svg.append('text').attr('class', 'farr-now-label')
+          .attr('x', xn).attr('y', base - h(v) - 7).text('this week');
       }
     });
 
-    const used = counts.window + counts.step;
-    const total = state.b * FREQ;   // the b years of history
-    const pct = Math.round(used / total * 100);
-    handle.setStatus(`${used} of ${total} weeks`, 'ok');
+    // week axis
+    const ax = svg.append('g').attr('class', 'farr-axis');
+    [1, 13, NOW_WEEK, 39, 52].forEach(wk => {
+      ax.append('text').attr('x', x(wk) + cw / 2).attr('y', H - 6)
+        .attr('class', wk === NOW_WEEK ? 'is-now' : null).text(wk === 1 ? 'week 1' : wk);
+    });
 
-    const fmla = state.version === 1996
-      ? `n = b(2w+1) = ${state.b}×${2 * state.w + 1} = <b>${used}</b>`
-      : `n = 52b + w − 26 = ${52 * state.b} + ${state.w} − 26 = <b>${52 * state.b + state.w - 26}</b>`;
-
-    readout.html(
-      fmla + ` &nbsp; (<b>${pct}%</b> of the ${total} weeks in ${state.b} years)<br>` +
-      (state.version === 1996
-        ? `${counts.window} weeks in the ±${state.w}-week window; the other ` +
-          `${counts.unused} are discarded, so a past outbreak outside the window never matters — ` +
-          `and neither does any other evidence about trend or dispersion.`
-        : `${counts.window} weeks in the window (the reference level) plus ${counts.step} weeks ` +
-          `carried by nine seasonal steps; ${counts.held} recent weeks are held out so a new ` +
-          `outbreak cannot raise its own threshold.`)
-    );
+    const n = state.b * (2 * state.w + 1);
+    card.setStatus(`${n} baseline weeks`, 'ok');
+    let coach = 'Same time of year in every row, so the model needs no seasonal term.';
+    if (state.b < 3) coach = 'Fewer than 3 years: the model will not be allowed a trend.';
+    else if (state.w >= 7) coach = 'A window this wide reaches into the quieter weeks around the peak.';
+    else if (state.w === 0) coach = 'One week per year: very few points to fit a model to.';
+    readout.html(`n = b(2w + 1) = ${state.b} \u00d7 ${2 * state.w + 1} = <b>${n}</b> weeks<br>` +
+                 `<span class="farr-coach">${coach}</span>`);
   }
 
-  render();
+  draw();
+  let last = 0;
+  new ResizeObserver(() => {
+    const w = chart.node().clientWidth;
+    if (Math.abs(w - last) > 4) { last = w; draw(); }
+  }).observe(chart.node());
 })();

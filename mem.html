@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Moving Epidemic Method – Epidemic Preparedness and Response</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./farrington.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e2b0d26dc907153b9b7d894772c108f8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-07505f6af4109e00365ac56af6beafc5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/tokens.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./mem.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Epidemic Preparedness and Response</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/thinhong/epr" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./epithreshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Epidemic threshold</span></a>
+            <button type="button" class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section: Epidemic threshold">
+              <i class="bi bi-chevron-right ms-2" aria-hidden="true"></i>
+            </button> 
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cusum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">CUSUM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rki.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">RKI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./farrington.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mem.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-mem-brief" id="toc-sec-mem-brief" class="nav-link active" data-scroll-target="#sec-mem-brief"><span class="header-section-number">5.1</span> The method in brief</a></li>
+  <li><a href="#sec-mem-data" id="toc-sec-mem-data" class="nav-link" data-scroll-target="#sec-mem-data"><span class="header-section-number">5.2</span> The data: one row per season</a></li>
+  <li><a href="#sec-mem-step1" id="toc-sec-mem-step1" class="nav-link" data-scroll-target="#sec-mem-step1"><span class="header-section-number">5.3</span> Step 1: the epidemic period of each season</a></li>
+  <li><a href="#sec-mem-step2" id="toc-sec-mem-step2" class="nav-link" data-scroll-target="#sec-mem-step2"><span class="header-section-number">5.4</span> Step 2: the epidemic threshold</a></li>
+  <li><a href="#sec-mem-step3" id="toc-sec-mem-step3" class="nav-link" data-scroll-target="#sec-mem-step3"><span class="header-section-number">5.5</span> Step 3: the intensity thresholds</a></li>
+  <li><a href="#sec-mem-step4" id="toc-sec-mem-step4" class="nav-link" data-scroll-target="#sec-mem-step4"><span class="header-section-number">5.6</span> Step 4: watching a new season</a></li>
+  <li><a href="#sec-mem-notes" id="toc-sec-mem-notes" class="nav-link" data-scroll-target="#sec-mem-notes"><span class="header-section-number">5.7</span> Notes</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./mem.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The Moving Epidemic Method (MEM) sets thresholds for weekly influenza-like illness (ILI) or acute respiratory infection (ARI) rates from past seasons <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. This chapter follows its steps one by one, with a figure for each step. The data are weekly ILI consultation rates per 100,000 in Croatia, week 26 of 2022 to week 43 of 2026, from ECDC’s European Respiratory Virus Surveillance Summary (ERVISS) <span class="citation" data-cites="ecdc_erviss">(<a href="references.html#ref-ecdc_erviss" role="doc-biblioref">European Centre for Disease Prevention and Control 2026</a>)</span>. In each figure, point at a blue symbol in a formula to see where it is in the chart.</p>
+<section id="sec-mem-brief" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="sec-mem-brief"><span class="header-section-number">5.1</span> The method in brief</h2>
+<p>MEM uses past seasons to set thresholds for the next season. It works in three steps.</p>
+<ol type="1">
+<li><strong>Find the epidemic weeks.</strong> For each past season, the MAP curve gives the length and the timing of the epidemic. This splits the season into three periods: pre-epidemic, epidemic and post-epidemic.</li>
+<li><strong>Set the epidemic threshold.</strong> From each pre-epidemic period, take the <span class="math inline">\(n\)</span> highest weekly rates, where <span class="math inline">\(n = 30 / \text{number of seasons}\)</span>. Pool these values from all seasons. The epidemic threshold is their mean plus <span class="math inline">\(z_{0.05}\)</span> standard deviations, where <span class="math inline">\(z_{0.05} = 1.645\)</span>. A post-epidemic threshold comes from the post-epidemic periods in the same way.</li>
+<li><strong>Set the intensity thresholds.</strong> From each epidemic period, take the <span class="math inline">\(n\)</span> highest weekly rates and pool them. Their geometric mean and upper limits give the thresholds for the levels of intensity.</li>
+</ol>
+<p>In a new season, the first weekly rate above the epidemic threshold signals the start of the epidemic. The intensity thresholds then give the level of each week.</p>
+<blockquote class="blockquote">
+<p>The purpose of the MEM is to model influenza epidemics based upon historical data from a specific country or region. The method has three main steps: First, the length, start and the end of the annual epidemics are determined, splitting the season in three periods: a pre-epidemic, an epidemic and a post-epidemic period. Secondly, the baseline and the epidemic thresholds are calculated using the pre-epidemic and post-epidemic values of historical seasons. Finally, thresholds for different levels of intensity are computed. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+</section>
+<section id="sec-mem-data" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="sec-mem-data"><span class="header-section-number">5.2</span> The data: one row per season</h2>
+<blockquote class="blockquote">
+<p>Weekly rates were estimated at least for 33 weeks in every season, from week 40 of 1 year to the week 20 of the following year. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Missing values in weekly rates at the beginning or at the end of the surveillance period did not affect the method and were excluded from calculations. Missing weekly data during the surveillance period were imputed with a smooth regression over the full season’s data using a small window parameter. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>A real series needs this preparation. Some weeks were never reported, some weeks fall between seasons, and the current season is not finished. The paper used countries with five or more seasons of data <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. ERVISS has four complete seasons for Croatia, so the numbers in this chapter are a worked example, not Croatia’s official thresholds.</p>
+<div id="fig-mem-series" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-series-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-series" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-series-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Weekly ILI rates in Croatia as reported to ERVISS. Hatching marks weeks with no data; a week with no data is not a week with zero cases. Brackets mark the four complete seasons. Press <strong>Cut into seasons</strong>: the weeks between seasons and the unfinished current season are left out. One week inside a season has no data, week 19 of 2025. It is filled with a smoothing regression over the season, as in the authors’ R package <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>; the regression gives a value below 0, so the week is set to 0.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-mem-step1" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="sec-mem-step1"><span class="header-section-number">5.3</span> Step 1: the epidemic period of each season</h2>
+<blockquote class="blockquote">
+<p>In the first step, for each season separately, the length of the epidemic period is estimated as the minimum number of consecutive weeks with the maximum accumulated rates percentage (MAP). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The MAP curve draws the maximum cumulated rate for a period of a given length <span class="math inline">\(r\)</span>, expressed as percentage of the total rate of the <span class="math inline">\(j\)</span>th season. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<div id="fig-mem-map" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-map" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: The best window of <span class="math inline">\(r\)</span> weeks in every season, beside the MAP curves. For each number of weeks <span class="math inline">\(r\)</span>, the window of <span class="math inline">\(r\)</span> consecutive weeks is placed where its total is largest, so it can be in a different place in each season.
+</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Then the MAP curve is smoothed, using a smoothing regression (over <span class="math inline">\(r\)</span>), selecting automatically the window parameter. The optimum number of weeks for each season is determined calculating the increment in the percentage from one number of weeks to the next one. … When this increment is lower than the predefined criteria, the optimum is found. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>The criterion is <span class="math inline">\(\delta\)</span>. It depends on the country, ranges from 2% to 4% and is chosen to maximise sensitivity and specificity <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. Once the optimum number of weeks <span class="math inline">\(r^*\)</span> is found, the epidemic starts at week <span class="math inline">\(k^*\)</span>, the first week of the window of <span class="math inline">\(r^*\)</span> weeks with the largest total. The weeks before the epidemic are the pre-epidemic period, and the weeks after it are the post-epidemic period <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>.</p>
+<div id="fig-mem-opt" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-opt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-opt" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-opt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Left: the MAP curve of one season and its smoothed version. Right: the increment in the percentage from one number of weeks to the next. When the increment is lower than <span class="math inline">\(\delta\)</span>, the optimum length <span class="math inline">\(r^*\)</span> is found. Bottom: the best window of <span class="math inline">\(r^*\)</span> weeks starts at week <span class="math inline">\(k^*\)</span>; the epidemic runs from week <span class="math inline">\(k^*\)</span> to week <span class="math inline">\(k^* + r^* - 1\)</span>, and this splits every season into three periods.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-mem-step2" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="sec-mem-step2"><span class="header-section-number">5.4</span> Step 2: the epidemic threshold</h2>
+<blockquote class="blockquote">
+<p>In the second step, the baseline and threshold using pre-epidemic values of historical seasons are calculated. The baseline is the arithmetic mean of all pre-epidemic rates of all historical seasons (pooled together as a single sample). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>To calculate the threshold, only a set of pre-epidemic values is considered. For each season, the highest <span class="math inline">\(n\)</span> values from the pre-epidemic period are taken, where <span class="math inline">\(n\)</span> = 30/number of seasons. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>With all these <span class="math inline">\(n \times N\)</span> values, a one-tailed point 95% confidence interval is calculated. … The upper limit of the confidence interval is the epidemic threshold. Additionally, a post-epidemic threshold is calculated using the same procedure. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>So the epidemic threshold is <span class="math inline">\(t^* = \bar{t} + z_{0.05} \times S_t\)</span>, where <span class="math inline">\(\bar{t}\)</span> and <span class="math inline">\(S_t\)</span> are the mean and the standard deviation of the <span class="math inline">\(n \times N\)</span> values, and <span class="math inline">\(z_{0.05} = 1.645\)</span>. With four seasons, <span class="math inline">\(n = 30 / 4 = 7.5\)</span>, which the authors’ R package rounds to 8 <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>, so 32 values are pooled.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What is <span class="math inline">\(z_{0.05}\)</span>?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<svg class="mem-bell" viewbox="0 0 320 112" role="img" aria-label="A normal curve: 95% of its area lies below the mean plus z 0.05 standard deviations, where z 0.05 is 1.645, and 5% lies above it."><path d="M14.0,80L14.0,79.6L16.3,79.6L18.6,79.5L20.8,79.4L23.1,79.3L25.4,79.2L27.7,79.0L30.0,78.9L32.2,78.7L34.5,78.5L36.8,78.3L39.1,78.1L41.4,77.8L43.7,77.5L45.9,77.2L48.2,76.8L50.5,76.4L52.8,76.0L55.1,75.5L57.3,74.9L59.6,74.3L61.9,73.7L64.2,72.9L66.5,72.2L68.7,71.3L71.0,70.4L73.3,69.5L75.6,68.4L77.9,67.3L80.2,66.2L82.4,64.9L84.7,63.6L87.0,62.2L89.3,60.7L91.6,59.2L93.8,57.6L96.1,56.0L98.4,54.3L100.7,52.5L103.0,50.7L105.2,48.8L107.5,47.0L109.8,45.1L112.1,43.1L114.4,41.2L116.7,39.2L118.9,37.3L121.2,35.4L123.5,33.5L125.8,31.7L128.1,29.9L130.3,28.2L132.6,26.5L134.9,25.0L137.2,23.5L139.5,22.2L141.7,20.9L144.0,19.8L146.3,18.8L148.6,18.0L150.9,17.3L153.2,16.7L155.4,16.3L157.7,16.1L160.0,16.0L162.3,16.1L164.6,16.3L166.8,16.7L169.1,17.3L171.4,18.0L173.7,18.8L176.0,19.8L178.2,20.9L180.5,22.2L182.8,23.5L185.1,25.0L187.4,26.5L189.7,28.2L191.9,29.9L194.2,31.7L196.5,33.5L198.8,35.4L201.1,37.3L203.3,39.2L205.6,41.2L207.9,43.1L210.2,45.1L212.5,47.0L214.7,48.8L217.0,50.7L219.3,52.5L221.6,54.3L223.9,56.0L226.2,57.6L228.4,59.2L230.7,60.7L233.0,62.2L235.0,63.5L235.0,80Z" fill="var(--tealSoft)"></path><path d="M235.0,80L235.0,63.5L237.3,64.8L239.6,66.0L241.9,67.2L244.2,68.3L246.5,69.4L248.7,70.3L251.0,71.2L253.3,72.1L255.6,72.9L257.9,73.6L260.1,74.2L262.4,74.8L264.7,75.4L267.0,75.9L269.3,76.4L271.5,76.8L273.8,77.2L276.1,77.5L278.4,77.8L280.7,78.1L283.0,78.3L285.2,78.5L287.5,78.7L289.8,78.9L292.1,79.0L294.4,79.2L296.6,79.3L298.9,79.4L301.2,79.5L303.5,79.5L305.8,79.6L306.0,79.6L306.0,80Z" fill="var(--red)" fill-opacity=".35"></path><path d="M14.0,79.6L16.3,79.6L18.6,79.5L20.8,79.4L23.1,79.3L25.4,79.2L27.7,79.0L30.0,78.9L32.2,78.7L34.5,78.5L36.8,78.3L39.1,78.1L41.4,77.8L43.7,77.5L45.9,77.2L48.2,76.8L50.5,76.4L52.8,76.0L55.1,75.5L57.3,74.9L59.6,74.3L61.9,73.7L64.2,72.9L66.5,72.2L68.7,71.3L71.0,70.4L73.3,69.5L75.6,68.4L77.9,67.3L80.2,66.2L82.4,64.9L84.7,63.6L87.0,62.2L89.3,60.7L91.6,59.2L93.8,57.6L96.1,56.0L98.4,54.3L100.7,52.5L103.0,50.7L105.2,48.8L107.5,47.0L109.8,45.1L112.1,43.1L114.4,41.2L116.7,39.2L118.9,37.3L121.2,35.4L123.5,33.5L125.8,31.7L128.1,29.9L130.3,28.2L132.6,26.5L134.9,25.0L137.2,23.5L139.5,22.2L141.7,20.9L144.0,19.8L146.3,18.8L148.6,18.0L150.9,17.3L153.2,16.7L155.4,16.3L157.7,16.1L160.0,16.0L162.3,16.1L164.6,16.3L166.8,16.7L169.1,17.3L171.4,18.0L173.7,18.8L176.0,19.8L178.2,20.9L180.5,22.2L182.8,23.5L185.1,25.0L187.4,26.5L189.7,28.2L191.9,29.9L194.2,31.7L196.5,33.5L198.8,35.4L201.1,37.3L203.3,39.2L205.6,41.2L207.9,43.1L210.2,45.1L212.5,47.0L214.7,48.8L217.0,50.7L219.3,52.5L221.6,54.3L223.9,56.0L226.2,57.6L228.4,59.2L230.7,60.7L233.0,62.2L235.3,63.6L237.6,64.9L239.8,66.2L242.1,67.3L244.4,68.4L246.7,69.5L249.0,70.4L251.2,71.3L253.5,72.2L255.8,72.9L258.1,73.7L260.4,74.3L262.7,74.9L264.9,75.5L267.2,76.0L269.5,76.4L271.8,76.8L274.1,77.2L276.3,77.5L278.6,77.8L280.9,78.1L283.2,78.3L285.5,78.5L287.7,78.7L290.0,78.9L292.3,79.0L294.6,79.2L296.9,79.3L299.2,79.4L301.4,79.5L303.7,79.6L306.0,79.6L306.0,79.6" fill="none" stroke="var(--ink2)" stroke-width="1.5"></path><line x1="14" x2="306" y1="80.5" y2="80.5" stroke="var(--ink2)" stroke-width="1"></line><line x1="160.0" x2="160.0" y1="14.0" y2="84" stroke="var(--tealInk)" stroke-width="1.2"></line><line x1="235.0" x2="235.0" y1="14.0" y2="84" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 3"></line><text x="118.9" y="67" text-anchor="middle" fill="var(--tealInk)" font-size="13" font-weight="600">95%</text><text x="241.0" y="62.0" fill="var(--redInk)" font-size="12.5" font-weight="600">5%</text><text x="160.0" y="97" text-anchor="middle" fill="var(--ink2)" font-size="12">mean</text><text x="235.0" y="97" text-anchor="middle" fill="var(--redInk)" font-size="12" font-weight="600">mean + z<tspan dy="3" font-size="10.5">0.05</tspan><tspan dy="-3"> SD</tspan></text></svg>
+<p><span class="math inline">\(z_{0.05}\)</span> is the point of the standard normal curve with 5% of the area above it. Its value is 1.645.</p>
+<p>The calculation assumes that the pooled values come from a normal distribution with their mean and standard deviation. In any normal distribution, 95% of the values lie below the mean plus <span class="math inline">\(z_{0.05}\)</span> standard deviations, and 5% lie above it.</p>
+<p>The interval is one-tailed because only high rates matter for an alarm, so all of the 5% is in the upper tail. A two-tailed 95% interval would put 2.5% in each tail and use <span class="math inline">\(z_{0.025} = 1.96\)</span> instead.</p>
+<p>The interval is a <em>point</em> interval: it is for one weekly value, not for the mean. So it uses the standard deviation, not the standard error. In plain words, if the highest pre-epidemic weeks of a new season follow the same distribution as in past seasons, about 1 in 20 of them would still be above the threshold.</p>
+</div>
+</div>
+<div id="fig-mem-threshold" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-threshold-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-threshold" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-threshold-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.4: Top: every season, zoomed in on its pre-epidemic weeks; its <span class="math inline">\(n\)</span> highest weeks are dark teal, with their rates per 100,000. Bottom left: the same <span class="math inline">\(n \times N\)</span> values side by side. Bottom right: their histogram on its side, so that it shares the rate axis with the bars, with the normal curve of the same mean, standard deviation and area. The <span class="math inline">\(z\)</span> axis on the right counts standard deviations from the mean. The threshold <span class="math inline">\(t^*\)</span> is one horizontal line across both panels, at <span class="math inline">\(z_{0.05}\)</span> on the <span class="math inline">\(z\)</span> axis, with 5% of the curve’s area above it. Press <strong>Show how</strong> to watch the steps in order, and <strong>t* on the seasons</strong> to draw the threshold on every season.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-mem-step3" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="sec-mem-step3"><span class="header-section-number">5.5</span> Step 3: the intensity thresholds</h2>
+<blockquote class="blockquote">
+<p>Thresholds for different levels of intensity are calculated using the <span class="math inline">\(n\)</span> highest values of each epidemic period to build a sample of <span class="math inline">\(n \times N\)</span> rates. With the sample, the geometric mean and 50%, 90% and 95% one-sided confidence intervals are calculated. These upper limits are the threshold for the different levels of intensity of the epidemic. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>As in step 2, <span class="math inline">\(z_\alpha\)</span> is the point of the standard normal curve with <span class="math inline">\(\alpha\)</span> of the area above it. Step 3 uses it on the logarithms of the rates: <span class="math inline">\(z_{0.50} = 0\)</span> for the 50% limit, which is the geometric mean itself, <span class="math inline">\(z_{0.10} = 1.282\)</span> for the 90% limit and <span class="math inline">\(z_{0.05} = 1.645\)</span> for the 95% limit. The three thresholds split the weekly rates into five levels: baseline, low, medium, high and very high <span class="citation" data-cites="vega2015">(<a href="references.html#ref-vega2015" role="doc-biblioref">Vega et al. 2015</a>)</span>. The paper says countries may change these percentages <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. <span class="citation" data-cites="vega2015">Vega et al. (<a href="references.html#ref-vega2015" role="doc-biblioref">2015</a>)</span> and the authors’ R package <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span> use 40%, 90% and 97.5%.</p>
+<div id="fig-mem-intensity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-intensity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-intensity" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-intensity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.5: Top: every season, zoomed in on its epidemic weeks; its <span class="math inline">\(n\)</span> highest weeks are dark blue, with their rates. Bottom: the same values side by side, and their histogram on its side, on a log axis. The normal curve of the logs is centred on the geometric mean (<span class="math inline">\(z = 0\)</span>); the 90% and 95% limits are at <span class="math inline">\(z_{0.10}\)</span> and <span class="math inline">\(z_{0.05}\)</span> on the <span class="math inline">\(z\)</span> axis. So the three thresholds split the curve’s area into 50%, 40%, 5% and 5%. Switch to the rate scale to see the same values and the same curve on the rates. Press <strong>I50, I90, I95 on the seasons</strong> to draw the thresholds on every season.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-mem-step4" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="sec-mem-step4"><span class="header-section-number">5.6</span> Step 4: watching a new season</h2>
+<blockquote class="blockquote">
+<p>The main purpose of the method is to define the baseline influenza activity in historical data and to establish an epidemic threshold above which the weekly rates are considered to be in the epidemic period. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Rates in the pre-epidemic period were expected to be lower than the pre-epidemic threshold rate, while rates within the epidemic period are expected to be higher. Finally, rates in the post-epidemic period were expected to be lower than the post-epidemic threshold rate. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>The paper calls the first week with a rate above the epidemic threshold the alert week <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. During the epidemic, the intensity thresholds give the level of each week. The paper gives no rule for the end of the epidemic in a new season; the authors’ R package ends it at the first week after the peak with a rate below the post-epidemic threshold <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>.</p>
+<blockquote class="blockquote">
+<p>If influenza weekly epidemiological data are accompanied by timely virological data, virus circulation should be taken into account to make appropriate public health decisions. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p><a href="#fig-mem-monitor" class="quarto-xref">Figure&nbsp;<span>5.6</span></a> starts with the current season, 2026/27, and the thresholds from all four past seasons. The data end in week 43 of 2026. To show how a season reaches the threshold, the weeks after that are illustrative, not data: each one is the average rate of the four past seasons in the same week.</p>
+<div id="fig-mem-monitor" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mem-monitor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-mem-monitor" class="mem-fig"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mem-monitor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.6: Press <strong>Play</strong> to add the weeks one by one. Solid bars are data and outlined bars are illustrative; the colour of a bar gives its level. At the right, step 3’s curve of past epidemic weeks stands on its side, cut at the intensity thresholds. Choose a past season to replay it, as in the paper’s cross-validation below.
+</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>For each country, each single season was extracted from the historical records to be used as the target season. MEM calculated the beginning and the end of the epidemic period of the target season. On the basis of the remaining seasons, excluding the target season, MEM calculated the pre- and post-epidemic thresholds. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+</blockquote>
+<p>In a replay, the band under the chart is the epidemic period that step 1 finds for the target season, and the reading scores the alert with the paper’s timeliness, detection lag and false alerts.</p>
+</section>
+<section id="sec-mem-notes" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="sec-mem-notes"><span class="header-section-number">5.7</span> Notes</h2>
+<ul>
+<li>The paper gives step 3 in words. The formulas in <a href="#fig-mem-intensity" class="quarto-xref">Figure&nbsp;<span>5.5</span></a> are how the authors’ R package computes it <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>.</li>
+<li>The MAP curve is smoothed by a local linear kernel regression with the window chosen by AICc. The results were checked against R’s <code>sm</code> package.</li>
+<li>The data are the ERVISS snapshot of 30 October 2026, released under the EUPL 1.2 licence <span class="citation" data-cites="ecdc_erviss">(<a href="references.html#ref-ecdc_erviss" role="doc-biblioref">European Centre for Disease Prevention and Control 2026</a>)</span>.</li>
+</ul>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/mem-data.js"></script>
+<script src="js/mem-core.js"></script>
+<script src="js/mem-shared.js"></script>
+<script src="js/mem-explore.js"></script>
+<script src="js/mem-stage.js"></script>
+<script src="js/mem-series.js"></script>
+<script src="js/mem-map.js"></script>
+<script src="js/mem-opt.js"></script>
+<script src="js/mem-threshold.js"></script>
+<script src="js/mem-intensity.js"></script>
+<script src="js/mem-monitor.js"></script>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-ecdc_erviss" class="csl-entry" role="listitem">
+European Centre for Disease Prevention and Control. 2026. <em>European Respiratory Virus Surveillance Summary (<span>ERVISS</span>): Weekly Data</em>. <a href="https://github.com/EU-ECDC/Respiratory_viruses_weekly_data">https://github.com/EU-ECDC/Respiratory_viruses_weekly_data</a>.
+</div>
+<div id="ref-lozano_mem" class="csl-entry" role="listitem">
+Lozano, Jose E. 2025. <em><span class="nocase">mem</span>: The Moving Epidemic Method</em>. <a href="https://github.com/lozalojo/mem">https://github.com/lozalojo/mem</a>.
+</div>
+<div id="ref-vega2013" class="csl-entry" role="listitem">
+Vega, Tomás, Jose Eugenio Lozano, Tamara Meerhoff, et al. 2013. <span>“Influenza Surveillance in <span>Europe</span>: Establishing Epidemic Thresholds by the <span>Moving Epidemic Method</span>.”</span> <em>Influenza and Other Respiratory Viruses</em> 7 (4): 546–58. <a href="https://doi.org/10.1111/j.1750-2659.2012.00422.x">https://doi.org/10.1111/j.1750-2659.2012.00422.x</a>.
+</div>
+<div id="ref-vega2015" class="csl-entry" role="listitem">
+Vega, Tomás, José E. Lozano, Tamara Meerhoff, et al. 2015. <span>“Influenza Surveillance in <span>Europe</span>: Comparing Intensity Levels Calculated Using the Moving Epidemic Method.”</span> <em>Influenza and Other Respiratory Viruses</em> 9 (5): 234–46. <a href="https://doi.org/10.1111/irv.12330">https://doi.org/10.1111/irv.12330</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/thinhong\.github\.io\/epr\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="./farrington.html" class="pagination-link" aria-label="Farrington">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

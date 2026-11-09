@@ -55,7 +55,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./references.html" rel="next">
+<link href="./serfling.html" rel="next">
 <link href="./farrington.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -67,7 +67,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-e2b0d26dc907153b9b7d894772c108f8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-07505f6af4109e00365ac56af6beafc5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-a69e96623606a37e67cac0cdbc27d10a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -214,6 +214,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./serfling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -264,7 +270,7 @@ window.Quarto = {
 </header>
 
 
-<p>The Moving Epidemic Method (MEM) sets thresholds for weekly influenza-like illness (ILI) or acute respiratory infection (ARI) rates from past seasons <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. This chapter follows its steps one by one, with a figure for each step. The data are weekly ILI consultation rates per 100,000 in Croatia, week 26 of 2022 to week 43 of 2026, from ECDC’s European Respiratory Virus Surveillance Summary (ERVISS) <span class="citation" data-cites="ecdc_erviss">(<a href="references.html#ref-ecdc_erviss" role="doc-biblioref">European Centre for Disease Prevention and Control 2026</a>)</span>. In each figure, point at a blue symbol in a formula to see where it is in the chart.</p>
+<p>The Moving Epidemic Method (MEM) sets thresholds for weekly influenza-like illness (ILI) or acute respiratory infection (ARI) rates from past seasons <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. This chapter follows its steps one by one, with a figure for each step. The data are weekly ILI consultation rates per 100,000 in Croatia, week 26 of 2022 to week 43 of 2026, from ECDC’s European Respiratory Virus Surveillance Summary (ERVISS) <span class="citation" data-cites="ecdc_erviss">(<a href="references.html#ref-ecdc_erviss" role="doc-biblioref">European Centre for Disease Prevention and Control 2026</a>)</span>. In each figure, point at a blue symbol in a formula to see where it is in the chart.</p>
 <section id="sec-mem-brief" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="sec-mem-brief"><span class="header-section-number">5.1</span> The method in brief</h2>
 <p>MEM uses past seasons to set thresholds for the next season. It works in three steps.</p>
@@ -275,18 +281,18 @@ window.Quarto = {
 </ol>
 <p>In a new season, the first weekly rate above the epidemic threshold signals the start of the epidemic. The intensity thresholds then give the level of each week.</p>
 <blockquote class="blockquote">
-<p>The purpose of the MEM is to model influenza epidemics based upon historical data from a specific country or region. The method has three main steps: First, the length, start and the end of the annual epidemics are determined, splitting the season in three periods: a pre-epidemic, an epidemic and a post-epidemic period. Secondly, the baseline and the epidemic thresholds are calculated using the pre-epidemic and post-epidemic values of historical seasons. Finally, thresholds for different levels of intensity are computed. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>The purpose of the MEM is to model influenza epidemics based upon historical data from a specific country or region. The method has three main steps: First, the length, start and the end of the annual epidemics are determined, splitting the season in three periods: a pre-epidemic, an epidemic and a post-epidemic period. Secondly, the baseline and the epidemic thresholds are calculated using the pre-epidemic and post-epidemic values of historical seasons. Finally, thresholds for different levels of intensity are computed. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 </section>
 <section id="sec-mem-data" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="sec-mem-data"><span class="header-section-number">5.2</span> The data: one row per season</h2>
 <blockquote class="blockquote">
-<p>Weekly rates were estimated at least for 33 weeks in every season, from week 40 of 1 year to the week 20 of the following year. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>Weekly rates were estimated at least for 33 weeks in every season, from week 40 of 1 year to the week 20 of the following year. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <blockquote class="blockquote">
-<p>Missing values in weekly rates at the beginning or at the end of the surveillance period did not affect the method and were excluded from calculations. Missing weekly data during the surveillance period were imputed with a smooth regression over the full season’s data using a small window parameter. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>Missing values in weekly rates at the beginning or at the end of the surveillance period did not affect the method and were excluded from calculations. Missing weekly data during the surveillance period were imputed with a smooth regression over the full season’s data using a small window parameter. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
-<p>A real series needs this preparation. Some weeks were never reported, some weeks fall between seasons, and the current season is not finished. The paper used countries with five or more seasons of data <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. ERVISS has four complete seasons for Croatia, so the numbers in this chapter are a worked example, not Croatia’s official thresholds.</p>
+<p>A real series needs this preparation. Some weeks were never reported, some weeks fall between seasons, and the current season is not finished. The paper used countries with five or more seasons of data <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. ERVISS has four complete seasons for Croatia, so the numbers in this chapter are a worked example, not Croatia’s official thresholds.</p>
 <div id="fig-mem-series" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-series-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -301,10 +307,10 @@ Figure&nbsp;5.1: Weekly ILI rates in Croatia as reported to ERVISS. Hatching mar
 <section id="sec-mem-step1" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="sec-mem-step1"><span class="header-section-number">5.3</span> Step 1: the epidemic period of each season</h2>
 <blockquote class="blockquote">
-<p>In the first step, for each season separately, the length of the epidemic period is estimated as the minimum number of consecutive weeks with the maximum accumulated rates percentage (MAP). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>In the first step, for each season separately, the length of the epidemic period is estimated as the minimum number of consecutive weeks with the maximum accumulated rates percentage (MAP). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <blockquote class="blockquote">
-<p>The MAP curve draws the maximum cumulated rate for a period of a given length <span class="math inline">\(r\)</span>, expressed as percentage of the total rate of the <span class="math inline">\(j\)</span>th season. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>The MAP curve draws the maximum cumulated rate for a period of a given length <span class="math inline">\(r\)</span>, expressed as percentage of the total rate of the <span class="math inline">\(j\)</span>th season. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <div id="fig-mem-map" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -317,9 +323,9 @@ Figure&nbsp;5.2: The best window of <span class="math inline">\(r\)</span> weeks
 </figure>
 </div>
 <blockquote class="blockquote">
-<p>Then the MAP curve is smoothed, using a smoothing regression (over <span class="math inline">\(r\)</span>), selecting automatically the window parameter. The optimum number of weeks for each season is determined calculating the increment in the percentage from one number of weeks to the next one. … When this increment is lower than the predefined criteria, the optimum is found. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>Then the MAP curve is smoothed, using a smoothing regression (over <span class="math inline">\(r\)</span>), selecting automatically the window parameter. The optimum number of weeks for each season is determined calculating the increment in the percentage from one number of weeks to the next one. … When this increment is lower than the predefined criteria, the optimum is found. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
-<p>The criterion is <span class="math inline">\(\delta\)</span>. It depends on the country, ranges from 2% to 4% and is chosen to maximise sensitivity and specificity <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. Once the optimum number of weeks <span class="math inline">\(r^*\)</span> is found, the epidemic starts at week <span class="math inline">\(k^*\)</span>, the first week of the window of <span class="math inline">\(r^*\)</span> weeks with the largest total. The weeks before the epidemic are the pre-epidemic period, and the weeks after it are the post-epidemic period <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>.</p>
+<p>The criterion is <span class="math inline">\(\delta\)</span>. It depends on the country, ranges from 2% to 4% and is chosen to maximise sensitivity and specificity <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. Once the optimum number of weeks <span class="math inline">\(r^*\)</span> is found, the epidemic starts at week <span class="math inline">\(k^*\)</span>, the first week of the window of <span class="math inline">\(r^*\)</span> weeks with the largest total. The weeks before the epidemic are the pre-epidemic period, and the weeks after it are the post-epidemic period <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>.</p>
 <div id="fig-mem-opt" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-opt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -334,13 +340,13 @@ Figure&nbsp;5.3: Left: the MAP curve of one season and its smoothed version. Rig
 <section id="sec-mem-step2" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="sec-mem-step2"><span class="header-section-number">5.4</span> Step 2: the epidemic threshold</h2>
 <blockquote class="blockquote">
-<p>In the second step, the baseline and threshold using pre-epidemic values of historical seasons are calculated. The baseline is the arithmetic mean of all pre-epidemic rates of all historical seasons (pooled together as a single sample). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>In the second step, the baseline and threshold using pre-epidemic values of historical seasons are calculated. The baseline is the arithmetic mean of all pre-epidemic rates of all historical seasons (pooled together as a single sample). <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <blockquote class="blockquote">
-<p>To calculate the threshold, only a set of pre-epidemic values is considered. For each season, the highest <span class="math inline">\(n\)</span> values from the pre-epidemic period are taken, where <span class="math inline">\(n\)</span> = 30/number of seasons. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>To calculate the threshold, only a set of pre-epidemic values is considered. For each season, the highest <span class="math inline">\(n\)</span> values from the pre-epidemic period are taken, where <span class="math inline">\(n\)</span> = 30/number of seasons. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <blockquote class="blockquote">
-<p>With all these <span class="math inline">\(n \times N\)</span> values, a one-tailed point 95% confidence interval is calculated. … The upper limit of the confidence interval is the epidemic threshold. Additionally, a post-epidemic threshold is calculated using the same procedure. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>With all these <span class="math inline">\(n \times N\)</span> values, a one-tailed point 95% confidence interval is calculated. … The upper limit of the confidence interval is the epidemic threshold. Additionally, a post-epidemic threshold is calculated using the same procedure. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <p>So the epidemic threshold is <span class="math inline">\(t^* = \bar{t} + z_{0.05} \times S_t\)</span>, where <span class="math inline">\(\bar{t}\)</span> and <span class="math inline">\(S_t\)</span> are the mean and the standard deviation of the <span class="math inline">\(n \times N\)</span> values, and <span class="math inline">\(z_{0.05} = 1.645\)</span>. With four seasons, <span class="math inline">\(n = 30 / 4 = 7.5\)</span>, which the authors’ R package rounds to 8 <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>, so 32 values are pooled.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -374,9 +380,9 @@ Figure&nbsp;5.4: Top: every season, zoomed in on its pre-epidemic weeks; its <sp
 <section id="sec-mem-step3" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="sec-mem-step3"><span class="header-section-number">5.5</span> Step 3: the intensity thresholds</h2>
 <blockquote class="blockquote">
-<p>Thresholds for different levels of intensity are calculated using the <span class="math inline">\(n\)</span> highest values of each epidemic period to build a sample of <span class="math inline">\(n \times N\)</span> rates. With the sample, the geometric mean and 50%, 90% and 95% one-sided confidence intervals are calculated. These upper limits are the threshold for the different levels of intensity of the epidemic. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>Thresholds for different levels of intensity are calculated using the <span class="math inline">\(n\)</span> highest values of each epidemic period to build a sample of <span class="math inline">\(n \times N\)</span> rates. With the sample, the geometric mean and 50%, 90% and 95% one-sided confidence intervals are calculated. These upper limits are the threshold for the different levels of intensity of the epidemic. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
-<p>As in step 2, <span class="math inline">\(z_\alpha\)</span> is the point of the standard normal curve with <span class="math inline">\(\alpha\)</span> of the area above it. Step 3 uses it on the logarithms of the rates: <span class="math inline">\(z_{0.50} = 0\)</span> for the 50% limit, which is the geometric mean itself, <span class="math inline">\(z_{0.10} = 1.282\)</span> for the 90% limit and <span class="math inline">\(z_{0.05} = 1.645\)</span> for the 95% limit. The three thresholds split the weekly rates into five levels: baseline, low, medium, high and very high <span class="citation" data-cites="vega2015">(<a href="references.html#ref-vega2015" role="doc-biblioref">Vega et al. 2015</a>)</span>. The paper says countries may change these percentages <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. <span class="citation" data-cites="vega2015">Vega et al. (<a href="references.html#ref-vega2015" role="doc-biblioref">2015</a>)</span> and the authors’ R package <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span> use 40%, 90% and 97.5%.</p>
+<p>As in step 2, <span class="math inline">\(z_\alpha\)</span> is the point of the standard normal curve with <span class="math inline">\(\alpha\)</span> of the area above it. Step 3 uses it on the logarithms of the rates: <span class="math inline">\(z_{0.50} = 0\)</span> for the 50% limit, which is the geometric mean itself, <span class="math inline">\(z_{0.10} = 1.282\)</span> for the 90% limit and <span class="math inline">\(z_{0.05} = 1.645\)</span> for the 95% limit. The three thresholds split the weekly rates into five levels: baseline, low, medium, high and very high <span class="citation" data-cites="vega2015">(<a href="references.html#ref-vega2015" role="doc-biblioref">Vega et al. 2015</a>)</span>. The paper says countries may change these percentages <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. <span class="citation" data-cites="vega2015">Vega et al. (<a href="references.html#ref-vega2015" role="doc-biblioref">2015</a>)</span> and the authors’ R package <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span> use 40%, 90% and 97.5%.</p>
 <div id="fig-mem-intensity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-mem-intensity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -391,14 +397,14 @@ Figure&nbsp;5.5: Top: every season, zoomed in on its epidemic weeks; its <span c
 <section id="sec-mem-step4" class="level2" data-number="5.6">
 <h2 data-number="5.6" class="anchored" data-anchor-id="sec-mem-step4"><span class="header-section-number">5.6</span> Step 4: watching a new season</h2>
 <blockquote class="blockquote">
-<p>The main purpose of the method is to define the baseline influenza activity in historical data and to establish an epidemic threshold above which the weekly rates are considered to be in the epidemic period. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>The main purpose of the method is to define the baseline influenza activity in historical data and to establish an epidemic threshold above which the weekly rates are considered to be in the epidemic period. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <blockquote class="blockquote">
-<p>Rates in the pre-epidemic period were expected to be lower than the pre-epidemic threshold rate, while rates within the epidemic period are expected to be higher. Finally, rates in the post-epidemic period were expected to be lower than the post-epidemic threshold rate. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>Rates in the pre-epidemic period were expected to be lower than the pre-epidemic threshold rate, while rates within the epidemic period are expected to be higher. Finally, rates in the post-epidemic period were expected to be lower than the post-epidemic threshold rate. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
-<p>The paper calls the first week with a rate above the epidemic threshold the alert week <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span>. During the epidemic, the intensity thresholds give the level of each week. The paper gives no rule for the end of the epidemic in a new season; the authors’ R package ends it at the first week after the peak with a rate below the post-epidemic threshold <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>.</p>
+<p>The paper calls the first week with a rate above the epidemic threshold the alert week <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. During the epidemic, the intensity thresholds give the level of each week. The paper gives no rule for the end of the epidemic in a new season; the authors’ R package ends it at the first week after the peak with a rate below the post-epidemic threshold <span class="citation" data-cites="lozano_mem">(<a href="references.html#ref-lozano_mem" role="doc-biblioref">Lozano 2025</a>)</span>.</p>
 <blockquote class="blockquote">
-<p>If influenza weekly epidemiological data are accompanied by timely virological data, virus circulation should be taken into account to make appropriate public health decisions. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>If influenza weekly epidemiological data are accompanied by timely virological data, virus circulation should be taken into account to make appropriate public health decisions. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <p><a href="#fig-mem-monitor" class="quarto-xref">Figure&nbsp;<span>5.6</span></a> starts with the current season, 2026/27, and the thresholds from all four past seasons. The data end in week 43 of 2026. To show how a season reaches the threshold, the weeks after that are illustrative, not data: each one is the average rate of the four past seasons in the same week.</p>
 <div id="fig-mem-monitor" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -412,7 +418,7 @@ Figure&nbsp;5.6: Press <strong>Play</strong> to add the weeks one by one. Solid 
 </figure>
 </div>
 <blockquote class="blockquote">
-<p>For each country, each single season was extracted from the historical records to be used as the target season. MEM calculated the beginning and the end of the epidemic period of the target season. On the basis of the remaining seasons, excluding the target season, MEM calculated the pre- and post-epidemic thresholds. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref">Vega et al. 2013</a>)</span></p>
+<p>For each country, each single season was extracted from the historical records to be used as the target season. MEM calculated the beginning and the end of the epidemic period of the target season. On the basis of the remaining seasons, excluding the target season, MEM calculated the pre- and post-epidemic thresholds. <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span></p>
 </blockquote>
 <p>In a replay, the band under the chart is the epidemic period that step 1 finds for the target season, and the reading scores the alert with the paper’s timeliness, detection lag and false alerts.</p>
 </section>
@@ -444,11 +450,11 @@ European Centre for Disease Prevention and Control. 2026. <em>European Respirato
 <div id="ref-lozano_mem" class="csl-entry" role="listitem">
 Lozano, Jose E. 2025. <em><span class="nocase">mem</span>: The Moving Epidemic Method</em>. <a href="https://github.com/lozalojo/mem">https://github.com/lozalojo/mem</a>.
 </div>
-<div id="ref-vega2013" class="csl-entry" role="listitem">
-Vega, Tomás, Jose Eugenio Lozano, Tamara Meerhoff, et al. 2013. <span>“Influenza Surveillance in <span>Europe</span>: Establishing Epidemic Thresholds by the <span>Moving Epidemic Method</span>.”</span> <em>Influenza and Other Respiratory Viruses</em> 7 (4): 546–58. <a href="https://doi.org/10.1111/j.1750-2659.2012.00422.x">https://doi.org/10.1111/j.1750-2659.2012.00422.x</a>.
-</div>
 <div id="ref-vega2015" class="csl-entry" role="listitem">
 Vega, Tomás, José E. Lozano, Tamara Meerhoff, et al. 2015. <span>“Influenza Surveillance in <span>Europe</span>: Comparing Intensity Levels Calculated Using the Moving Epidemic Method.”</span> <em>Influenza and Other Respiratory Viruses</em> 9 (5): 234–46. <a href="https://doi.org/10.1111/irv.12330">https://doi.org/10.1111/irv.12330</a>.
+</div>
+<div id="ref-vega2013" class="csl-entry" role="listitem">
+<span class="nocase">Vega, Tomás, José Eugenio Lozano, Tamara Meerhoff, et al.</span> 2013. <span>“Influenza Surveillance in <span>Europe</span>: Establishing Epidemic Thresholds by the <span>Moving Epidemic Method</span>.”</span> <em>Influenza and Other Respiratory Viruses</em> 7 (4): 546–58. <a href="https://doi.org/10.1111/j.1750-2659.2012.00422.x">https://doi.org/10.1111/j.1750-2659.2012.00422.x</a>.
 </div>
 </div>
 </section>
@@ -937,8 +943,8 @@ Vega, Tomás, José E. Lozano, Tamara Meerhoff, et al. 2015. <span>“Influenza 
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./serfling.html" class="pagination-link" aria-label="Serfling">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

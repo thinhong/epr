@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Serfling – Epidemic Preparedness and Response</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./mem.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e2b0d26dc907153b9b7d894772c108f8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a69e96623606a37e67cac0cdbc27d10a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&amp;display=swap" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/tokens.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./serfling.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Site">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Epidemic Preparedness and Response</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/thinhong/epr" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./epithreshold.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Epidemic threshold</span></a>
+            <button type="button" class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section: Epidemic threshold">
+              <i class="bi bi-chevron-right ms-2" aria-hidden="true"></i>
+            </button> 
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./cusum.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">CUSUM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./rki.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">RKI</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bayes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bayesian</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./farrington.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Farrington</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mem.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./serfling.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-serfl-overview" id="toc-sec-serfl-overview" class="nav-link active" data-scroll-target="#sec-serfl-overview"><span class="header-section-number">6.1</span> Overview</a></li>
+  <li><a href="#sec-serfl-math" id="toc-sec-serfl-math" class="nav-link" data-scroll-target="#sec-serfl-math"><span class="header-section-number">6.2</span> Mathematical basis</a>
+  <ul class="collapse">
+  <li><a href="#sec-serfl-equation" id="toc-sec-serfl-equation" class="nav-link" data-scroll-target="#sec-serfl-equation"><span class="header-section-number">6.2.1</span> The general equation</a></li>
+  <li><a href="#sec-serfl-fourier" id="toc-sec-serfl-fourier" class="nav-link" data-scroll-target="#sec-serfl-fourier"><span class="header-section-number">6.2.2</span> Fourier series, intuitively</a></li>
+  <li><a href="#sec-serfl-1963" id="toc-sec-serfl-1963" class="nav-link" data-scroll-target="#sec-serfl-1963"><span class="header-section-number">6.2.3</span> Choosing the number of harmonics: the example in the original paper</a></li>
+  </ul></li>
+  <li><a href="#sec-serfl-steps" id="toc-sec-serfl-steps" class="nav-link" data-scroll-target="#sec-serfl-steps"><span class="header-section-number">6.3</span> Computing an epidemic threshold with Serfling</a>
+  <ul class="collapse">
+  <li><a href="#sec-serfl-cleaning" id="toc-sec-serfl-cleaning" class="nav-link" data-scroll-target="#sec-serfl-cleaning"><span class="header-section-number">6.3.1</span> What cleaning does</a></li>
+  <li><a href="#sec-serfl-twoweek" id="toc-sec-serfl-twoweek" class="nav-link" data-scroll-target="#sec-serfl-twoweek"><span class="header-section-number">6.3.2</span> Why two weeks in a row</a></li>
+  <li><a href="#sec-serfl-excess" id="toc-sec-serfl-excess" class="nav-link" data-scroll-target="#sec-serfl-excess"><span class="header-section-number">6.3.3</span> Excess burden</a></li>
+  </ul></li>
+  <li><a href="#sec-serfl-variants" id="toc-sec-serfl-variants" class="nav-link" data-scroll-target="#sec-serfl-variants"><span class="header-section-number">6.4</span> Variants and practical implementation</a>
+  <ul class="collapse">
+  <li><a href="#sec-serfl-cdc" id="toc-sec-serfl-cdc" class="nav-link" data-scroll-target="#sec-serfl-cdc"><span class="header-section-number">6.4.1</span> P&amp;I mortality surveillance at the US CDC</a></li>
+  <li><a href="#sec-serfl-euromomo" id="toc-sec-serfl-euromomo" class="nav-link" data-scroll-target="#sec-serfl-euromomo"><span class="header-section-number">6.4.2</span> Serfling–Poisson and EuroMOMO</a></li>
+  <li><a href="#sec-serfl-r" id="toc-sec-serfl-r" class="nav-link" data-scroll-target="#sec-serfl-r"><span class="header-section-number">6.4.3</span> Implementation in R</a></li>
+  </ul></li>
+  <li><a href="#sec-serfl-compare" id="toc-sec-serfl-compare" class="nav-link" data-scroll-target="#sec-serfl-compare"><span class="header-section-number">6.5</span> Comparison with other methods</a>
+  <ul class="collapse">
+  <li><a href="#sec-serfl-mem" id="toc-sec-serfl-mem" class="nav-link" data-scroll-target="#sec-serfl-mem"><span class="header-section-number">6.5.1</span> The Moving Epidemic Method (MEM)</a></li>
+  <li><a href="#sec-serfl-farrington" id="toc-sec-serfl-farrington" class="nav-link" data-scroll-target="#sec-serfl-farrington"><span class="header-section-number">6.5.2</span> The Farrington algorithm</a></li>
+  <li><a href="#sec-serfl-cusum" id="toc-sec-serfl-cusum" class="nav-link" data-scroll-target="#sec-serfl-cusum"><span class="header-section-number">6.5.3</span> The cumulative sum control chart (CUSUM)</a></li>
+  <li><a href="#sec-serfl-table" id="toc-sec-serfl-table" class="nav-link" data-scroll-target="#sec-serfl-table"><span class="header-section-number">6.5.4</span> Summary table</a></li>
+  </ul></li>
+  <li><a href="#sec-serfl-apply" id="toc-sec-serfl-apply" class="nav-link" data-scroll-target="#sec-serfl-apply"><span class="header-section-number">6.6</span> Points to consider before applying it</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./epithreshold.html">Epidemic threshold</a></li><li class="breadcrumb-item"><a href="./serfling.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Serfling</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="sec-serfl-overview" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-serfl-overview"><span class="header-section-number">6.1</span> Overview</h2>
+<p>Every method so far has answered one question: is this week unusual for this time of year? The Farrington chapter ended on the question that kind of method cannot answer — has the epidemic season started? — because a normal seasonal rise is, by construction, not unusual for its time of year. Serfling’s method answers that second question. It models what the year would look like with no epidemic in it at all, and treats anything well above that line as epidemic activity.</p>
+<p>A tide table works the same way. It predicts the water level from a handful of regular cycles, each with a fixed period, and a storm surge is whatever the table did not predict. Serfling’s baseline is a tide table for a disease: a slow trend plus a few waves of fixed length, fitted to years with the epidemics taken out, so that an epidemic is whatever rises above it.</p>
+<p>Robert E. Serfling published the method in 1963 at the US Communicable Disease Center (CDC), originally to monitor weekly deaths from pneumonia and influenza (P&amp;I) in 108 US cities <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>. He chose P&amp;I deaths as the main quantitative indicator even though excess deaths lag influenza cases by about four weeks, because other sources such as case reports or school and work absences were not quantitative enough or were not available on a wide scale. It is a <strong>parametric periodic regression</strong> model, and sixty years on it remains one of the foundational methods for setting epidemic thresholds <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>.</p>
+<p>For a seasonal disease, one fixed threshold for the whole year does not work. A threshold low enough to catch an epidemic outside the season raises alarms continually during the peak season, while a threshold high enough for the peak season misses epidemics outside it. Serfling solves this by letting the threshold change over time, following the seasonal baseline.</p>
+<p>The method rests on three main ideas:</p>
+<ul>
+<li><strong>Modelling the baseline:</strong> combine a long-term trend with sine and cosine waves (a Fourier series) to reproduce the seasonal variation in the absence of epidemics.</li>
+<li><strong>Cleaning the training data:</strong> remove or downweight past epidemic periods before fitting the model, so that old epidemics do not pull the baseline up.</li>
+<li><strong>Threshold and alarm rule:</strong> set the threshold above the baseline by a margin measured in standard deviations of the error (usually 1.64–1.645 standard deviations), and confirm an epidemic only when the indicator stays above the threshold for at least two consecutive weeks <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Core idea
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Epidemic threshold = the expected level with no epidemic + a safety margin for random variation. The variants of Serfling differ mainly in how they estimate these two components.</p>
+</div>
+</div>
+</section>
+<section id="sec-serfl-math" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="sec-serfl-math"><span class="header-section-number">6.2</span> Mathematical basis</h2>
+<section id="sec-serfl-equation" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="sec-serfl-equation"><span class="header-section-number">6.2.1</span> The general equation</h3>
+<p>The Serfling model with <span class="math inline">\(r\)</span> harmonics has the form <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>:</p>
+<p><span id="eq-serfl-general"><span class="math display">\[
+E\left(Y_t\right) = \beta_0 + \beta_1 t + \sum_{i=1}^{r}\left[\gamma_i\cos\left(\frac{2\pi i t}{L}\right) + \delta_i\sin\left(\frac{2\pi i t}{L}\right)\right]
+\tag{6.1}\]</span></span></p>
+<div id="tbl-serfl-symbols" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-serfl-symbols-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6.1: Symbols in the Serfling equation.
+</figcaption>
+<div aria-describedby="tbl-serfl-symbols-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Y_t\)</span></td>
+<td>Observed value of the surveillance indicator at time <span class="math inline">\(t\)</span> (cases, deaths, a percentage…)</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(t\)</span></td>
+<td>Continuous time index, <span class="math inline">\(t = 1, 2, \ldots, n\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\beta_0\)</span></td>
+<td>Intercept: the mean baseline level at the time origin</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\beta_1\)</span></td>
+<td>Long-term (secular) trend coefficient, reflecting changes in population or in the reporting system</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(L\)</span></td>
+<td>Length of one annual cycle: 52 for weekly data, 13 for data aggregated into four-week periods (as in the original paper), 12 for monthly data</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(r\)</span></td>
+<td>Number of harmonics included in the model</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\gamma_i,\ \delta_i\)</span></td>
+<td>Coefficients of the cosine and sine waves of harmonic <span class="math inline">\(i\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The trend need not be a straight line: a quadratic or cubic polynomial can be used when the data change nonlinearly <span class="citation" data-cites="pelat2007">(<a href="references.html#ref-pelat2007" role="doc-biblioref">Pelat et al. 2007</a>)</span>. In the original paper, Serfling wrote the equation as <span class="math inline">\(\hat{Y} = u + bt + \sum a_i\cos\theta + \sum b_i\sin\theta\)</span>, with <span class="math inline">\(\theta\)</span> a linear function of <span class="math inline">\(t\)</span> <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>; this lesson uses the symbols <span class="math inline">\(\beta\)</span>, <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\delta\)</span> to avoid clashing with notation in later sections.</p>
+</section>
+<section id="sec-serfl-fourier" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="sec-serfl-fourier"><span class="header-section-number">6.2.2</span> Fourier series, intuitively</h3>
+<p>A Fourier series rests on a simple observation: any curve that repeats every year can be assembled from sine and cosine waves of different frequencies, in the same way that a chord is built from single notes.</p>
+<ul>
+<li><strong>Harmonic 1</strong> has period <span class="math inline">\(L\)</span> (52 weeks): it rises and falls once a year.</li>
+<li><strong>Harmonic 2</strong> has period <span class="math inline">\(L/2\)</span> (26 weeks): it rises and falls twice a year.</li>
+<li><strong>Harmonic</strong> <span class="math inline">\(i\)</span> rises and falls <span class="math inline">\(i\)</span> times a year.</li>
+</ul>
+<p>At each harmonic, the cosine–sine pair is equivalent to a single wave with a given amplitude and phase:</p>
+<p><span class="math display">\[
+\gamma_i\cos\left(\frac{2\pi i t}{L}\right) + \delta_i\sin\left(\frac{2\pi i t}{L}\right) = A_i\cos\left(\frac{2\pi i t}{L} - \theta_i\right),\qquad A_i = \sqrt{\gamma_i^2 + \delta_i^2}
+\]</span></p>
+<p>Here <span class="math inline">\(A_i\)</span> is the amplitude (how tall the wave is) and <span class="math inline">\(\theta_i\)</span> the phase (when the peak falls). With the cosine alone, the peak always sits at the start of the cycle; with the sine alone, it always sits a quarter of a cycle later. Mixing the two components in the ratio <span class="math inline">\(\gamma_i : \delta_i\)</span> lets the peak fall in any week (<a href="#fig-serfl-fourier" class="quarto-xref">Figure&nbsp;<span>6.1</span></a>). The important benefit is that <span class="math inline">\(\gamma_i\)</span> and <span class="math inline">\(\delta_i\)</span> enter the model linearly, so they can be estimated by ordinary linear regression instead of estimating the phase by nonlinear regression.</p>
+<p>Two points to remember:</p>
+<ul>
+<li>The analyst chooses only <span class="math inline">\(L\)</span> and <span class="math inline">\(r\)</span>. The coefficients <span class="math inline">\(\gamma_i\)</span> and <span class="math inline">\(\delta_i\)</span> (and so the amplitude and phase) are decided by the data, through the regression.</li>
+<li>The frequency of each harmonic is fixed. The data decide only how tall that wave is and where its peak falls.</li>
+</ul>
+<div id="fig-serfl-fourier" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-serfl-fourier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-serf-fourier"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-serfl-fourier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: Fourier series, illustrated. Mixing the cosine and sine of the same harmonic moves the peak of the wave to any week; adding harmonic 2 (period 26 weeks) to harmonic 1 produces a curve with two peaks in the year, or one asymmetric peak. Change the four coefficients; the readout converts each pair into an amplitude and a peak week.
+</figcaption>
+</figure>
+</div>
+<p><strong>The first-order model</strong> (<span class="math inline">\(r = 1\)</span>) gives exactly one symmetric peak a year:</p>
+<p><span class="math display">\[
+Y_t = \beta_0 + \beta_1 t + \gamma_1\cos\left(\frac{2\pi t}{52}\right) + \delta_1\sin\left(\frac{2\pi t}{52}\right) + \varepsilon_t
+\]</span></p>
+<p><strong>The second-order model</strong> (<span class="math inline">\(r = 2\)</span>) adds a semi-annual wave, allowing two peaks a year or one asymmetric peak that rises fast and falls slowly (<a href="#fig-serfl-fourier" class="quarto-xref">Figure&nbsp;<span>6.1</span></a>):</p>
+<p><span class="math display">\[
+Y_t = \beta_0 + \beta_1 t + \gamma_1\cos\left(\frac{2\pi t}{52}\right) + \delta_1\sin\left(\frac{2\pi t}{52}\right) + \gamma_2\cos\left(\frac{2\pi t}{26}\right) + \delta_2\sin\left(\frac{2\pi t}{26}\right) + \varepsilon_t
+\]</span></p>
+<p>Increasing <span class="math inline">\(r\)</span> lets the curve fit more complex shapes (sharp peaks, several peaks). But if it is increased too far, the model fits random noise and leftover epidemic peaks as well. So <span class="math inline">\(r\)</span> must be chosen by a statistical test, not by eye.</p>
+</section>
+<section id="sec-serfl-1963" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="sec-serfl-1963"><span class="header-section-number">6.2.3</span> Choosing the number of harmonics: the example in the original paper</h3>
+<p>Serfling (1963) fitted the model to P&amp;I deaths in 108 US cities over three seasons without a major epidemic (leaving out the 1957–58 pandemic season), with the data aggregated into thirteen four-week periods a year <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>. To decide whether a second harmonic was needed, he used Bliss’s analysis of variance (a partial F test). The additional variance explained by adding harmonic 2 (mean square 8,136) was smaller than the residual variance of the second-order model (13,157), so <span class="math inline">\(F \approx 0.62 &lt; 1\)</span>. Harmonic 2 carried no information beyond the level of the noise, and the first-order model was kept:</p>
+<p><span id="eq-serfl-1963"><span class="math display">\[
+\hat{Y}_t = 300.5 + 2.1\, t + 97.6\cos\left(\frac{2\pi t}{13} - 2.67\right)
+\tag{6.2}\]</span></span></p>
+<p>Here <span class="math inline">\(t\)</span> is measured in four-week periods, with origin <span class="math inline">\(t = 0\)</span> at the midpoint of the period ending 24 September 1955. The equation is written in amplitude–phase form: the amplitude is 97.6 deaths per week, and the peak falls at <span class="math inline">\(t = 2.67 \times 13/2\pi \approx 5.5\)</span>, around February 1956, in the middle of winter (<a href="#fig-serfl-1963" class="quarto-xref">Figure&nbsp;<span>6.2</span></a>). Today the equivalent test in R is <code>anova(m1, m2)</code>; models can also be compared by AIC <span class="citation" data-cites="pelat2007">(<a href="references.html#ref-pelat2007" role="doc-biblioref">Pelat et al. 2007</a>)</span>.</p>
+<div id="fig-serfl-1963" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-serfl-1963-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-serf-1963"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-serfl-1963-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.2: Reconstructed from Serfling (1963). (a) The baseline from <a href="#eq-serfl-1963" class="quarto-xref">Equation&nbsp;<span>6.2</span></a> and an illustrative epidemic threshold, set 1.64 times the weekly standard deviation (27.9 deaths) reported by Serfling above the baseline; in the original paper the standard deviation was also corrected for the extrapolated trend, so this gap widens over time. (b) The analysis of variance used to choose the number of harmonics. Hover panel (a) to read any period.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-serfl-steps" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-serfl-steps"><span class="header-section-number">6.3</span> Computing an epidemic threshold with Serfling</h2>
+<p>To put the equation into routine surveillance, the method goes through four steps (<a href="#fig-serfl-steps" class="quarto-xref">Figure&nbsp;<span>6.3</span></a>). The goal throughout is to separate baseline variation from the noise left by past epidemics before the threshold is computed.</p>
+<div class="algo-step">
+<p><strong>1. Clean the history.</strong> Remove or downweight past epidemics before fitting, so the baseline describes a year without them. Five ways are in use:</p>
+<ul>
+<li><strong>By calendar.</strong> Drop seasons or weeks known to be epidemic. Serfling used only non-epidemic seasons and, when estimating the spread, replaced isolated high weeks with the trend value; when many years in a row had epidemics he estimated the trend from the low season alone, roughly mid-May to mid-September <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>. EuroMOMO fits only spring and autumn weeks, when mortality is least affected by winter influenza and summer heat <span class="citation" data-cites="euromomo">(<a href="references.html#ref-euromomo" role="doc-biblioref">EuroMOMO, n.d.</a>)</span>.</li>
+<li><strong>By percentile.</strong> Drop a fixed share of the highest training weeks, typically about 15% <span class="citation" data-cites="pelat2007 pelat2017">(<a href="references.html#ref-pelat2007" role="doc-biblioref">Pelat et al. 2007</a>, <a href="references.html#ref-pelat2017" role="doc-biblioref">2017</a>)</span>. On French influenza-like illness data the best configuration cut at the 86th percentile and used the full history <span class="citation" data-cites="souty2018">(<a href="references.html#ref-souty2018" role="doc-biblioref">Souty et al. 2018</a>)</span>.</li>
+<li><strong>Iteratively.</strong> Fit, drop points above a boundary — the fitted line in the first round, the upper 95% prediction limit after that — and refit, stopping when <span class="math inline">\(R^2\)</span> stops improving <span class="citation" data-cites="wang2015">(<a href="references.html#ref-wang2015" role="doc-biblioref">Wang et al. 2015</a>)</span>.</li>
+<li><strong>Robustly.</strong> Keep every week but fit with iteratively reweighted estimation, such as <code>MASS::rlm</code>, so unusual weeks lose weight on their own <span class="citation" data-cites="pelat2017">(<a href="references.html#ref-pelat2017" role="doc-biblioref">Pelat et al. 2017</a>)</span>. The CDC used periodic regression with a robust procedure for its P&amp;I baseline <span class="citation" data-cites="cdc1998">(<a href="references.html#ref-cdc1998" role="doc-biblioref">Centers for Disease Control and Prevention 1998</a>)</span>.</li>
+<li><strong>As censored.</strong> Treat each epidemic week as left-censored — without the epidemic it would have been at most what was observed — and mark the week with the largest positive residual as epidemic, one at a time, up to a set share, about 16% for acute respiratory infection <span class="citation" data-cites="prochazka2016">(<a href="references.html#ref-prochazka2016" role="doc-biblioref">Procházka and Kynčl 2016</a>)</span>.</li>
+</ul>
+</div>
+<div class="algo-step">
+<p><strong>2. Fit and extrapolate.</strong> Estimate the coefficients on the cleaned data, by least squares or a weighted or likelihood variant, and project <span class="math inline">\(\hat Y_t\)</span> forward over the weeks to be monitored. That projection is the <strong>seasonal baseline</strong>: what the community should expect if nothing epidemic is going on. Five years of training is common <span class="citation" data-cites="euromomo pelat2017">(<a href="references.html#ref-euromomo" role="doc-biblioref">EuroMOMO, n.d.</a>; <a href="references.html#ref-pelat2017" role="doc-biblioref">Pelat et al. 2017</a>)</span>, but it is a choice to be tested; on the French data the full history did better than windows of 3, 5 or 10 years <span class="citation" data-cites="souty2018">(<a href="references.html#ref-souty2018" role="doc-biblioref">Souty et al. 2018</a>)</span>.</p>
+</div>
+<div class="algo-step">
+<p><strong>3. Set the threshold.</strong> Even with no epidemic the series scatters around the baseline, so the threshold sits a multiple of the forecast error above it:</p>
+<p><span class="math display">\[ \text{Threshold}_t = \hat Y_t + z_\alpha\,\hat\sigma_t, \]</span></p>
+<p>where <span class="math inline">\(\hat\sigma_t\)</span> is the standard deviation of the forecast error, estimated from the residuals and including the extra uncertainty of extrapolating. Serfling and the CDC use <span class="math inline">\(z = 1.64\)</span> to <span class="math inline">\(1.645\)</span> <span class="citation" data-cites="serfling1963 cdc1998">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>; <a href="references.html#ref-cdc1998" role="doc-biblioref">Centers for Disease Control and Prevention 1998</a>)</span>; Serfling corrected the standard deviation for the extrapolated trend but not for the Fourier terms. That <span class="math inline">\(z\)</span> is the upper end of a one-sided 95% prediction interval — equivalently a two-sided 90% one, which is <code>level = 0.90</code> in R’s <code>predict()</code> <span class="citation" data-cites="mcconeghy_flumodelr">(<a href="references.html#ref-mcconeghy_flumodelr" role="doc-biblioref">McConeghy, n.d.</a>)</span>. Santé publique France uses the two-sided 95% limit, <span class="math inline">\(z \approx 1.96\)</span>, trading sensitivity for specificity <span class="citation" data-cites="pelat2017">(<a href="references.html#ref-pelat2017" role="doc-biblioref">Pelat et al. 2017</a>)</span>. On a log-normal model the threshold is computed on the log scale and transformed back, <span class="math inline">\(\exp(\hat\mu_t + z_\alpha\hat\sigma)\)</span> <span class="citation" data-cites="prochazka2016">(<a href="references.html#ref-prochazka2016" role="doc-biblioref">Procházka and Kynčl 2016</a>)</span>.</p>
+</div>
+<div class="algo-step">
+<p><strong>4. Require two weeks.</strong> A single week above the threshold is not yet an epidemic; one high week is as often a reporting delay or a data error as anything else. The onset is declared only when the series stays above the threshold <strong>two weeks in a row</strong> <span class="citation" data-cites="serfling1963 wang2015">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>; <a href="references.html#ref-wang2015" role="doc-biblioref">Wang et al. 2015</a>)</span>.</p>
+</div>
+<section id="sec-serfl-cleaning" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="sec-serfl-cleaning"><span class="header-section-number">6.3.1</span> What cleaning does</h3>
+<p>Step 1 decides the quality of the whole method. Fit raw history and every past epidemic pulls the baseline up and swells the residual spread, so the threshold lands too high and new epidemics are flagged late <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>. The figure below simulates five training seasons, each with a winter epidemic, and a sixth season to monitor; because the data are simulated, the true baseline is known, and so is the real false alarm rate of any threshold.</p>
+<div id="fig-serfl-steps" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-serfl-steps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-serf-cleaning"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-serfl-steps-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.3: The four steps on simulated weekly data. Amber circles are training weeks dropped by the trim; the grey line is the true baseline, which the method never sees. Change the share trimmed and watch the baseline, the residual spread and the threshold move.
+</figcaption>
+</figure>
+</div>
+<div id="tbl-serfl-trim" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-serfl-trim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6.2: What trimming does to the threshold in <a href="#fig-serfl-steps" class="quarto-xref">Figure&nbsp;<span>6.3</span></a>. The true noise has a standard deviation of 10; the nominal false alarm rate is 5%.
+</figcaption>
+<div aria-describedby="tbl-serfl-trim-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Trim</th>
+<th style="text-align: right;">Residual <span class="math inline">\(s\)</span></th>
+<th style="text-align: right;">Baseline at the peak</th>
+<th style="text-align: right;">Real weekly false alarm rate</th>
+<th style="text-align: right;">Alarm before the peak</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">none</td>
+<td style="text-align: right;">21.9</td>
+<td style="text-align: right;">30.5 above the truth</td>
+<td style="text-align: right;">0.05%</td>
+<td style="text-align: right;">1 week</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">15%</td>
+<td style="text-align: right;">10.5</td>
+<td style="text-align: right;">7.7 above</td>
+<td style="text-align: right;">2.4%</td>
+<td style="text-align: right;">2 weeks</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">25%</td>
+<td style="text-align: right;">9.4</td>
+<td style="text-align: right;">0.4 above</td>
+<td style="text-align: right;">5.8%</td>
+<td style="text-align: right;">4 weeks</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">40%</td>
+<td style="text-align: right;">8.3</td>
+<td style="text-align: right;">8.5 below</td>
+<td style="text-align: right;">18%</td>
+<td style="text-align: right;">5 weeks</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Untrimmed, the threshold barely fires and the epidemic is confirmed one week before it peaks. Trim too hard and the normal seasonal peak goes too, so an ordinary week crosses the threshold almost one time in five. The right share is roughly <strong>the share of weeks that are actually epidemic</strong> — about 20% here; the common 15% was tuned on French influenza-like illness <span class="citation" data-cites="souty2018">(<a href="references.html#ref-souty2018" role="doc-biblioref">Souty et al. 2018</a>)</span>. Trimming also matters for choosing <span class="math inline">\(r\)</span>: untrimmed, the test for a second harmonic gives <span class="math inline">\(F = 27.8\)</span>, because the extra wave is chasing epidemic peaks; at 15% it falls to 1.6.</p>
+</section>
+<section id="sec-serfl-twoweek" class="level3" data-number="6.3.2">
+<h3 data-number="6.3.2" class="anchored" data-anchor-id="sec-serfl-twoweek"><span class="header-section-number">6.3.2</span> Why two weeks in a row</h3>
+<p>With <span class="math inline">\(z = 1.645\)</span>, an ordinary week still crosses the threshold about 5% of the time, on average 2–3 weeks a year <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>. Over a 26-week winter–spring with no epidemic and independent weeks, the chance that at least one crosses is <span class="math inline">\(1 - 0.95^{26} = 0.736\)</span>. Requiring two weeks in a row leaves 25 adjacent pairs, each crossing with probability <span class="math inline">\(0.05^2\)</span>, so the chance falls to at most <span class="math inline">\(25 \times 0.0025 = 0.0625\)</span> — exactly 0.058; Serfling quoted about one in ten.</p>
+<p>The price is time: the chance that a genuine rise is still unflagged at the end of its second week is 0.9 for a moderate epidemic and 0.7 for a large one, and at the end of the third, 0.1 and under 0.01 <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>. The arithmetic also assumes independent weeks. Serfling noted they are slightly correlated; at a correlation of 0.4 the two-week false alarm rate triples to about 18% (<a href="#fig-serfl-twoweek" class="quarto-xref">Figure&nbsp;<span>6.4</span></a>).</p>
+<div id="fig-serfl-twoweek" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-serfl-twoweek-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-serf-twoweek"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-serfl-twoweek-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.4: Serfling’s argument, simulated. Each bar is one week of a 26-week season, in standard deviations from the baseline. Amber weeks cross the line alone; red weeks are confirmed by the week before. Simulate many seasons, then raise <span class="math inline">\(\rho\)</span>.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-serfl-excess" class="level3" data-number="6.3.3">
+<h3 data-number="6.3.3" class="anchored" data-anchor-id="sec-serfl-excess"><span class="header-section-number">6.3.3</span> Excess burden</h3>
+<p>Once the epidemic period has been identified, the model also estimates the excess burden, in one of two ways:</p>
+<ul>
+<li><strong>Against the baseline:</strong> <span class="math inline">\(\text{Excess}_t = Y_t - \hat{Y}_t\)</span>, summed over the epidemic weeks <span class="citation" data-cites="serfling1963">(<a href="references.html#ref-serfling1963" role="doc-biblioref">Serfling 1963</a>)</span>.</li>
+<li><strong>Against the threshold (more conservative):</strong> <span class="math inline">\(\text{Excess}_t = \max\left(Y_t - \text{Threshold}_t,\ 0\right)\)</span>, counting only the part above the threshold <span class="citation" data-cites="mcconeghy_flumodelr">(<a href="references.html#ref-mcconeghy_flumodelr" role="doc-biblioref">McConeghy, n.d.</a>)</span>.</li>
+</ul>
+</section>
+</section>
+<section id="sec-serfl-variants" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="sec-serfl-variants"><span class="header-section-number">6.4</span> Variants and practical implementation</h2>
+<section id="sec-serfl-cdc" class="level3" data-number="6.4.1">
+<h3 data-number="6.4.1" class="anchored" data-anchor-id="sec-serfl-cdc"><span class="header-section-number">6.4.1</span> P&amp;I mortality surveillance at the US CDC</h3>
+<p>The CDC applied Serfling to the <strong>percentage of all deaths due to pneumonia and influenza</strong>. Using a percentage instead of an absolute count reduces bias when the number of reporting units changes from week to week. The baseline was projected by periodic regression combined with a robust procedure, and the epidemic threshold was set at 1.645 standard deviations above the baseline <span class="citation" data-cites="cdc1998">(<a href="references.html#ref-cdc1998" role="doc-biblioref">Centers for Disease Control and Prevention 1998</a>)</span>. From October 2016, the data source moved from the 122 Cities Mortality Reporting System to the mortality surveillance system of the National Center for Health Statistics (NCHS) <span class="citation" data-cites="cdc2016">(<a href="references.html#ref-cdc2016" role="doc-biblioref">Centers for Disease Control and Prevention 2016</a>)</span>.</p>
+</section>
+<section id="sec-serfl-euromomo" class="level3" data-number="6.4.2">
+<h3 data-number="6.4.2" class="anchored" data-anchor-id="sec-serfl-euromomo"><span class="header-section-number">6.4.2</span> Serfling–Poisson and EuroMOMO</h3>
+<p>The OLS model assumes normally distributed residuals with constant variance. That assumption is reasonable when counts are large, but fits poorly with small or sparse counts, or with counts stratified by age group and small area <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>. The solution is to move the Serfling equation into a generalised linear model (GLM) with a Poisson distribution corrected for overdispersion (quasi-Poisson) and a log link:</p>
+<p><span class="math display">\[
+\log\left(\mu_t\right) = \log\left(N_t\right) + \eta_0 + \eta_1 t + \eta_2\sin\left(\frac{2\pi t}{52}\right) + \eta_3\cos\left(\frac{2\pi t}{52}\right)
+\]</span></p>
+<p>Here <span class="math inline">\(\mu_t\)</span> is the expected count and <span class="math inline">\(\log\left(N_t\right)\)</span> an offset for population. The offset is included when population data are available, so that the model estimates a rate rather than a raw count.</p>
+<p>This is the structure of the <strong>EuroMOMO</strong> algorithm (European monitoring of excess mortality): a Poisson GLM corrected for overdispersion, with a linear trend and an annual sine wave, fitted on the spring and autumn weeks of up to five previous years, plus a step that corrects for delay in death registration <span class="citation" data-cites="euromomo">(<a href="references.html#ref-euromomo" role="doc-biblioref">EuroMOMO, n.d.</a>)</span>. Two extensions are worth noting:</p>
+<ul>
+<li><strong>FluMOMO</strong> puts the level of influenza activity and extreme temperatures directly into the model as explanatory variables <span class="citation" data-cites="nielsen2018">(<a href="references.html#ref-nielsen2018" role="doc-biblioref">Nielsen et al. 2018</a>)</span>.</li>
+<li><strong>The modulation model</strong> lets the trend and the seasonal amplitude change smoothly over time through P-splines, instead of being fixed across years <span class="citation" data-cites="leger2025">(<a href="references.html#ref-leger2025" role="doc-biblioref">Leger et al. 2025</a>)</span>.</li>
+</ul>
+</section>
+<section id="sec-serfl-r" class="level3" data-number="6.4.3">
+<h3 data-number="6.4.3" class="anchored" data-anchor-id="sec-serfl-r"><span class="header-section-number">6.4.3</span> Implementation in R</h3>
+<div id="tbl-serfl-r" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-serfl-r-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6.3: Implementing Serfling’s method in R.
+</figcaption>
+<div aria-describedby="tbl-serfl-r-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variant</th>
+<th>Package / function</th>
+<th>Main syntax</th>
+<th>Handling past epidemics and the threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Serfling OLS</td>
+<td><code>stats::lm</code>, <code>predict</code></td>
+<td><code>lm(y ~ t + sin(2*pi*t/52) + cos(2*pi*t/52), data = df_clean)</code></td>
+<td>Trim before fitting. The threshold is the upper limit of <code>predict(..., interval = "prediction", level = 0.90)</code> <span class="citation" data-cites="mcconeghy_flumodelr">(<a href="references.html#ref-mcconeghy_flumodelr" role="doc-biblioref">McConeghy, n.d.</a>)</span></td>
+</tr>
+<tr class="even">
+<td>Automatic Serfling</td>
+<td><code>flumodelr::fluserf</code></td>
+<td><code>fluserf(data = df, outc = perc_fludeaths, time = yrweek_dt)</code></td>
+<td>By default fits only on June–September (treating October–May as the influenza season). Returns the baseline <code>y0</code> and the threshold <code>y0_ul</code> <span class="citation" data-cites="mcconeghy_flumodelr">(<a href="references.html#ref-mcconeghy_flumodelr" role="doc-biblioref">McConeghy, n.d.</a>)</span></td>
+</tr>
+<tr class="odd">
+<td>Robust Serfling</td>
+<td><code>MASS::rlm</code></td>
+<td>Same formula, fitted on a sliding 261-week window (from <span class="math inline">\(w - 261\)</span> to <span class="math inline">\(w - 1\)</span>)</td>
+<td>No trimming beforehand; the algorithm downweights unusually high weeks automatically <span class="citation" data-cites="pelat2017">(<a href="references.html#ref-pelat2017" role="doc-biblioref">Pelat et al. 2017</a>)</span></td>
+</tr>
+<tr class="even">
+<td>Left-censored Serfling</td>
+<td><code>survival::survreg</code></td>
+<td><code>survreg(Surv(y, d, type = "left") ~ t + sin(2*pi*t/52) + cos(2*pi*t/52), dist = "lognormal")</code></td>
+<td><code>d = 1</code>: an ordinary week; <code>d = 0</code>: an epidemic week. Iterated up to a predefined censoring share <span class="citation" data-cites="prochazka2016">(<a href="references.html#ref-prochazka2016" role="doc-biblioref">Procházka and Kynčl 2016</a>)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>A note on using fluserf
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the current source code, <code>y0_ul</code> is computed as <code>y0 + 1.645 × se.fit</code>, the standard error of the fitted line rather than the forecast error. The resulting threshold is therefore narrower than the threshold as the CDC defines it. Check it before using it in operation.</p>
+</div>
+</div>
+<p>A minimal example of the Serfling OLS model with percentile trimming and the two-week rule:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># df: weekly data with a column y (cases); the first 260 weeks are used for training</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>t  <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(df))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> df[df<span class="sc">$</span>t <span class="sc">&lt;=</span> <span class="dv">260</span>, ]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>clean <span class="ot">&lt;-</span> train[train<span class="sc">$</span>y <span class="sc">&lt;=</span> <span class="fu">quantile</span>(train<span class="sc">$</span>y, <span class="fl">0.85</span>), ]   <span class="co"># drop the highest 15% of weeks</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> t <span class="sc">+</span> <span class="fu">cos</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>t<span class="sc">/</span><span class="dv">52</span>) <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>t<span class="sc">/</span><span class="dv">52</span>), <span class="at">data =</span> clean)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">update</span>(m1, . <span class="sc">~</span> . <span class="sc">+</span> <span class="fu">cos</span>(<span class="dv">4</span><span class="sc">*</span>pi<span class="sc">*</span>t<span class="sc">/</span><span class="dv">52</span>) <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">4</span><span class="sc">*</span>pi<span class="sc">*</span>t<span class="sc">/</span><span class="dv">52</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(m1, m2)                                           <span class="co"># is harmonic 2 needed?</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>new  <span class="ot">&lt;-</span> df[df<span class="sc">$</span>t <span class="sc">&gt;</span> <span class="dv">260</span>, ]</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">newdata =</span> new, <span class="at">interval =</span> <span class="st">"prediction"</span>, <span class="at">level =</span> <span class="fl">0.90</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>new<span class="sc">$</span>baseline  <span class="ot">&lt;-</span> pred[, <span class="st">"fit"</span>]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>new<span class="sc">$</span>threshold <span class="ot">&lt;-</span> pred[, <span class="st">"upr"</span>]                          <span class="co"># baseline + 1.645 x forecast error</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>over          <span class="ot">&lt;-</span> new<span class="sc">$</span>y <span class="sc">&gt;</span> new<span class="sc">$</span>threshold</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>new<span class="sc">$</span>alarm     <span class="ot">&lt;-</span> over <span class="sc">&amp;</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="fu">head</span>(over, <span class="sc">-</span><span class="dv">1</span>))        <span class="co"># above the threshold 2 weeks running</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="sec-serfl-compare" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="sec-serfl-compare"><span class="header-section-number">6.5</span> Comparison with other methods</h2>
+<p>In essence, Serfling works like a Shewhart control chart: each week is compared with the threshold independently. This catches sudden surges well but is less sensitive to slow, smouldering rises <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>. This section compares Serfling with three commonly used groups of methods.</p>
+<section id="sec-serfl-mem" class="level3" data-number="6.5.1">
+<h3 data-number="6.5.1" class="anchored" data-anchor-id="sec-serfl-mem"><span class="header-section-number">6.5.1</span> The Moving Epidemic Method (MEM)</h3>
+<p>MEM was developed by Vega and colleagues for influenza surveillance in Europe <span class="citation" data-cites="vega2013">(<a href="references.html#ref-vega2013" role="doc-biblioref"><span class="nocase">Vega et al.</span> 2013</a>)</span>. Instead of one wave function for the whole year, MEM divides each past season into three periods (pre-epidemic, epidemic and post-epidemic) based on the maximum accumulated rate percentage (MAP) curve. The epidemic threshold for a new season is the upper limit of a one-sided confidence interval computed from the highest values in the pre-epidemic periods of previous seasons.</p>
+<p>On influenza-like illness data from the French Sentinelles network, compared against a gold standard set by expert consensus, Souty and colleagues found <span class="citation" data-cites="souty2018">(<a href="references.html#ref-souty2018" role="doc-biblioref">Souty et al. 2018</a>)</span> (<a href="#fig-serfl-compare" class="quarto-xref">Figure&nbsp;<span>6.5</span></a>):</p>
+<ul>
+<li>Serfling (with percentile trimming) and MEM detected the epidemic start week equally well.</li>
+<li>Serfling had higher specificity and positive predictive value, while MEM had higher sensitivity.</li>
+<li>Robust regression detected onsets less well and was the only method to split one epidemic season into two waves.</li>
+</ul>
+<div id="fig-serfl-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-serfl-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="viz-serf-compare"></div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-serfl-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.5: Performance of four methods in detecting influenza epidemics on French data (figures from Souty et al., 2018), each at its best detector. Choose a metric.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-serfl-farrington" class="level3" data-number="6.5.2">
+<h3 data-number="6.5.2" class="anchored" data-anchor-id="sec-serfl-farrington"><span class="header-section-number">6.5.2</span> The Farrington algorithm</h3>
+<p>The Farrington algorithm <span class="citation" data-cites="farrington1996">(<a href="references.html#ref-farrington1996" role="doc-biblioref">Farrington et al. 1996</a>)</span> and Noufaily’s improved version <span class="citation" data-cites="noufaily2013">(<a href="references.html#ref-noufaily2013" role="doc-biblioref">Noufaily et al. 2013</a>)</span> are widely used in routine surveillance in Europe and are available in R’s <code>surveillance</code> package <span class="citation" data-cites="salmon2016">(<a href="references.html#ref-salmon2016" role="doc-biblioref">Salmon et al. 2016</a>)</span>. Unlike Serfling, Farrington handles seasonality <strong>through the design of its reference window</strong>: to compute the threshold for week <span class="math inline">\(t_0\)</span>, the algorithm takes only the data within <span class="math inline">\(\pm w\)</span> weeks of the same point in time in the <span class="math inline">\(b\)</span> previous years (for example <span class="math inline">\(w = 3\)</span>, <span class="math inline">\(b = 5\)</span>), and then fits a log-linear quasi-Poisson model:</p>
+<p><span class="math display">\[
+\log\left(\mu_t\right) = \theta_0 + \theta_1 t,\qquad Var\left(y_t\right) = \phi\,\mu_t
+\]</span></p>
+<p>Past epidemics are downweighted based on their residuals, and the threshold is computed after a 2/3 power transformation to approximate a normal distribution, even for small counts:</p>
+<p><span class="math display">\[
+U_{t_0} = \hat{\mu}_{t_0}\left\{1 + \frac{2}{3}\, z_\alpha\,\frac{\left[\hat{\phi}\,\hat{\mu}_{t_0} + var\left(\hat{\mu}_{t_0}\right)\right]^{1/2}}{\hat{\mu}_{t_0}}\right\}^{3/2}
+\]</span></p>
+<p>Thanks to its quasi-Poisson structure and local window, Farrington is better suited than classical Serfling to diseases with low or sparse counts. Its limitation is that it does not account for serial autocorrelation <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>.</p>
+</section>
+<section id="sec-serfl-cusum" class="level3" data-number="6.5.3">
+<h3 data-number="6.5.3" class="anchored" data-anchor-id="sec-serfl-cusum"><span class="header-section-number">6.5.3</span> The cumulative sum control chart (CUSUM)</h3>
+<p>CUSUM accumulates the positive standardised deviations over consecutive weeks:</p>
+<p><span class="math display">\[
+z_t = \frac{y_t - \mu_t}{\sigma_t},\qquad C_t = \max\left(0,\ C_{t-1} + z_t - k\right)
+\]</span></p>
+<p>and raises an alarm when <span class="math inline">\(C_t &gt; h\)</span>, where <span class="math inline">\(k\)</span> is the reference value and <span class="math inline">\(h\)</span> the decision threshold <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>. Because it accumulates information over many weeks, CUSUM is more sensitive than Serfling to small but sustained shifts. However, standard CUSUM does not handle seasonality on its own. If it is applied directly to seasonal data without standardising them with a baseline model (for example, using Serfling’s residuals), it raises false alarms every time the peak season begins.</p>
+</section>
+<section id="sec-serfl-table" class="level3" data-number="6.5.4">
+<h3 data-number="6.5.4" class="anchored" data-anchor-id="sec-serfl-table"><span class="header-section-number">6.5.4</span> Summary table</h3>
+<div id="tbl-serfl-compare" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-serfl-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6.4: Serfling compared with other methods.
+</figcaption>
+<div aria-describedby="tbl-serfl-compare-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Modelling seasonality</th>
+<th>Handling past epidemics</th>
+<th>Alarm threshold</th>
+<th>Strengths</th>
+<th>Limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Serfling (OLS)</td>
+<td>Fourier series over the whole year</td>
+<td>Calendar exclusion, percentile trimming, robust or Tobit</td>
+<td><span class="math inline">\(\hat{Y}_t + 1.645\,\hat{\sigma}_t\)</span>, crossed for ≥ 2 consecutive weeks</td>
+<td>High specificity; separates trend from seasonality; easy to automate</td>
+<td>Poor with small counts; needs regular seasonality</td>
+</tr>
+<tr class="even">
+<td>Serfling–Poisson (EuroMOMO)</td>
+<td>Fourier series, fitted on spring and autumn weeks</td>
+<td>Uses only weeks outside the epidemic season</td>
+<td>Prediction interval, z-score</td>
+<td>Suited to counts; population offset and delay correction</td>
+<td>Assumes no excess mortality in spring and autumn</td>
+</tr>
+<tr class="odd">
+<td>MEM</td>
+<td>Splits the season into pre-, during and post-epidemic</td>
+<td>Separates the epidemic period itself using the MAP curve</td>
+<td>Upper limit of a one-sided confidence interval of pre-epidemic values</td>
+<td>High sensitivity; distinguishes several intensity levels</td>
+<td>Designed for single-peak epidemic seasons</td>
+</tr>
+<tr class="even">
+<td>Farrington</td>
+<td>±<span class="math inline">\(w\)</span> weeks around the same time in previous years</td>
+<td>Downweights by residual</td>
+<td>Threshold after a 2/3 power transformation</td>
+<td>Suited to small counts; no assumed wave shape</td>
+<td>Does not account for serial autocorrelation</td>
+</tr>
+<tr class="odd">
+<td>CUSUM</td>
+<td>Does not handle it alone; needs a baseline model</td>
+<td>Resets the cumulative sum after an alarm</td>
+<td><span class="math inline">\(C_t &gt; h\)</span></td>
+<td>Sensitive to small, sustained shifts</td>
+<td>False alarms if the baseline model is wrong</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-serfl-apply" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="sec-serfl-apply"><span class="header-section-number">6.6</span> Points to consider before applying it</h2>
+<p>Serfling’s method rests on a premise about the indicator being monitored: the disease has a clear seasonality that repeats steadily from year to year, and there is a low baseline period long enough to anchor the estimate of the baseline <span class="citation" data-cites="unkel2012">(<a href="references.html#ref-unkel2012" role="doc-biblioref">Unkel et al. 2012</a>)</span>. The premise usually holds for diseases with regular seasonality, such as influenza in temperate regions with one winter peak a year, but it is not always true. Before applying Serfling to a specific disease, indicator or area, four points need to be considered.</p>
+<ol type="1">
+<li><strong>There must be a low baseline period to anchor the estimate.</strong> If a disease circulates all year round without any truly “non-epidemic” period, cutting out a fixed band of calendar weeks to obtain the baseline loses its basis, and the remaining data may still contain epidemic activity. For example, when estimating influenza-associated mortality in China, Feng and colleagues used the Serfling model only for northern cities with a clear winter peak; in the subtropical southern cities, influenza circulated all year round without a distinct season <span class="citation" data-cites="feng2012">(<a href="references.html#ref-feng2012" role="doc-biblioref"><span class="nocase">Feng et al.</span> 2012</a>)</span>.</li>
+<li><strong>The seasonal shape may be more complex than one peak a year.</strong> Some diseases have several peaks a year, asymmetric peaks, or seasonal patterns that differ between regions. A first-order model (one peak a year) may then be insufficient, and the number of harmonics needs to be tested on each area’s own data. For example, in northern Vietnam influenza can produce several peaks in a year, falling in different seasons <span class="citation" data-cites="horby2012">(<a href="references.html#ref-horby2012" role="doc-biblioref"><span class="nocase">Horby et al.</span> 2012</a>)</span>, and overall the seasonality of influenza in Vietnam is weak <span class="citation" data-cites="servadio2023">(<a href="references.html#ref-servadio2023" role="doc-biblioref"><span class="nocase">Servadio et al.</span> 2023</a>)</span>.</li>
+<li><strong>The timing of the peak needs to be relatively stable between years.</strong> The Serfling model uses the same seasonal wave, with a fixed phase, for every year. If the timing of the peak varies strongly from one year to the next, an “average” baseline built from previous years represents any particular year poorly, and the timing of last year’s peak says very little about the timing of next year’s. For example, in Vietnam the interval between influenza epidemic peaks varies much more than in temperate regions <span class="citation" data-cites="servadio2023">(<a href="references.html#ref-servadio2023" role="doc-biblioref"><span class="nocase">Servadio et al.</span> 2023</a>)</span>.</li>
+<li><strong>Performance depends on the data context.</strong> Performance figures, such as the high specificity in the French study, were measured on one disease, one indicator and one surveillance system, so they cannot be assumed to carry over to another context. Before putting the method into operation, it needs to be re-evaluated on the historical series of the very disease and area to be monitored.</li>
+</ol>
+</section>
+<section id="summary" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li>Serfling estimates the expected baseline with a long-term trend plus a Fourier series, then sets the threshold about 1.645 standard deviations of the forecast error above the baseline.</li>
+<li>Each Fourier harmonic is a cosine–sine pair, equivalent to one wave with an amplitude and a phase. The analyst chooses the number of harmonics <span class="math inline">\(r\)</span> by testing; the coefficients are decided by the data.</li>
+<li>Cleaning the historical data is the decisive step: if past epidemics are not removed, the threshold is set too high.</li>
+<li>The rule of crossing the threshold for two consecutive weeks reduces false alarms.</li>
+<li>The Poisson variant (such as EuroMOMO) is better suited to counts; Farrington and CUSUM complement Serfling when case numbers are small or an epidemic rises slowly.</li>
+<li>In tropical regions, the assumptions about seasonality need to be checked again before the method is applied.</li>
+</ul>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="js/viz-kit.js"></script>
+<script src="js/serfling-core.js"></script>
+<script src="js/serfling-fourier.js"></script>
+<script src="js/serfling-1963.js"></script>
+<script src="js/serfling-cleaning.js"></script>
+<script src="js/serfling-twoweek.js"></script>
+<script src="js/serfling-compare.js"></script>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-cdc1998" class="csl-entry" role="listitem">
+Centers for Disease Control and Prevention. 1998. <span>“Update: Influenza Activity — <span>United States</span>, 1998–99 Season.”</span> <em>Morbidity and Mortality Weekly Report</em> 47 (45).
+</div>
+<div id="ref-cdc2016" class="csl-entry" role="listitem">
+Centers for Disease Control and Prevention. 2016. <span>“Notice to Readers: Update to Reporting of Pneumonia and Influenza Mortality.”</span> <em>Morbidity and Mortality Weekly Report</em> 65 (39): 1088. <a href="https://doi.org/10.15585/mmwr.mm6539a8">https://doi.org/10.15585/mmwr.mm6539a8</a>.
+</div>
+<div id="ref-euromomo" class="csl-entry" role="listitem">
+EuroMOMO. n.d. <em>Methods</em>. <a href="https://euromomo.eu/how-it-works/methods">https://euromomo.eu/how-it-works/methods</a>.
+</div>
+<div id="ref-farrington1996" class="csl-entry" role="listitem">
+Farrington, C. P., N. J. Andrews, A. D. Beale, and M. A. Catchpole. 1996. <span>“A Statistical Algorithm for the Early Detection of Outbreaks of Infectious Disease.”</span> <em>Journal of the Royal Statistical Society: Series A</em> 159 (3): 547–63.
+</div>
+<div id="ref-feng2012" class="csl-entry" role="listitem">
+<span class="nocase">Feng, Luzhao, David K. Shay, Yong Jiang, et al.</span> 2012. <span>“Influenza-Associated Mortality in Temperate and Subtropical <span>Chinese</span> Cities, 2003–2008.”</span> <em>Bulletin of the World Health Organization</em> 90 (4): 279–288B.
+</div>
+<div id="ref-horby2012" class="csl-entry" role="listitem">
+<span class="nocase">Horby, Peter, Le Quynh Mai, Annette Fox, et al.</span> 2012. <span>“The Epidemiology of Interpandemic and Pandemic Influenza in <span>Vietnam</span>, 2007–2010: The <span>Ha Nam</span> Household Cohort Study <span>I</span>.”</span> <em>American Journal of Epidemiology</em> 175 (10): 1062–74. <a href="https://doi.org/10.1093/aje/kws121">https://doi.org/10.1093/aje/kws121</a>.
+</div>
+<div id="ref-leger2025" class="csl-entry" role="listitem">
+Leger, Anne-Eva, Silvia Rizzi, and Ugofilippo Basellini. 2025. <em>Modelling and Short-Term Forecasting of Seasonal Mortality</em>. <a href="https://arxiv.org/abs/2502.10787">https://arxiv.org/abs/2502.10787</a>.
+</div>
+<div id="ref-mcconeghy_flumodelr" class="csl-entry" role="listitem">
+McConeghy, Kevin. n.d. <em>Flumodelr: <span>Serfling</span> Model Background</em>. <a href="https://kmcconeghy.github.io/flumodelr/articles/04-serfling.html">https://kmcconeghy.github.io/flumodelr/articles/04-serfling.html</a>.
+</div>
+<div id="ref-nielsen2018" class="csl-entry" role="listitem">
+Nielsen, Jens, Tyra Grove Krause, and Kåre Mølbak. 2018. <span>“Influenza-Associated Mortality Determined from All-Cause Mortality, <span>Denmark</span> 2010/11–2016/17: The <span>FluMOMO</span> Model.”</span> <em>Influenza and Other Respiratory Viruses</em> 12 (5): 591–604. <a href="https://doi.org/10.1111/irv.12564">https://doi.org/10.1111/irv.12564</a>.
+</div>
+<div id="ref-noufaily2013" class="csl-entry" role="listitem">
+Noufaily, Angela, Doyo G. Enki, Paddy Farrington, Paul Garthwaite, Nick Andrews, and Andre Charlett. 2013. <span>“An Improved Algorithm for Outbreak Detection in Multiple Surveillance Systems.”</span> <em>Statistics in Medicine</em> 32 (7): 1206–22.
+</div>
+<div id="ref-pelat2007" class="csl-entry" role="listitem">
+Pelat, Camille, Pierre-Yves Boëlle, Benjamin J. Cowling, et al. 2007. <span>“Online Detection and Quantification of Epidemics.”</span> <em>BMC Medical Informatics and Decision Making</em> 7: 29. <a href="https://doi.org/10.1186/1472-6947-7-29">https://doi.org/10.1186/1472-6947-7-29</a>.
+</div>
+<div id="ref-pelat2017" class="csl-entry" role="listitem">
+Pelat, Camille, Isabelle Bonmarin, Marc Ruello, et al. 2017. <span>“Improving Regional Influenza Surveillance Through a Combination of Automated Outbreak Detection Methods: The 2015/16 Season in <span>France</span>.”</span> <em>Eurosurveillance</em> 22 (32): 30593. <a href="https://doi.org/10.2807/1560-7917.ES.2017.22.32.30593">https://doi.org/10.2807/1560-7917.ES.2017.22.32.30593</a>.
+</div>
+<div id="ref-prochazka2016" class="csl-entry" role="listitem">
+Procházka, Bohumir, and Jan Kynčl. 2016. <span>“Estimating the Baseline Incidence of a Seasonal Disease Independently of Epidemic Outbreaks.”</span> <em>Central European Journal of Public Health</em> 24 (3): 199–205.
+</div>
+<div id="ref-salmon2016" class="csl-entry" role="listitem">
+Salmon, Maëlle, Dirk Schumacher, and Michael Höhle. 2016. <span>“Monitoring Count Time Series in <span>R</span>: Aberration Detection in Public Health Surveillance.”</span> <em>Journal of Statistical Software</em> 70 (10): 1–35.
+</div>
+<div id="ref-serfling1963" class="csl-entry" role="listitem">
+Serfling, Robert E. 1963. <span>“Methods for Current Statistical Analysis of Excess Pneumonia-Influenza Deaths.”</span> <em>Public Health Reports</em> 78 (6): 494–506. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1915276/">https://pmc.ncbi.nlm.nih.gov/articles/PMC1915276/</a>.
+</div>
+<div id="ref-servadio2023" class="csl-entry" role="listitem">
+<span class="nocase">Servadio, Joseph L., Pham Quang Thai, Marc Choisy, et al.</span> 2023. <span>“Repeatability and Timing of Tropical Influenza Epidemics.”</span> <em>PLOS Computational Biology</em> 19 (7): e1011317. <a href="https://doi.org/10.1371/journal.pcbi.1011317">https://doi.org/10.1371/journal.pcbi.1011317</a>.
+</div>
+<div id="ref-souty2018" class="csl-entry" role="listitem">
+Souty, Cécile, Rana Jreich, Yann Le Strat, et al. 2018. <span>“Performances of Statistical Methods for the Detection of Seasonal Influenza Epidemics Using a Consensus-Based Gold Standard.”</span> <em>Epidemiology and Infection</em> 146 (2): 168–76. <a href="https://doi.org/10.1017/S095026881700276X">https://doi.org/10.1017/S095026881700276X</a>.
+</div>
+<div id="ref-unkel2012" class="csl-entry" role="listitem">
+Unkel, Steffen, C. Paddy Farrington, Paul H. Garthwaite, Chris Robertson, and Nick Andrews. 2012. <span>“Statistical Methods for the Prospective Detection of Infectious Disease Outbreaks: A Review.”</span> <em>Journal of the Royal Statistical Society: Series A</em> 175 (1): 49–82. <a href="https://doi.org/10.1111/j.1467-985X.2011.00714.x">https://doi.org/10.1111/j.1467-985X.2011.00714.x</a>.
+</div>
+<div id="ref-vega2013" class="csl-entry" role="listitem">
+<span class="nocase">Vega, Tomás, José Eugenio Lozano, Tamara Meerhoff, et al.</span> 2013. <span>“Influenza Surveillance in <span>Europe</span>: Establishing Epidemic Thresholds by the <span>Moving Epidemic Method</span>.”</span> <em>Influenza and Other Respiratory Viruses</em> 7 (4): 546–58. <a href="https://doi.org/10.1111/j.1750-2659.2012.00422.x">https://doi.org/10.1111/j.1750-2659.2012.00422.x</a>.
+</div>
+<div id="ref-wang2015" class="csl-entry" role="listitem">
+Wang, Xiaoli, Shuangsheng Wu, C. Raina MacIntyre, et al. 2015. <span>“Using an Adjusted <span>Serfling</span> Regression Model to Improve the Early Warning at the Arrival of Peak Timing of Influenza in <span>Beijing</span>.”</span> <em>PLOS ONE</em> 10 (3): e0119923. <a href="https://doi.org/10.1371/journal.pone.0119923">https://doi.org/10.1371/journal.pone.0119923</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/thinhong\.github\.io\/epr\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+      <a href="./mem.html" class="pagination-link" aria-label="Moving Epidemic Method">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Moving Epidemic Method</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="References">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

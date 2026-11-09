@@ -2,34 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://thinhong.github.io/epr/index.html</loc>
-    <lastmod>2026-11-04T05:57:08.394Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.045Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/epithreshold.html</loc>
-    <lastmod>2026-11-04T05:57:08.394Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.045Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/cusum.html</loc>
-    <lastmod>2026-11-04T05:57:08.394Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.045Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/rki.html</loc>
-    <lastmod>2026-11-04T05:57:08.398Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.049Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/bayes.html</loc>
-    <lastmod>2026-11-04T05:57:08.391Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.042Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/farrington.html</loc>
-    <lastmod>2026-11-04T05:57:08.394Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.045Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/mem.html</loc>
-    <lastmod>2026-11-04T05:57:08.397Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.048Z</lastmod>
+  </url>
+  <url>
+    <loc>https://thinhong.github.io/epr/serfling.html</loc>
+    <lastmod>2026-11-09T15:09:25.049Z</lastmod>
   </url>
   <url>
     <loc>https://thinhong.github.io/epr/references.html</loc>
-    <lastmod>2026-11-04T05:57:08.397Z</lastmod>
+    <lastmod>2026-11-09T15:09:25.048Z</lastmod>
   </url>
 </urlset>

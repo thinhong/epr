@@ -25,6 +25,7 @@ book:
         - bayes.qmd
         - farrington.qmd
         - mem.qmd
+        - serfling.qmd
     - references.qmd
 
 bibliography: references.bib

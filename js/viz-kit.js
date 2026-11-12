@@ -179,6 +179,53 @@ const VIZ = (function () {
     return handles;
   }
 
+  /* ---- slider ------------------------------------------------
+     slider(el, {sym, label, desc, min, max, step, value, format, onChange})
+     One parameter: − button, range input, + button, value, and a
+     short description underneath. Drag for big moves, click the
+     buttons for one step. Returns {set(v), get(), node}; set()
+     moves the control without calling onChange. Put several in a
+     div.viz-params.viz-params--sliders so they line up in columns. */
+  function slider(el, cfg) {
+    const min = cfg.min, max = cfg.max, step = cfg.step || 1;
+    const dp = (String(step).split('.')[1] || '').length;
+    const fmt = cfg.format || (v => v.toFixed(dp).replace('-', '−'));
+    const snap = v => +Math.min(max, Math.max(min, min + Math.round((v - min) / step) * step)).toFixed(dp);
+
+    const row = el.append('div').attr('class', 'viz-param viz-param--slider');
+    row.append('span').attr('class', 'k').text(cfg.sym || '');
+    const dec = row.append('button').attr('class', 'viz-step').attr('type', 'button')
+      .attr('aria-label', `decrease ${cfg.label || cfg.sym}`).text('−');
+    const input = row.append('input').attr('class', 'viz-range').attr('type', 'range')
+      .attr('min', min).attr('max', max).attr('step', step)
+      .attr('aria-label', cfg.label || cfg.sym);
+    const inc = row.append('button').attr('class', 'viz-step').attr('type', 'button')
+      .attr('aria-label', `increase ${cfg.label || cfg.sym}`).text('+');
+    const val = row.append('span').attr('class', 'v').attr('aria-live', 'polite');
+    if (cfg.desc) row.append('span').attr('class', 'd').text(cfg.desc);
+
+    let value = snap(cfg.value ?? min);
+    function show() {
+      input.property('value', value);
+      val.text(fmt(value));
+      dec.property('disabled', value <= min);
+      inc.property('disabled', value >= max);
+    }
+    function change(v) {
+      const nv = snap(v);
+      if (nv === value) { show(); return; }
+      value = nv;
+      show();
+      if (cfg.onChange) cfg.onChange(value);
+    }
+    input.on('input', function () { change(+this.value); });
+    dec.on('click', () => change(value - step));
+    inc.on('click', () => change(value + step));
+    show();
+
+    return { set(v) { value = snap(v); show(); }, get: () => value, node: row };
+  }
+
   /* ---- hover readout -----------------------------------------
      Attaches a transparent capture rect that reports the nearest
      datum index as the pointer moves. Used for the "hover the
@@ -213,5 +260,5 @@ const VIZ = (function () {
     new ResizeObserver(run).observe(node);
   }
 
-  return { C, dur, card, panel, axisX, axisY, refLine, annotate, formula, controls, hoverIndex, mount };
+  return { C, dur, card, panel, axisX, axisY, refLine, annotate, formula, controls, slider, hoverIndex, mount };
 })();

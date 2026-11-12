@@ -15,6 +15,7 @@
   if (typeof d3   === 'undefined') missing.push('d3');
   if (typeof VIZ  === 'undefined') missing.push('viz-kit.js');
   if (typeof SERF === 'undefined') missing.push('serfling-core.js');
+  if (!missing.length && !VIZ.slider) missing.push('VIZ.slider (update viz-kit.js)');
   if (missing.length) {
     el.innerHTML = '<div class="viz-missing">Figure did not load — not available: <b>' +
       missing.join('</b>, <b>') + '</b>. Check that every script is listed at the ' +
@@ -28,17 +29,16 @@
      rule reproduces the miss probabilities Serfling (1963) reported for
      a moderate epidemic: 0.9 by the end of week 2, 0.1 by week 3. */
   const RAMP = [0.42, 2.93, 4.5, 5.5, 6, 6, 5.5, 5, 4.2, 3.3, 2.4, 1.6, 1, 0.5, 0.2];
-  const RHOS = [0, 0.2, 0.4, 0.6];
 
   const gen = SERF.rng(1963);
-  const state = { mode: 'quiet', ri: 0, last: null, tally: null };
+  const state = { mode: 'quiet', rho: 0, last: null, tally: null };
 
   function emptyTally() {
     return { n: 0, any: 0, pair: 0, missBy2: 0, missBy3: 0, falseBefore: 0 };
   }
 
   function simulate() {
-    const rho = RHOS[state.ri], k = Math.sqrt(1 - rho * rho);
+    const rho = state.rho, k = Math.sqrt(1 - rho * rho);
     const z = new Array(W);
     let prev = gen.normal();
     for (let t = 0; t < W; t++) {
@@ -78,7 +78,7 @@
 
   const handle = VIZ.card(MOUNT, { title: 'A 26-week winter, one week at a time', status: '\u2026' });
   const tabs     = handle.body.append('div').attr('class', 'viz-tabs');
-  const paramBar = handle.body.append('div').attr('class', 'viz-params');
+  const paramBar = handle.body.append('div').attr('class', 'viz-params viz-params--sliders');
   const chart    = handle.body.append('div');
   const readout  = handle.body.append('div').attr('class', 'viz-readout');
 
@@ -100,27 +100,14 @@
       .on('click', () => { if (state.mode !== mode) { state.mode = mode; reset(); } });
   });
 
-  let syncRho;
-  (function () {
-    const row = paramBar.append('div').attr('class', 'viz-param');
-    row.append('span').attr('class', 'k').text('ρ');
-    const dec = row.append('button').attr('class', 'viz-step').attr('type', 'button')
-      .attr('aria-label', 'less correlation').text('−');
-    const val = row.append('span').attr('class', 'v').attr('aria-live', 'polite');
-    const inc = row.append('button').attr('class', 'viz-step').attr('type', 'button')
-      .attr('aria-label', 'more correlation').text('+');
-    row.append('span').attr('class', 'd').text('correlation between neighbouring weeks');
-    dec.on('click', () => { state.ri = Math.max(0, state.ri - 1); reset(); });
-    inc.on('click', () => { state.ri = Math.min(RHOS.length - 1, state.ri + 1); reset(); });
-    syncRho = () => {
-      val.text(RHOS[state.ri].toFixed(1));
-      dec.property('disabled', state.ri <= 0);
-      inc.property('disabled', state.ri >= RHOS.length - 1);
-    };
-  })();
+  VIZ.slider(paramBar, {
+    sym: 'ρ', label: 'correlation between neighbouring weeks',
+    desc: 'correlation between neighbouring weeks (changing it resets the tally)',
+    min: 0, max: 0.8, step: 0.1, value: state.rho,
+    onChange: v => { state.rho = v; reset(); }
+  });
 
   function render() {
-    syncRho();
     tabs.selectAll('button').attr('aria-pressed', function () {
       return (d3.select(this).text() === 'Quiet season') === (state.mode === 'quiet');
     });
@@ -170,7 +157,7 @@
 
     /* ---- readout ---- */
     const T = state.tally, pct = (a, n) => (n ? (100 * a / n).toFixed(1) : '0.0') + '%';
-    const rho = RHOS[state.ri];
+    const rho = state.rho;
     const nSingle = s.ex.filter(Boolean).length, nConf = s.conf.filter(Boolean).length;
 
     handle.setStatus(`${T.n.toLocaleString('en')} season${T.n === 1 ? '' : 's'}`, 'ok');

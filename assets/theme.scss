@@ -829,3 +829,106 @@ a, button, .btn, summary, .sidebar-link, .code-copy-button {
   .mem-fig .mx-line { font-size: 14px; }
   .mem-fig .mx-line.muted { font-size: 13px; }
 }
+
+// ---- Sliders: − [====o====] + value, description underneath ----
+.viz-params--sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr));
+  gap: 0.9rem 2rem;
+}
+.viz-param--slider {
+  display: grid;
+  grid-template-columns: minmax(1.7rem, auto) 1.85rem minmax(5rem, 1fr) 1.85rem 3.3rem;
+  align-items: center;
+  gap: 0.2rem 0.45rem;
+}
+.viz-param--slider .v { text-align: right; min-width: 0; }
+.viz-param--slider .d { grid-column: 2 / -1; font-size: 0.8rem; line-height: 1.3; }
+.viz-range {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--viz-blue);
+  cursor: pointer;
+}
+
+// ---- Stage stepper: 1 · 2 · 3 · 4, for step-by-step figures ----
+.viz-stages { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-bottom: 1rem; }
+.viz-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 0.32rem 0.8rem 0.32rem 0.36rem;
+  border-radius: 999px;
+  border: 1px solid var(--viz-rule);
+  background: #fff;
+  color: var(--viz-ink-muted);
+  cursor: pointer;
+}
+.viz-stage .n {
+  display: inline-grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  background: var(--viz-surface-alt);
+  color: var(--viz-ink-deep);
+  font-size: 0.8rem;
+}
+.viz-stage.is-done { color: var(--viz-ink-deep); }
+.viz-stage.is-done .n { background: var(--viz-teal); color: #fff; }
+.viz-stage[aria-current="step"] { border-color: var(--viz-blue); color: var(--viz-ink-deep); }
+.viz-stage[aria-current="step"] .n { background: var(--viz-blue); color: #fff; }
+.viz-stage-sep { width: 0.9rem; height: 1px; background: var(--viz-rule-strong); }
+
+// ---- Process at a glance: numbered cards with a small chart each ----
+.viz-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+.viz-flow-step {
+  position: relative;
+  display: block;
+  border: 1px solid var(--viz-rule);
+  border-radius: $radius-sm;
+  padding: 0.75rem 0.8rem 0.8rem;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+}
+a.viz-flow-step:hover { border-color: var(--viz-rule-strong); text-decoration: none; }
+.viz-flow-step + .viz-flow-step::before {
+  content: "→";
+  position: absolute;
+  left: -1.02rem;
+  top: 42%;
+  color: var(--viz-ink-muted);
+  font-size: 0.95rem;
+}
+.viz-flow-head { display: flex; align-items: flex-start; gap: 0.45rem; line-height: 1.35; }
+.viz-flow-num {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--viz-blue);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.viz-flow-title { font-size: 0.92rem; font-weight: 700; color: var(--viz-ink-deep); padding-top: 0.08rem; }
+.viz-flow-step svg { margin: 0.55rem 0 0.4rem; }
+.viz-flow-text { font-size: 0.8rem; line-height: 1.4; color: var(--viz-ink-muted); margin: 0; }
+@media (max-width: 860px) {
+  .viz-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .viz-flow-step:nth-child(odd)::before { content: none; }
+}
+@media (max-width: 480px) {
+  .viz-flow { grid-template-columns: 1fr; }
+  .viz-flow-step + .viz-flow-step::before { content: none; }
+}
